@@ -153,7 +153,7 @@ def make_preview(frame, result, fps, show_help):
     for hand in hands:
         draw_hand(preview, hand, top_margin=54 if show_help else 27)
     rate = "--" if fps is None else f"{fps:.1f}"
-    lines = [f"App FPS: {rate} | Hands: {len(hands)} | Q: Quit | H: Help"]
+    lines = [f"App FPS: {rate} | Hands: {len(hands)} | {width} x {height} | Q: Quit | H: Help"]
     if show_help:
         lines.append("Show one or two hands. Left: green | Right: blue | H: Hide help")
     for index, text in enumerate(lines):

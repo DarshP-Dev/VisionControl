@@ -48,7 +48,7 @@ at capture resolution before inference. Landmarks are mapped from normalized
 coordinates onto the resized preview, without mirroring the feed. Colored points
 with dark borders and matching skeleton lines mark each hand. A label near each
 wrist displays its handedness prediction. A compact black status panel shows
-application FPS, the hand count (0, 1 or 2), and exit instructions.
+application FPS, the hand count (0, 1 or 2), captured resolution, and exit instructions.
 
 ### Handedness, colors and detection order
 
