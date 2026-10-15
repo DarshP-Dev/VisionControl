@@ -223,7 +223,7 @@ class SmoothingTest(unittest.TestCase):
             previews.append((result, kwargs["raw_result"]))
             return frame
 
-        args = tracker.parse_args(["--show-raw-landmarks"])
+        args = tracker.parse_args(["--show-raw-landmarks", "--gui-mode", "waitkey"])
         with patch.object(tracker.cv2, "imshow"), \
                 patch.object(tracker.cv2, "waitKey", side_effect=[-1, ord("q")]), \
                 patch.object(tracker.cv2, "getWindowProperty", return_value=1), \

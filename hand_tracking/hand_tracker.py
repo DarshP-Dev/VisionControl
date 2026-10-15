@@ -1,10 +1,11 @@
-"""Phase 2.4: conservative landmark smoothing and recovery for two-hand tracking."""
+"""Phase 2.5: synchronous tracking with guarded GUI polling and workload profiles."""
 
 import argparse
 from collections import Counter
 from contextlib import ExitStack
 import logging
 import math
+import os
 import platform
 from pathlib import Path
 import time
@@ -15,7 +16,10 @@ from camera.camera_diagnostics import (
     BACKENDS, capture_snapshot, configure_capture, read_frame,
 )
 from .download_model import MODEL_PATH
-from .performance import InferenceInput, Profile, inference_resolution, write_report
+from .gui import GuiEvents
+from .performance import (
+    InferenceInput, WorkloadProfile, inference_resolution, process_cpu_usage, write_report,
+)
 from .smoothing import DEFAULT_ALPHA, LandmarkSmoother, valid_alpha
 from .tracking_utils import (
     MAX_HANDS, ONE_HAND_REFERENCE_FPS, PERFORMANCE_DROP_RATIO,
@@ -64,7 +68,7 @@ def parse_args(argv=None):
                         help="full (default), 1280x720, 960x540, 640x360 or WIDTHxHEIGHT bounds; "
                              "preserves aspect ratio, never upscales")
     parser.add_argument("--benchmark", action="store_true",
-                        help="timed preview benchmark with warm-up excluded from measurements")
+                        help="timed benchmark with warm-up excluded from measurements")
     parser.add_argument("--warmup", type=positive_float, default=3.0,
                         help="warm-up seconds for --benchmark (default: 3)")
     parser.add_argument("--duration", type=positive_float, default=30.0,
@@ -76,7 +80,16 @@ def parse_args(argv=None):
                         help="current-measurement weight in (0, 1] (default: 0.75); higher reduces lag")
     parser.add_argument("--show-raw-landmarks", action="store_true",
                         help="draw raw measured points as white crosses for comparison")
-    return parser.parse_args(argv)
+    parser.add_argument("--gui-mode", choices=("auto", "waitkey", "pollkey"), default="auto",
+                        help="auto uses native Win32 pollKey; waitkey preserves the earlier GUI path")
+    parser.add_argument("--headless", action="store_true",
+                        help="benchmark capture/inference/smoothing without rendering or GUI")
+    args = parser.parse_args(argv)
+    if args.headless and not args.benchmark:
+        parser.error("--headless requires --benchmark for a timed run (Ctrl+C can interrupt)")
+    if args.headless and args.show_raw_landmarks:
+        parser.error("--show-raw-landmarks needs a preview and cannot be used with --headless")
+    return args
 
 
 def create_landmarker(model_path):
@@ -102,9 +115,11 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
     measuring = not args.benchmark
     measurement_start = start if measuring else None
     measurement_end = None
-    timings = Profile(enabled=measuring)
+    cpu_start = time.process_time() if measuring else None
+    timings = WorkloadProfile(enabled=measuring)
     inference_input = InferenceInput(args.inference_resolution)
-    renderer = PreviewRenderer()
+    renderer = PreviewRenderer() if not args.headless else None
+    gui = GuiEvents(args.gui_mode) if not args.headless else None
     smoother = LandmarkSmoother(enabled=args.smoothing, alpha=args.smoothing_alpha)
     capture_sizes, inference_sizes, hand_counts = Counter(), Counter(), Counter()
     frames = 0
@@ -112,9 +127,13 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
     warned_slow = False
     status = "stopped"
     show_help = False
+    previous_frame_end = start
+    LOGGER.info("Execution: %s | GUI: %s", "headless tracking" if args.headless else "preview",
+                gui.metadata() if gui else "disabled (no GUI work)")
     if args.benchmark:
-        LOGGER.info("Benchmark: %.1f s warm-up, then %.1f s measured full preview pipeline. "
-                    "Q stops early; warm-up frames are processed and displayed.", args.warmup, args.duration)
+        LOGGER.info("Benchmark: %.1f s warm-up, then %.1f s measured %s. "
+                    "Ctrl+C interrupts; Q/H work when a preview is enabled.", args.warmup, args.duration,
+                    "headless tracking" if args.headless else "preview pipeline")
     try:
         while True:
             before_read = time.perf_counter()
@@ -127,9 +146,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
             before_image = time.perf_counter()
             image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
             before_inference = time.perf_counter()
-            timings.add("mediapipe_image", before_inference - before_image)
             raw_result = landmarker.detect_for_video(image, timestamp_ms)
             after_inference = time.perf_counter()
+            timings.add("mediapipe_image", before_inference - before_image)
             timings.add("inference", after_inference - before_inference)
             before_smoothing = time.perf_counter()
             result = smoother.apply(raw_result, timestamp_ms, frame.shape[:2])
@@ -138,18 +157,26 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 LOGGER.info("Actual capture: %d x %d | actual inference: %d x %d",
                             frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])
                 capture_logged = True
-            preview = make_preview(frame, result, fps.current, show_help,
-                                   renderer=renderer, timings=timings,
-                                   raw_result=raw_result if args.show_raw_landmarks else None)
-            before_display = time.perf_counter()
-            cv2.imshow(WINDOW, preview)
-            before_wait = time.perf_counter()
-            key = cv2.waitKey(1) & 0xFF
-            end = time.perf_counter()
-            timings.add("imshow", before_wait - before_display)
-            timings.add("waitKey", end - before_wait)
+            key = -1
+            if not args.headless:
+                preview = make_preview(frame, result, fps.current, show_help,
+                                       renderer=renderer, timings=timings,
+                                       raw_result=raw_result if args.show_raw_landmarks else None)
+                before_display = time.perf_counter()
+                cv2.imshow(WINDOW, preview)
+                before_events = time.perf_counter()
+                key = gui.read_key()
+                end = time.perf_counter()
+                timings.add("imshow", before_events - before_display)
+                timings.add(gui.api, end - before_events)
+                timings.add("gui_events", end - before_events)
+                timings.add("gui_total", end - before_display)
+            else:
+                end = time.perf_counter()
             timings.add("processing", end - after_read)
             timings.add("end_to_end", end - before_read)
+            timings.add("frame_interval", end - previous_frame_end)
+            previous_frame_end = end
             rate = None
             if measuring:
                 frames += 1
@@ -157,6 +184,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 capture_sizes[f"{frame.shape[1]}x{frame.shape[0]}"] += 1
                 inference_sizes[f"{rgb.shape[1]}x{rgb.shape[0]}"] += 1
                 hand_counts[str(min(MAX_HANDS, len(result.hand_landmarks)))] += 1
+                timings.finish_frame(min(MAX_HANDS, len(raw_result.hand_landmarks)))
                 rate = fps.record(end)
             if rate is not None and not args.benchmark:
                 LOGGER.info("End-to-end application FPS: %.2f | hands: %d",
@@ -172,11 +200,12 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 return 0
             if key in (ord("h"), ord("H")):
                 show_help = not show_help
-            if cv2.getWindowProperty(WINDOW, cv2.WND_PROP_VISIBLE) < 1:
+            if not args.headless and cv2.getWindowProperty(WINDOW, cv2.WND_PROP_VISIBLE) < 1:
                 return 0
             if not measuring and end - start >= args.warmup:
                 measuring = True
                 measurement_start = end
+                cpu_start = time.process_time()
                 fps = ApplicationFPS(end)
                 timings.enabled = True
                 LOGGER.info("Warm-up complete; starting steady-state measurement.")
@@ -184,13 +213,19 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 status = "completed"
                 return 0
     finally:
+        cpu_end = time.process_time()
+        cpu_wall_seconds = (max(0.0, time.perf_counter() - measurement_start)
+                            if measurement_start is not None else 0.0)
         smoother.reset()
         duration = (measurement_end - measurement_start
                     if measurement_start is not None and measurement_end is not None else 0.0)
         average = frames / duration if duration > 0 else None
+        resources = process_cpu_usage(max(0.0, cpu_end - cpu_start) if cpu_start is not None else 0.0,
+                                      cpu_wall_seconds, frames)
         LOGGER.info("Completed frames: %d | duration: %.3f s | average application FPS: %.2f",
                     frames, duration, average or 0.0)
         timings.report()
+        LOGGER.info("Process CPU: %s", resources)
         if not frames:
             LOGGER.info("No completed measured frames; FPS and percentiles are unavailable.")
         if report is not None:
@@ -204,10 +239,16 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 "warmup_seconds_requested": args.warmup if args.benchmark else 0,
                 "measurement_seconds_requested": args.duration if args.benchmark else None,
                 "timings": timings.summary(),
-                "latency_note": "Host read-to-waitKey completion only; camera/driver frame age is unknown.",
+                "timings_by_detected_hands": timings.workload_summary(),
+                "execution_mode": "headless_tracking" if args.headless else "preview",
+                "gui": gui.metadata() if gui else {"requested": args.gui_mode, "effective": "none",
+                                                  "backend": None, "fallback_reason": None},
+                "resources": resources,
+                "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown.",
             })
-        LOGGER.info("Application FPS includes capture, RGB conversion, inference and preview; "
-                    "the webcam's tested ~60 FPS does not guarantee 60 FPS tracking.")
+        LOGGER.info("Application FPS includes capture, preparation, inference, smoothing%s; "
+                    "the webcam's tested ~60 FPS does not guarantee 60 FPS tracking.",
+                    " and preview/GUI" if not args.headless else " (preview/GUI disabled)")
 
 
 def run(args, report=None):
@@ -218,6 +259,9 @@ def run(args, report=None):
                    "inference_bounds": args.inference_resolution or "full",
                    "smoothing": {"enabled": args.smoothing, "alpha": args.smoothing_alpha,
                                  "show_raw_landmarks": args.show_raw_landmarks},
+                   "execution_mode": "headless_tracking" if args.headless else "preview",
+                   "gui_mode_requested": args.gui_mode,
+                   "logical_cpu_count": os.cpu_count(),
                    "python": platform.python_version(), "opencv": cv2.__version__})
     try:
         if not args.model.is_file() or args.model.stat().st_size == 0:
@@ -245,9 +289,12 @@ def run(args, report=None):
                         args.smoothing, args.smoothing_alpha, args.show_raw_landmarks)
             LOGGER.info("Preview/input: unmirrored. Left/Right identify the subject's hands; "
                         "colors follow each frame's handedness predictions, not detection order.")
-            LOGGER.info("Q: Quit | H: Toggle help. No camera throughput claim is made by inference FPS.")
-            cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)
-            resources.callback(cv2.destroyAllWindows)
+            LOGGER.info("%s No camera throughput claim is made by inference FPS.",
+                        "Timed headless run; Ctrl+C interrupts." if args.headless
+                        else "Q: Quit | H: Toggle help.")
+            if not args.headless:
+                cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)
+                resources.callback(cv2.destroyAllWindows)
             return process_frames(cap, landmarker, mp, args=args, report=report)
     except (ImportError, OSError, ValueError, RuntimeError, cv2.error) as exc:
         report.update(status="error", error=str(exc))

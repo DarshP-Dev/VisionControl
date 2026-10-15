@@ -95,7 +95,7 @@ class TrackingLifecycleTest(unittest.TestCase):
                     dir=Path(__file__).resolve().parent) as directory:
                 model = Path(directory) / "model.task"
                 model.write_bytes(b"test model stand-in")
-                args = tracker.parse_args(["--model", str(model)])
+                args = tracker.parse_args(["--model", str(model), "--gui-mode", "waitkey"])
                 cap = MagicMock()
                 cap.isOpened.return_value = scenario != "no_camera"
                 cap.get.return_value = 0.0

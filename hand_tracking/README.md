@@ -1,4 +1,4 @@
-# Phase 2.4: Hand tracking stability
+# Phase 2.5: Targeted hand tracking performance optimization
 
 Detect and draw **up to two hands**, each with 21 landmarks and a skeleton, using the
 MediaPipe Tasks Hand Landmarker API in synchronous **VIDEO** mode on the CPU.
@@ -9,6 +9,10 @@ and host timing reports are available. See [PERFORMANCE.md](PERFORMANCE.md) for
 the measured synthetic baseline, limitations and full comparison procedure.
 Lightweight landmark EMA smoothing is enabled conservatively by default, with
 raw comparison and explicit reset behavior described below.
+Phase 2.5 uses native Win32 GUI polling when supported, retaining an explicit
+`waitKey(1)` baseline and a timed headless comparison. Full inference, MSMF,
+two-hand model options, drawing, confidence thresholds and EMA alpha 0.75 are
+unchanged. Webcam FPS gains and quality acceptance await local testing.
 
 ## Run on Windows
 
@@ -223,8 +227,10 @@ The owner physically tested Phase 2.1: **35.81 average application FPS**, about
 **13.51 ms inference per frame**, and excellent one-hand tracking during movement.
 The owner subsequently measured approximately **31 application FPS** with two
 hands in Phase 2.2, with 42 landmarks, and about **28–29 FPS** after Phase 2.3
-using full inference. Phase 2.4 stability and overhead remain unverified pending
-local hardware testing.
+using full inference. The owner's Phase 2.4 measurements were **42.00 FPS** with
+no hands, **28.42 FPS** with one hand, **28.76 FPS** with two, and **28.87 FPS**
+with two hands and smoothing. Smoothing slightly improved stability without
+noticeable lag. Phase 2.5 hardware performance remains unverified.
 The camera's ~60 FPS capture rate does not guarantee 60 FPS inference.
 Low light, occlusion, framing and motion can affect detection.
 
@@ -239,7 +245,8 @@ iterations over roughly two-second windows. FPS initially shows `--`. Logs give
 the end-to-end rate and a final average. On exit, profiling reports mean, p50,
 p95, p99 and maximum times for camera reads, inference resize, BGR-to-RGB,
 MediaPipe image wrapping, inference, smoothing, preview resize, drawing/labels, text, imshow,
-waitKey, processing and the loop. Means/maxima cover all measured samples;
+GUI events (`pollKey` or `waitKey`), combined GUI time, processing, read-to-completion
+time and completed-frame interval. Means/maxima cover all measured samples;
 percentiles use the most recent 8192 per stage. Interactive runs include startup;
 `--benchmark` excludes warm-up. Setup/cleanup and JSON writing are excluded.
 
@@ -268,10 +275,36 @@ Run one full-resolution benchmark (30 measured seconds after 3 seconds of warm-u
 
 The normal preview and Q/H controls remain active. Reports include actual capture
 and inference dimensions, detected-hand counts, FPS, timing percentiles, requested
-settings and driver readbacks. Report directories are created automatically and
-ignored by Git; existing reports are protected from overwrite. Use a fresh filename
+settings and driver readbacks. Phase 2.5 also adds per-detected-hand-count timing
+groups, effective GUI mode and whole-process CPU observations. Report directories
+are created automatically and ignored by Git; existing reports are protected from overwrite. Use a fresh filename
 for each run. A run stopped with Q is marked `stopped`; Ctrl+C marks `interrupted`.
 Only a benchmark reaching its requested duration is marked `completed`.
+
+### Phase 2.5 comparisons
+
+`--gui-mode auto` (default) uses one `pollKey()` call per processed frame only
+when OpenCV reports the native `WIN32` UI backend and exposes that API.
+`--gui-mode waitkey` retains the earlier `waitKey(1)` path. `--gui-mode pollkey`
+requests native polling explicitly; an unavailable native implementation or a
+runtime polling error falls back to `waitKey(1)` with a warning. Other UI backends
+use `waitKey(1)`. No spin loop, timer-resolution changes or extra sleeps are added.
+Q/H and window close remain active in both preview modes.
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --benchmark --gui-mode waitkey --warmup 3 --duration 30 --report hand_tracking\benchmarks\waitkey-two-01.json
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --benchmark --gui-mode auto --warmup 3 --duration 30 --report hand_tracking\benchmarks\auto-two-01.json
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --benchmark --headless --warmup 3 --duration 30 --report hand_tracking\benchmarks\headless-two-01.json
+```
+
+Run these sequentially under the same conditions, first with zero hands, then one,
+then two; choose a fresh report name each time. Headless tracking includes capture,
+input preparation, the real model, smoothing and profiling; it skips all preview,
+landmark drawing and GUI calls. It requires `--benchmark`, exits after the duration,
+and can be interrupted with Ctrl+C; Q/H and raw comparison overlays require a
+preview. Headless FPS is a diagnostic comparison, never preview/display FPS.
+See [PERFORMANCE.md](PERFORMANCE.md#repeatable-phase-25-hardware-validation) for
+the complete comparison loop, report columns, CPU interpretation and quality checks.
 
 A missing/empty model produces setup instructions before opening the camera.
 Invalid model bundles, dependency errors, failed camera opens and failed reads
@@ -341,17 +374,29 @@ hands, invalid detections, performance warnings, model checksums, inference size
 buffer reuse, percentile calculations, warm-up exclusion, JSON reports, EMA
 arithmetic, independent handedness histories, motion bypass, loss/reappearance,
 ambiguous identity, reset rules and error/cleanup paths with mocked cameras.
+Phase 2.5 adds checks for native polling, guarded fallbacks, Q/H/window close,
+headless execution without GUI calls, per-hand-count profiles, CPU calculations,
+new CLI constraints and warm-up exclusion.
+All **77 automated tests pass**: 61 tracking tests and 16 Phase 1 camera tests.
 Phase 1 tests cover
 the preserved camera tester. A separate smoke check also initialized the actual
 downloaded model and processed two blank 1080p RGB images in VIDEO mode, returning
 0 hands for both. These checks do not establish real-world detection quality.
+Phase 2.5 also loaded the real installed model and completed a timed headless run
+with blank 1920×1080 synthetic frames, no GUI calls and a simulated camera that
+was released on exit. It returned no hands and produced a JSON-serializable
+report; this verifies integration and model loading, not hardware performance.
+A second synthetic run exercised the real Win32 preview/event pump with the real
+model, selected native polling automatically, completed the timed benchmark and
+destroyed its window on exit. Physical keyboard/window responsiveness and live
+tracking quality still require the owner's webcam checks.
 
 Suggested commit after local hardware testing:
 
 ```text
-feat(hand-tracking): improve landmark smoothing and recovery
+perf(hand-tracking): reduce Win32 preview event overhead
 ```
 
-This implementation is limited to Phase 2.4. No automatic commit or push is made.
+This implementation is limited to Phase 2.5. No automatic commit or push is made.
 Use local hardware results to decide
 the next milestone.

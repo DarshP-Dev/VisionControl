@@ -130,7 +130,8 @@ class TwoHandTest(unittest.TestCase):
             fps.return_value.frames = 0
             fps.return_value.record.return_value = 20.0
             fps.return_value.average.return_value = 20.0
-            self.assertEqual(tracker.process_frames(cap, detector, mp), 0)
+            self.assertEqual(tracker.process_frames(
+                cap, detector, mp, tracker.parse_args(["--gui-mode", "waitkey"])), 0)
         output = "\n".join(logs.output)
         self.assertIn("hands: 2", output)
         self.assertIn("Significant application FPS decrease", output)

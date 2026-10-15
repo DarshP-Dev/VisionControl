@@ -81,6 +81,48 @@ class Profile:
                         stage["count"], stage["percentile_samples"])
 
 
+class WorkloadProfile(Profile):
+    """Stratify completed-frame timings by observed 0/1/2-hand model results."""
+
+    def __init__(self, enabled=True, capacity=8192):
+        super().__init__(enabled, capacity)
+        self.by_hands = {}
+
+    def finish_frame(self, hand_count):
+        if not self.enabled:
+            return
+        if hand_count not in self.by_hands:
+            self.by_hands[hand_count] = Profile(capacity=self.capacity)
+        group = self.by_hands[hand_count]
+        for name in ("camera_read", "inference_resize", "bgr_to_rgb", "mediapipe_image",
+                     "inference", "smoothing", "preview_resize", "landmark_drawing",
+                     "text_overlay", "imshow", "gui_events", "gui_total",
+                     "processing", "end_to_end", "frame_interval"):
+            if name in self.stages:
+                group.add(name, self.stages[name]["samples"][-1])
+
+    def workload_summary(self):
+        return {str(count): profile.summary() for count, profile in self.by_hands.items()}
+
+    def report(self):
+        super().report()
+        for count, stages in self.workload_summary().items():
+            def text(name):
+                stage = stages.get(name)
+                return (f"{stage['mean_ms']:.3f}/{stage['p95_ms']:.3f} ms"
+                        if stage else "not measured")
+
+            LOGGER.info("Observed %s hand(s), mean/p95: inference %s | GUI %s | loop %s",
+                        count, text("inference"), text("gui_total"), text("end_to_end"))
+
+
+def process_cpu_usage(cpu_seconds, wall_seconds, frames):
+    """Whole-process CPU time, including native threads; 100% means one core."""
+    return {"process_cpu_seconds": cpu_seconds, "process_wall_seconds": wall_seconds,
+            "process_cpu_percent_of_one_core": 100 * cpu_seconds / wall_seconds if wall_seconds > 0 else None,
+            "process_cpu_ms_per_frame": 1000 * cpu_seconds / frames if frames > 0 else None}
+
+
 class InferenceInput:
     """Resize BGR before conversion; reuse buffers, never crop/pad/stretch/upscale."""
 

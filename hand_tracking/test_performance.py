@@ -137,7 +137,7 @@ class PerformanceTest(unittest.TestCase):
         detector.detect_for_video.side_effect = infer
         mp = SimpleNamespace(Image=lambda **kwargs: kwargs["data"], ImageFormat=SimpleNamespace(SRGB=1))
         args = tracker.parse_args(["--benchmark", "--warmup", ".25", "--duration", ".5",
-                                   "--inference-resolution", "640x360"])
+                                   "--inference-resolution", "640x360", "--gui-mode", "waitkey"])
         report = {}
         with patch.object(tracker.time, "perf_counter", side_effect=lambda: now), \
                 patch.object(tracker.cv2, "imshow"), \
@@ -165,7 +165,8 @@ class PerformanceTest(unittest.TestCase):
         with patch.object(tracker.cv2, "imshow"), \
                 patch.object(tracker.cv2, "waitKey", return_value=ord("q")), \
                 self.assertLogs(tracker.LOGGER):
-            tracker.process_frames(cap, detector, mp, tracker.parse_args(["--benchmark"]), report)
+            tracker.process_frames(cap, detector, mp,
+                                   tracker.parse_args(["--benchmark", "--gui-mode", "waitkey"]), report)
         self.assertEqual(report["status"], "stopped")
         self.assertIsNone(report["average_application_fps"])
         self.assertEqual(report["timings"], {})

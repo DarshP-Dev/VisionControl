@@ -1,1 +1,1 @@
-"""VisionControl Phase 2.4: conservative landmark smoothing and tracking recovery."""
+"""VisionControl Phase 2.5: synchronous hand tracking and targeted GUI optimization."""

@@ -1,4 +1,188 @@
-# Phase 2.3 profiling and benchmark procedure
+# Phase 2.5: targeted GUI optimization and workload profiling
+
+## Findings before changing the pipeline
+
+The starting point is Phase 2.4, commit `9cbbb77`. The owner's physical tests
+reported 42.00 FPS with no hands, 28.42 with one, 28.76 with two, and 28.87 with
+two hands plus smoothing. Prior full-resolution stage means were approximately
+15.96 ms inference, 11.02 ms `waitKey`, 4.17 ms camera read and 0.49 ms drawing.
+These supplied measurements identify inference and GUI scheduling as the main
+candidates; they do not provide per-condition stage profiles or prove a cause.
+Smaller inference images did not materially improve application FPS locally.
+
+The existing pipeline already reuses BGR/RGB/preview buffers, downsizes before
+RGB conversion when requested, and draws on a preview made from the original
+capture. Inspection found no duplicate full-frame color conversion. Constructing
+the public MediaPipe Image and synchronous result objects still costs work;
+private native pointers or speculative zero-copy reuse would add lifetime risks.
+Rendering at the supplied 0.49 ms mean offers little headroom. Those paths,
+confidence thresholds, model, VIDEO/CPU/two-hand options and EMA are preserved.
+Full inference and 1080p60 MSMF capture remain the defaults.
+
+### Why one hand can cost nearly as much as two
+
+The upstream MediaPipe graph checks whether tracked rectangles reach the configured
+hand limit before skipping palm detection. With a limit of two, one tracked hand
+can still require a detector pass looking for another. Two tracked hands can skip
+that pass; losing tracking can trigger it again. No-hand frames also search, but
+have no detected hands for landmark processing, smoothing or skeleton drawing.
+This is a plausible explanation of the nonlinear cost, based on
+[MediaPipe's graph implementation](https://raw.githubusercontent.com/google-ai-edge/mediapipe/master/mediapipe/tasks/cc/vision/hand_landmarker/hand_landmarker_graph.cc).
+It does **not** demonstrate which native paths or costs occurred in the installed
+binary during the owner's runs. Python result conversion also varies with hand
+count. Per-observed-hand-count timings now help investigate correlations; they
+cannot identify internal detector invocation, ground truth or tracking accuracy.
+Reducing the hand limit or confidence thresholds would change behavior and is
+not used as a performance shortcut.
+
+## Changes and measured GUI-only effect
+
+OpenCV documents that a `waitKey` delay is a minimum subject to OS scheduling,
+and that an event pump must be called for a responsive window. The native Win32
+implementation offers `pollKey` to process queued events without the waitKey
+sleep path. Other UI backends can implement polling differently, so the default
+uses it only when `currentUIFramework()` reports `WIN32` and the API is callable.
+See [HighGUI documentation](https://docs.opencv.org/4.x/d7/dfc/group__highgui.html)
+and [Win32 implementation](https://raw.githubusercontent.com/opencv/opencv/5.x/modules/highgui/src/window_w32.cpp).
+
+- `--gui-mode auto`: one native Win32 `pollKey` call per processed frame; no
+  busy-wait loop, global timer changes, added sleep or removal of event processing.
+- `--gui-mode waitkey`: preserve the earlier `waitKey(1)` GUI path for comparison.
+- `--gui-mode pollkey`: request native polling explicitly. Unsupported UI builds
+  fall back with a warning. A polling runtime error switches to waitKey as well.
+- Q/H and window close handling stay in the synchronous loop. Effective backend,
+  mode and fallback reason are logged and saved. Slow capture/inference can still
+  delay event processing; polling cannot fix a blocking camera read.
+- `--benchmark --headless` runs capture, preparation, inference and smoothing,
+  with no rendering or GUI work. This isolates throughput costs and has a timed
+  exit; Ctrl+C interrupts. Q/H and raw comparison overlays require a preview.
+
+Before pipeline edits, a native Win32 GUI-only comparison used a synthetic static
+1100×619 image, a **20 ms sleep between frames in the probe only**, 10 warm-up
+iterations and 100 measured iterations per mode, in the installed Windows /
+Python 3.13.7 / OpenCV 5.0.0 environment:
+
+| Event API | Mean ms | p50 ms | p95 ms | p99 ms | Maximum ms |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| waitKey(1) | 3.955 | 1.849 | 12.153 | 13.153 | 14.201 |
+| native pollKey | 1.745 | 1.790 | 2.566 | 2.816 | 6.268 |
+
+`imshow` mean/p95 was 0.605/0.992 ms with waitKey and 0.667/1.012 ms with pollKey.
+These measurements support reducing avoidable GUI waiting in this environment.
+They are **not live webcam, inference, CPU or application-FPS comparisons** and
+must not be subtracted from the owner's supplied live timings to predict FPS.
+Scheduling and window state affect results. No physical before/after tracking
+benchmark or accuracy acceptance test was performed during implementation.
+
+## Repeatable Phase 2.5 hardware validation
+
+Run from `C:\Users\Darsh\VisionControl` in PowerShell. Normal tracking:
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker
+```
+
+The following compares the old GUI path, optimized path and headless pipeline,
+sequentially with identical capture/inference/EMA settings. At each prompt,
+prepare the requested number of hands for the warm-up and measured interval.
+The condition in the filename describes your intended workload; the report
+records what the model actually detected.
+
+```powershell
+$runStamp = Get-Date -Format 'yyyyMMdd_HHmmss_fff'
+foreach ($condition in @('zero', 'one', 'two')) {
+    foreach ($mode in @('waitkey', 'auto', 'headless')) {
+        Read-Host "Prepare $condition hands for $mode; press Enter to start (3s warm-up)"
+        $extraArgs = if ($mode -eq 'headless') { @('--headless') } else { @('--gui-mode', $mode) }
+        & .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --benchmark --camera-index 0 --backend msmf --width 1920 --height 1080 --fps 60 --inference-resolution full --smoothing --smoothing-alpha 0.75 --warmup 3 --duration 30 @extraArgs --report "hand_tracking\benchmarks\${runStamp}_${condition}_${mode}.json"
+        if ($LASTEXITCODE -ne 0) { throw "Run failed or interrupted: $condition / $mode" }
+    }
+}
+```
+
+Review `status`: compare only `completed` runs; Q/window close save a `stopped`
+partial report and Ctrl+C saves `interrupted` with exit code 130. Each process
+releases its camera/model before the next starts; files are never overwritten.
+Use at least three repeats, reverse GUI mode order on a repeat, keep lighting,
+hand positions/movement, distance, USB connection and power mode consistent, and
+close other camera applications. Headless has no visual feedback; establish the
+framing in a preview first and check its detected-hand histogram afterward.
+
+```powershell
+Get-ChildItem hand_tracking\benchmarks\*.json | ForEach-Object {
+    $r = Get-Content -LiteralPath $_.FullName -Raw | ConvertFrom-Json
+    [pscustomobject]@{
+        Run = $_.BaseName
+        Status = $r.status
+        Mode = $r.execution_mode
+        GUI = $r.gui.effective
+        Capture = ($r.capture_resolution_frames.PSObject.Properties.Name -join ', ')
+        Input = ($r.inference_resolution_frames.PSObject.Properties.Name -join ', ')
+        FPS = $r.average_application_fps
+        InferenceMeanMs = $r.timings.inference.mean_ms
+        InferenceP95Ms = $r.timings.inference.p95_ms
+        GuiMeanMs = $r.timings.gui_total.mean_ms
+        GuiP95Ms = $r.timings.gui_total.p95_ms
+        LoopMeanMs = $r.timings.end_to_end.mean_ms
+        LoopP95Ms = $r.timings.end_to_end.p95_ms
+        SmoothingMeanMs = $r.timings.smoothing.mean_ms
+        CpuOneCorePercent = $r.resources.process_cpu_percent_of_one_core
+        CpuMsPerFrame = $r.resources.process_cpu_ms_per_frame
+    }
+} | Format-Table -AutoSize
+```
+
+Headless GUI columns are absent/null, not zero-cost display measurements. Reports
+also retain mean, p50, p95, p99 and maximum for every measured stage. In
+`timings_by_detected_hands`, each group's stage percentiles use its last 8192
+samples; its means/maxima cover all its measured samples. Warm-up is excluded.
+The groups are observational strata within a run, not separate controlled tests.
+
+Whole-process `time.process_time()` includes native worker threads. CPU percent
+is CPU seconds divided by measured process wall time, times 100: **100% is one
+fully occupied logical core**, so values can exceed 100%. This is not whole-system
+utilization or a memory/GPU measurement. `process_wall_seconds` includes final
+loop bookkeeping; report/cleanup work is excluded. Compare CPU milliseconds per
+frame as well as FPS and CPU percent: higher throughput can raise CPU utilization
+without raising per-frame work. Partial/error runs can include unfinished work
+and should not be used for acceptance comparisons.
+
+For preview acceptance, check Q/H, closing, dragging/resizing the window,
+responsive labels, one/two hands, fast motion, crossing, loss/reappearance and
+raw markers (`--show-raw-landmarks`). Confirm unchanged quality and no noticeable
+extra lag, comparable or improved FPS, and no significant CPU increase without
+benefit. The 40–45 FPS target is unverified; use the waitkey baseline if polling
+does not benefit your actual workload.
+
+## Timing and latency limits
+
+`processing` covers post-read preparation through smoothing and, when enabled,
+rendering/GUI. `end_to_end` covers host read-start through completion of those
+stages. `frame_interval` covers successive completed frames and also includes
+between-frame accounting and window checks. `gui_events` times the actual event
+pump; `gui_total` includes imshow plus the pump. API-specific `waitKey`/`pollKey`
+keys remain for compatibility. The same report can contain both after fallback.
+These overlapping timings must not be summed. `average_application_fps` is
+completed frames divided by elapsed measurement wall time; headless throughput
+is not display FPS, and neither is necessarily sensor FPS.
+
+The camera/driver can buffer frames, and a fast read can return an old frame.
+Neither host timing nor VIDEO timestamps establish capture age. Removing a GUI
+wait may instead increase time waiting in the next camera read. Compare complete
+runs, not just one reduced stage. A visible stopwatch can help check gross lag;
+true camera-to-display timing needs external measurement. No threads, async
+inference, frame dropping or buffer flushing are introduced. If measured queue
+age remains a problem, a future latest-frame capture worker could improve
+freshness but would discard intermediate frames and require new synchronization,
+timing and recovery tests. That change is deferred pending hardware evidence.
+
+---
+
+# Historical Phase 2.3 profiling and benchmark procedure
+
+The sections below record the earlier milestone's synthetic experiments. For
+current Phase 2.5 validation, use the procedure above; historical commands now
+use the Phase 2.5 default GUI path unless `--gui-mode waitkey` is added.
 
 Phase 2.4 adds optional display smoothing, enabled by default at alpha 0.75.
 Its overhead is reported separately as `smoothing` and included in `processing`
