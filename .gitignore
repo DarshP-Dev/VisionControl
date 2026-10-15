@@ -221,3 +221,6 @@ __marimo__/
 
 # Local camera test screenshots
 /camera/captures/
+
+# Downloaded MediaPipe model bundles
+/hand_tracking/models/
