@@ -122,29 +122,19 @@ def preview_frame(frame, args, driver_fps, measured, show_help, timings=None):
     overlay_start = time.perf_counter()
     if timings is not None:
         timings.add("resize", overlay_start - resize_start)
-    rate = "warming up..." if measured is None else f"{measured:.2f} FPS"
-    lines = [
-        f"Preview loop: {rate} | requested: {args.fps:g} FPS",
-        f"Captured: {width} x {height} | camera index: {args.camera_index}",
-        f"Driver FPS: {fps_text(driver_fps)}",
-        "S: save PNG | Q: quit | H: toggle help",
-    ]
-    if measured is not None and measured < args.fps * DROP_RATIO:
-        lines.append("LOW FPS: measured rate is below 80% of requested FPS")
     if show_help:
-        lines.extend([
-            "Focus: move a hand near/far; observe refocusing.",
-            "Motion: move hands quickly; inspect blur/stutter.",
-            "View: inspect framing (optical FOV is not measured).",
-            "Lighting: repeat in bright, normal, and dim light.",
-        ])
-    # Opaque panel grows with the help/warning text and spans the preview width.
-    panel_height = min(preview.shape[0], len(lines) * 25 + 10)
-    preview[:panel_height, :] = 0
-    for index, line in enumerate(lines):
-        origin = (10, 24 + index * 25)
-        cv2.putText(preview, line, origin, cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, (255, 255, 255), 1, cv2.LINE_AA)
+        rate = "--" if measured is None else f"{measured:.1f}"
+        text = f"FPS: {rate} | {width} x {height}"
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        padding = 8
+        font_scale = 0.55
+        (text_width, _), _ = cv2.getTextSize(text, font, font_scale, 1)
+        font_scale *= min(1.0, max(1, preview.shape[1] - 2 * padding) / text_width)
+        (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, 1)
+        # Cover only the text and its padding, leaving the rest of the feed visible.
+        preview[:text_height + baseline + 2 * padding, :text_width + 2 * padding] = 0
+        cv2.putText(preview, text, (padding, padding + text_height), font,
+                    font_scale, (255, 255, 255), 1, cv2.LINE_AA)
     if timings is not None:
         timings.add("overlay", time.perf_counter() - overlay_start)
     return preview
@@ -193,7 +183,7 @@ def run(args):
         snapshot = capture_snapshot(cap, args, "After configuration")
         driver_fps = snapshot["fps"]
         LOGGER.info("Application FPS includes read/preview/save overhead; it does not prove sensor FPS.")
-        LOGGER.info("S: save full-resolution PNG | Q: quit | H: toggle help")
+        LOGGER.info("S: save full-resolution PNG | Q: quit | H: toggle FPS/resolution overlay")
         cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)
         stats = CaptureStats(time.perf_counter())
         measured = None

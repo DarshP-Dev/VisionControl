@@ -92,8 +92,12 @@ class DiagnosticTest(unittest.TestCase):
         preview = camera.preview_frame(frame, self.args(), 60, 5, True, timings)
         self.assertEqual(set(timings.stages), {"resize", "overlay"})
         self.assertTrue(np.all(frame == 120))
-        self.assertTrue(np.all(preview[0, :] == 0))
-        self.assertTrue(np.any(preview[:200] == 255))
+        self.assertTrue(np.all(preview[0, 0] == 0))
+        self.assertTrue(np.all(preview[0, 400:] == 120))
+        self.assertTrue(np.all(preview[40:] == 120))
+        self.assertTrue(np.any(preview[:40] == 255))
+        hidden = camera.preview_frame(frame, self.args(), 60, 5, False)
+        np.testing.assert_array_equal(hidden, frame)
 
     def test_mode_status_marks_fallbacks(self):
         args = self.args()

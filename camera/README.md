@@ -36,11 +36,13 @@ Focus the preview window for keyboard input:
 | --- | --- |
 | S | Save the current full-resolution frame as a PNG |
 | Q | Quit and print results |
-| H | Toggle the manual-testing help text |
+| H | Toggle the FPS/resolution overlay |
 
 Closing the preview or pressing Ctrl+C also ends the test. The preview fits
 within 1100 × 650 pixels; resizing it does not change the capture or saved image.
-Basic status and keyboard instructions remain visible when help is hidden.
+Only measured FPS and captured resolution appear in a compact black box with
+white text at the top left. FPS displays `--` until the first measurement window
+completes. Keyboard instructions and detailed diagnostics remain in the console.
 Screenshots have timestamps including microseconds and are saved without the
 overlay in `camera/captures/`, created automatically and ignored by Git. The path
 is relative to the script, regardless of the shell's working directory.
