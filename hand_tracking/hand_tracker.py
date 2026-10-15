@@ -1,4 +1,4 @@
-"""Phase 2.3: configurable inference size and profiled two-hand tracking."""
+"""Phase 2.4: conservative landmark smoothing and recovery for two-hand tracking."""
 
 import argparse
 from collections import Counter
@@ -16,6 +16,7 @@ from camera.camera_diagnostics import (
 )
 from .download_model import MODEL_PATH
 from .performance import InferenceInput, Profile, inference_resolution, write_report
+from .smoothing import DEFAULT_ALPHA, LandmarkSmoother, valid_alpha
 from .tracking_utils import (
     MAX_HANDS, ONE_HAND_REFERENCE_FPS, PERFORMANCE_DROP_RATIO,
     ApplicationFPS, FrameTimestamp, PreviewRenderer, make_preview, significant_fps_drop,
@@ -69,6 +70,12 @@ def parse_args(argv=None):
     parser.add_argument("--duration", type=positive_float, default=30.0,
                         help="measurement seconds for --benchmark (default: 30)")
     parser.add_argument("--report", type=Path, help="write JSON profile; refuses existing files")
+    parser.add_argument("--smoothing", action=argparse.BooleanOptionalAction, default=True,
+                        help="enable conservative landmark EMA (default); --no-smoothing uses raw results")
+    parser.add_argument("--smoothing-alpha", type=valid_alpha, default=DEFAULT_ALPHA,
+                        help="current-measurement weight in (0, 1] (default: 0.75); higher reduces lag")
+    parser.add_argument("--show-raw-landmarks", action="store_true",
+                        help="draw raw measured points as white crosses for comparison")
     return parser.parse_args(argv)
 
 
@@ -98,6 +105,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
     timings = Profile(enabled=measuring)
     inference_input = InferenceInput(args.inference_resolution)
     renderer = PreviewRenderer()
+    smoother = LandmarkSmoother(enabled=args.smoothing, alpha=args.smoothing_alpha)
     capture_sizes, inference_sizes, hand_counts = Counter(), Counter(), Counter()
     frames = 0
     capture_logged = False
@@ -120,15 +128,19 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
             image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
             before_inference = time.perf_counter()
             timings.add("mediapipe_image", before_inference - before_image)
-            result = landmarker.detect_for_video(image, timestamp_ms)
+            raw_result = landmarker.detect_for_video(image, timestamp_ms)
             after_inference = time.perf_counter()
             timings.add("inference", after_inference - before_inference)
+            before_smoothing = time.perf_counter()
+            result = smoother.apply(raw_result, timestamp_ms, frame.shape[:2])
+            timings.add("smoothing", time.perf_counter() - before_smoothing)
             if not capture_logged:
                 LOGGER.info("Actual capture: %d x %d | actual inference: %d x %d",
                             frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])
                 capture_logged = True
             preview = make_preview(frame, result, fps.current, show_help,
-                                   renderer=renderer, timings=timings)
+                                   renderer=renderer, timings=timings,
+                                   raw_result=raw_result if args.show_raw_landmarks else None)
             before_display = time.perf_counter()
             cv2.imshow(WINDOW, preview)
             before_wait = time.perf_counter()
@@ -172,6 +184,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 status = "completed"
                 return 0
     finally:
+        smoother.reset()
         duration = (measurement_end - measurement_start
                     if measurement_start is not None and measurement_end is not None else 0.0)
         average = frames / duration if duration > 0 else None
@@ -203,6 +216,8 @@ def run(args, report=None):
                                          "backend": args.backend, "fourcc": args.fourcc,
                                          "camera_index": args.camera_index},
                    "inference_bounds": args.inference_resolution or "full",
+                   "smoothing": {"enabled": args.smoothing, "alpha": args.smoothing_alpha,
+                                 "show_raw_landmarks": args.show_raw_landmarks},
                    "python": platform.python_version(), "opencv": cv2.__version__})
     try:
         if not args.model.is_file() or args.model.stat().st_size == 0:
@@ -226,6 +241,8 @@ def run(args, report=None):
             configure_capture(cap, args)
             report["driver_readback"] = capture_snapshot(cap, args, "After configuration")
             LOGGER.info("MediaPipe Hand Landmarker: VIDEO mode | CPU | maximum %d hands", MAX_HANDS)
+            LOGGER.info("Landmark smoothing: %s | alpha: %.2f | raw comparison markers: %s",
+                        args.smoothing, args.smoothing_alpha, args.show_raw_landmarks)
             LOGGER.info("Preview/input: unmirrored. Left/Right identify the subject's hands; "
                         "colors follow each frame's handedness predictions, not detection order.")
             LOGGER.info("Q: Quit | H: Toggle help. No camera throughput claim is made by inference FPS.")

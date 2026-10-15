@@ -1,1 +1,1 @@
-"""VisionControl Phase 2.3: profiled two-hand tracking with configurable inference."""
+"""VisionControl Phase 2.4: conservative landmark smoothing and tracking recovery."""

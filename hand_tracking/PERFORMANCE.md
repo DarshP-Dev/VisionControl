@@ -1,5 +1,12 @@
 # Phase 2.3 profiling and benchmark procedure
 
+Phase 2.4 adds optional display smoothing, enabled by default at alpha 0.75.
+Its overhead is reported separately as `smoothing` and included in `processing`
+and `end_to_end`. Add `--no-smoothing` to the commands below when reproducing the
+Phase 2.3 raw pipeline, or use the raw/EMA comparison commands in README.md.
+Disable optional raw-point markers for performance comparisons. The following
+synthetic measurements describe Phase 2.3, before smoothing was added.
+
 No physical webcam benchmarks were run during this implementation. Improvements
 in application FPS, detection quality and sensor-to-display latency must be
 verified locally. All old camera settings, two-hand behavior and controls remain.

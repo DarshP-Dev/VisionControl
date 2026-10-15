@@ -1,4 +1,4 @@
-# Phase 2.3: Hand tracking performance
+# Phase 2.4: Hand tracking stability
 
 Detect and draw **up to two hands**, each with 21 landmarks and a skeleton, using the
 MediaPipe Tasks Hand Landmarker API in synchronous **VIDEO** mode on the CPU.
@@ -7,6 +7,8 @@ The existing Phase 1 camera applications are unchanged.
 Inference size is configurable independently of capture; detailed benchmarking
 and host timing reports are available. See [PERFORMANCE.md](PERFORMANCE.md) for
 the measured synthetic baseline, limitations and full comparison procedure.
+Lightweight landmark EMA smoothing is enabled conservatively by default, with
+raw comparison and explicit reset behavior described below.
 
 ## Run on Windows
 
@@ -49,6 +51,113 @@ Override capture settings or the model location:
 Use module invocation (`-m hand_tracking.hand_tracker`) from the repository root
 so the tracker can import its package and the existing camera utilities.
 
+## Smoothing and recovery
+
+The new display-only EMA blends normalized x/y/z landmarks after inference:
+
+```text
+filtered = alpha * current_raw + (1 - alpha) * previous_filtered
+```
+
+| Option | Meaning |
+| --- | --- |
+| `--smoothing` | Enable smoothing (default) |
+| `--no-smoothing` | Display original MediaPipe coordinates; retain no EMA state |
+| `--smoothing-alpha 0.75` | Current-measurement weight; finite and greater than 0, at most 1 |
+| `--show-raw-landmarks` | Overlay raw normalized points as white crosses; skeleton remains the selected raw/smoothed display |
+
+**Higher alpha is more responsive and applies less smoothing.** Lower alpha
+suppresses more jitter but can make slow motion trail. Alpha 1 is equivalent to
+raw display. The default 0.75 keeps 75% of the new measurement. No frames are
+queued or delayed for smoothing, but the visual lag of an EMA is not zero and
+must be assessed locally. There is no extra dead zone, gesture logic or prediction.
+
+The original MediaPipe result object and landmark objects are never mutated.
+The loop retains `raw_result` and builds a separate display result only when
+coordinates are actually filtered. Handedness/confidences and world landmarks
+remain raw. The renderer still maps normalized coordinates to the preview,
+independently of inference resolution. Do not treat display EMA output as a
+verified measurement or assume it improves model accuracy.
+
+The filter retains separate Left and Right histories only when those labels are
+unique and have confidence at least 0.8. It uses the label paired with each
+detection in the current result, never list order. The following safety rules
+favor current measurements over an uncertain association:
+
+- A missing hand's history is removed immediately. No detected hands means no
+  history and no overlay. The first measurement on reappearance is shown raw.
+- Unknown, duplicate, missing or low-confidence handedness, or malformed
+  coordinates, clear all histories and use current raw results. Detection
+  confidence settings are unchanged; the 0.8 threshold gates smoothing only.
+- Overlapping normalized landmark bounding boxes, or wrists closer than 0.10
+  normalized x/y units, clear history and bypass EMA for that frame. When the
+  hands separate, each starts again from its current raw measurement.
+- For a confidently labeled hand, movement of **any landmark** by more than
+  0.06 normalized x/y Euclidean units between consecutive raw frames bypasses
+  EMA and reseeds that hand from raw coordinates. This includes large jumps
+  caused by label changes; it is not physical velocity measurement.
+- Exactly unchanged raw coordinates snap to raw and avoid residual settling
+  lag. Stationary detector jitter still uses EMA; there is no claim to reliably
+  classify a hand as stationary.
+- A frame timestamp gap over 250 ms, non-increasing timestamps, a capture-shape
+  change or application exit resets history. No interpolation fills a gap.
+
+These are conservative **history-discard gates**, not persistent identity
+matching. High-confidence handedness can still be wrong or flip between nearby
+hands, and occluded hands may temporarily vanish. No reliable physical identity
+through arbitrary crossings is claimed. In ambiguous/overlapping frames the
+preview intentionally reverts to raw measurements, which can visibly be noisier.
+
+Compare raw and smoothed tracking from the repository root, one run at a time:
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --no-smoothing
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --smoothing --smoothing-alpha 0.75
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --smoothing --smoothing-alpha 0.75 --show-raw-landmarks
+```
+
+The third command compares raw white crosses with colored smoothed landmarks
+in the same frame. H shows the marker legend. Q and all capture/inference options
+are preserved. Markers are off by default because they add drawing work.
+
+For a timed comparison with full inference and identical capture settings:
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --benchmark --no-smoothing --inference-resolution full --warmup 3 --duration 30 --report hand_tracking\benchmarks\phase24-raw-01.json
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --benchmark --smoothing --smoothing-alpha 0.75 --inference-resolution full --warmup 3 --duration 30 --report hand_tracking\benchmarks\phase24-ema-01.json
+```
+
+Use fresh filenames for repeats. Keep the same lighting, visible hands, motions,
+distance and camera settings. Compare application FPS, processing p95 and the
+separate `smoothing` timing stage. Reports store enabled state, alpha and whether
+raw markers were drawn. The markers' drawing cost is part of `landmark_drawing`,
+not `smoothing`. Disable markers for a fair performance comparison. Warm-up
+exclusion, percentile reporting and bounded timing storage remain unchanged.
+
+A synthetic smoothing-only check with two separated hands, 100 warm-up and 3000
+measured jittered frames, measured **0.090 ms mean, 0.105 ms p95, 0.324 ms p99**
+and 0.789 ms maximum on the implementation environment. This excludes camera,
+inference, drawing and GUI and is **not** a hardware FPS or responsiveness result.
+The owner's current full-resolution baseline is about **28–29 application FPS**.
+Phase 2.4 overhead, jitter reduction and perceived lag need local webcam testing.
+
+Manual stability checks:
+
+1. Compare a stationary open hand in raw and smoothed modes; observe fingertip
+   jitter. Then try the raw-marker overlay for a direct comparison.
+2. Make small, slow finger movements: confirm real motion remains visible and
+   decide whether the default alpha trails unacceptably. Raise alpha or disable
+   smoothing if necessary.
+3. Move or flick hands rapidly; check that large motion uses current positions
+   rather than dragging an old skeleton behind it.
+4. Remove one hand, then both. Overlays should vanish immediately. Reintroduce
+   each hand at a new location; its first points must not interpolate from the
+   old location.
+5. Cross/overlap hands, separate them, and switch their screen positions. Expect
+   raw behavior while identity is ambiguous, then fresh filtering after separation.
+6. Check one and two hands, Q/H, reentry, and FPS/profile reports under the same
+   conditions. No physical stability or latency claim is made before this test.
+
 ## Controls and local testing
 
 | Key | Action |
@@ -88,7 +197,8 @@ Each frame pairs landmark entry `i` with handedness entry `i` from that same
 result. Detection order can change between frames; it is never treated as a
 persistent ID. Colors follow handedness, not screen position. In ambiguous cases,
 labels and colors may change, including during crossing or occlusion; there is
-no identity tracker or smoothing layer. The purple fallback is not a persistent ID.
+no persistent identity tracker. Ambiguous detections bypass smoothing as described
+above. The purple fallback is not a persistent ID.
 Frames are drawn from scratch, so missing detections never reuse old skeletons.
 Malformed landmark sets are skipped without discarding another valid hand.
 
@@ -112,8 +222,9 @@ For local hardware validation:
 The owner physically tested Phase 2.1: **35.81 average application FPS**, about
 **13.51 ms inference per frame**, and excellent one-hand tracking during movement.
 The owner subsequently measured approximately **31 application FPS** with two
-hands in Phase 2.2, with 42 landmarks. Phase 2.3 improvement and tracking quality
-at lower inference sizes remain unverified pending local hardware testing.
+hands in Phase 2.2, with 42 landmarks, and about **28–29 FPS** after Phase 2.3
+using full inference. Phase 2.4 stability and overhead remain unverified pending
+local hardware testing.
 The camera's ~60 FPS capture rate does not guarantee 60 FPS inference.
 Low light, occlusion, framing and motion can affect detection.
 
@@ -127,7 +238,7 @@ The application counts completed capture/conversion/inference/preview/event-pump
 iterations over roughly two-second windows. FPS initially shows `--`. Logs give
 the end-to-end rate and a final average. On exit, profiling reports mean, p50,
 p95, p99 and maximum times for camera reads, inference resize, BGR-to-RGB,
-MediaPipe image wrapping, inference, preview resize, drawing/labels, text, imshow,
+MediaPipe image wrapping, inference, smoothing, preview resize, drawing/labels, text, imshow,
 waitKey, processing and the loop. Means/maxima cover all measured samples;
 percentiles use the most recent 8192 per stage. Interactive runs include startup;
 `--benchmark` excludes warm-up. Setup/cleanup and JSON writing are excluded.
@@ -227,8 +338,10 @@ The hand-tracking tests cover arguments, timestamps, FPS, RGB conversion,
 landmark scaling/topology, 0/1/2-hand rendering, help, VIDEO/CPU/two-hand options,
 handedness pairing, order changes, duplicate/missing predictions, disappearing
 hands, invalid detections, performance warnings, model checksums, inference sizes,
-buffer reuse, percentile calculations, warm-up exclusion, JSON reports and error/cleanup
-paths with mocked cameras. Phase 1 tests cover
+buffer reuse, percentile calculations, warm-up exclusion, JSON reports, EMA
+arithmetic, independent handedness histories, motion bypass, loss/reappearance,
+ambiguous identity, reset rules and error/cleanup paths with mocked cameras.
+Phase 1 tests cover
 the preserved camera tester. A separate smoke check also initialized the actual
 downloaded model and processed two blank 1080p RGB images in VIDEO mode, returning
 0 hands for both. These checks do not establish real-world detection quality.
@@ -236,9 +349,9 @@ downloaded model and processed two blank 1080p RGB images in VIDEO mode, returni
 Suggested commit after local hardware testing:
 
 ```text
-perf(hand-tracking): optimize real-time landmark processing
+feat(hand-tracking): improve landmark smoothing and recovery
 ```
 
-This implementation is limited to Phase 2.3. No automatic commit or push is made.
+This implementation is limited to Phase 2.4. No automatic commit or push is made.
 Use local hardware results to decide
 the next milestone.

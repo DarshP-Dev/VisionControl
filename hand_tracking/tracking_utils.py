@@ -163,7 +163,7 @@ class PreviewRenderer:
         return self.buffer
 
 
-def make_preview(frame, result, fps, show_help, renderer=None, timings=None):
+def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw_result=None):
     start = time.perf_counter()
     height, width = frame.shape[:2]
     scale = min(1100 / width, 650 / height, 1.0)
@@ -175,13 +175,20 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None):
     hands = hand_overlays(result, preview.shape[1], preview.shape[0])
     for hand in hands:
         draw_hand(preview, hand, top_margin=54 if show_help else 27)
+    if raw_result is not None:
+        for hand in hand_overlays(raw_result, preview.shape[1], preview.shape[0]):
+            for point in hand.points:
+                cv2.drawMarker(preview, point, (255, 255, 255), cv2.MARKER_CROSS,
+                               markerSize=7, thickness=1, line_type=cv2.LINE_AA)
     drawn = time.perf_counter()
     if timings is not None:
         timings.add("landmark_drawing", drawn - resized)
     rate = "--" if fps is None else f"{fps:.1f}"
     lines = [f"App FPS: {rate} | Hands: {len(hands)} | {width} x {height} | Q: Quit | H: Help"]
     if show_help:
-        lines.append("Show one or two hands. Left: green | Right: blue | H: Hide help")
+        lines.append("Left: green | Right: blue | Raw: white + | H: Hide help"
+                     if raw_result is not None else
+                     "Show one or two hands. Left: green | Right: blue | H: Hide help")
     for index, text in enumerate(lines):
         (text_width, text_height), baseline = cv2.getTextSize(
             text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
