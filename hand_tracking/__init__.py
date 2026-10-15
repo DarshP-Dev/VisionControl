@@ -1,1 +1,1 @@
-"""VisionControl Phase 2.1: single-hand landmark visualization."""
+"""VisionControl Phase 2.2: simultaneous two-hand landmark visualization."""

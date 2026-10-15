@@ -1,8 +1,16 @@
 """Small timing and drawing helpers independent of the MediaPipe runtime."""
 
 import math
+from dataclasses import dataclass
 
 import cv2
+
+
+MAX_HANDS = 2
+HAND_COLORS = {"Left": (80, 220, 80), "Right": (255, 160, 60), "Unknown": (180, 180, 180)}
+ALTERNATE_COLOR = (200, 80, 220)
+ONE_HAND_REFERENCE_FPS = 35.81
+PERFORMANCE_DROP_RATIO = 0.75
 
 
 # MediaPipe's 21-landmark hand topology: wrist, fingers and palm edges.
@@ -66,25 +74,88 @@ def landmark_pixels(landmarks, width, height):
     return points
 
 
+@dataclass
+class HandOverlay:
+    label: str
+    color: tuple
+    points: list
+
+
+def handedness_label(categories):
+    """Current Tasks labels use the subject's hands for our unmirrored input.
+
+    This is not the legacy mp.solutions.hands mirrored-input convention.
+    Missing/unrecognized predictions remain Unknown instead of inventing a side.
+    """
+    candidates = [category for category in categories
+                  if getattr(category, "score", None) is not None
+                  and math.isfinite(category.score)]
+    if not candidates:
+        return "Unknown"
+    category = max(candidates, key=lambda item: item.score)
+    name = getattr(category, "category_name", None)
+    return name if name in ("Left", "Right") else "Unknown"
+
+
+def hand_overlays(result, width, height):
+    """Pair landmarks and handedness within this result only; retain no track IDs."""
+    overlays = []
+    handedness = getattr(result, "handedness", None) or []
+    used_colors = set()
+    for index, landmarks in enumerate((getattr(result, "hand_landmarks", None) or [])[:MAX_HANDS]):
+        if not landmarks or len(landmarks) != 21:
+            continue
+        try:
+            points = landmark_pixels(landmarks, width, height)
+        except ValueError:
+            continue
+        categories = handedness[index] if index < len(handedness) else []
+        label = handedness_label(categories or [])
+        color = HAND_COLORS[label]
+        # Do not collapse two detections when the model predicts the same side.
+        if color in used_colors:
+            color = ALTERNATE_COLOR
+        used_colors.add(color)
+        overlays.append(HandOverlay(label, color, points))
+    return overlays
+
+
+def draw_hand(preview, hand, top_margin=27):
+    """Shared drawing path for either hand, with a label close to its wrist."""
+    for start, end in HAND_CONNECTIONS:
+        cv2.line(preview, hand.points[start], hand.points[end], hand.color, 2, cv2.LINE_AA)
+    for point in hand.points:
+        cv2.circle(preview, point, 4, (0, 0, 0), -1, cv2.LINE_AA)
+        cv2.circle(preview, point, 3, hand.color, -1, cv2.LINE_AA)
+    text = f"{hand.label} hand"
+    (width, height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 1)
+    x = max(4, min(hand.points[0][0] + 8, preview.shape[1] - width - 5))
+    y = max(top_margin + height + 4,
+            min(hand.points[0][1] + 22, preview.shape[0] - baseline - 5))
+    cv2.rectangle(preview, (x - 3, y - height - 3), (x + width + 3, y + baseline + 3),
+                  (0, 0, 0), -1)
+    cv2.putText(preview, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX,
+                0.55, hand.color, 1, cv2.LINE_AA)
+
+
+def significant_fps_drop(rate):
+    """Compare application throughput with the owner's Phase 2.1 benchmark."""
+    return (rate is not None and math.isfinite(rate)
+            and rate < ONE_HAND_REFERENCE_FPS * PERFORMANCE_DROP_RATIO)
+
+
 def make_preview(frame, result, fps, show_help):
     height, width = frame.shape[:2]
     scale = min(1100 / width, 650 / height, 1.0)
     preview = cv2.resize(frame, (max(1, round(width * scale)),
                                  max(1, round(height * scale))))
-    hands = result.hand_landmarks[:1]
-    for landmarks in hands:
-        if len(landmarks) != 21:
-            raise ValueError("Expected 21 hand landmarks")
-        points = landmark_pixels(landmarks, preview.shape[1], preview.shape[0])
-        for start, end in HAND_CONNECTIONS:
-            cv2.line(preview, points[start], points[end], (70, 230, 70), 2, cv2.LINE_AA)
-        for point in points:
-            cv2.circle(preview, point, 4, (0, 0, 0), -1, cv2.LINE_AA)
-            cv2.circle(preview, point, 3, (0, 230, 255), -1, cv2.LINE_AA)
+    hands = hand_overlays(result, preview.shape[1], preview.shape[0])
+    for hand in hands:
+        draw_hand(preview, hand, top_margin=54 if show_help else 27)
     rate = "--" if fps is None else f"{fps:.1f}"
     lines = [f"App FPS: {rate} | Hands: {len(hands)} | Q: Quit | H: Help"]
     if show_help:
-        lines.append("Show one hand to see its 21 landmarks. Q: Quit | H: Hide help")
+        lines.append("Show one or two hands. Left: green | Right: blue | H: Hide help")
     for index, text in enumerate(lines):
         (text_width, text_height), baseline = cv2.getTextSize(
             text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)

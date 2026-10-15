@@ -1,4 +1,4 @@
-"""Phase 2.1: one-hand MediaPipe Tasks tracking with a synchronous webcam preview."""
+"""Phase 2.2: simultaneous two-hand MediaPipe Tasks tracking with a webcam preview."""
 
 import argparse
 from contextlib import ExitStack
@@ -13,7 +13,10 @@ from camera.camera_diagnostics import (
     BACKENDS, StageTimings, capture_snapshot, configure_capture, read_frame,
 )
 from .download_model import MODEL_PATH
-from .tracking_utils import ApplicationFPS, FrameTimestamp, make_preview
+from .tracking_utils import (
+    MAX_HANDS, ONE_HAND_REFERENCE_FPS, PERFORMANCE_DROP_RATIO,
+    ApplicationFPS, FrameTimestamp, make_preview, significant_fps_drop,
+)
 
 
 LOGGER = logging.getLogger("hand_tracking")
@@ -66,7 +69,7 @@ def create_landmarker(model_path):
             delegate=mp.tasks.BaseOptions.Delegate.CPU,
         ),
         running_mode=mp.tasks.vision.RunningMode.VIDEO,
-        num_hands=1,
+        num_hands=MAX_HANDS,
     )
     return mp, mp.tasks.vision.HandLandmarker.create_from_options(options)
 
@@ -87,9 +90,11 @@ def process_frames(cap, landmarker, mp):
             timestamp_ms = timestamps.next(after_read)
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+            before_inference = time.perf_counter()
+            timings.add("RGB conversion", before_inference - after_read)
             result = landmarker.detect_for_video(image, timestamp_ms)
             after_inference = time.perf_counter()
-            timings.add("RGB conversion + inference", after_inference - after_read)
+            timings.add("MediaPipe inference", after_inference - before_inference)
             if fps.frames == 0:
                 LOGGER.info("Actual captured frame: %d x %d", frame.shape[1], frame.shape[0])
             preview = make_preview(frame, result, fps.current, show_help)
@@ -100,7 +105,13 @@ def process_frames(cap, landmarker, mp):
             rate = fps.record(end)
             if rate is not None:
                 LOGGER.info("End-to-end application FPS: %.2f | hands: %d",
-                            rate, min(1, len(result.hand_landmarks)))
+                            rate, min(MAX_HANDS, len(result.hand_landmarks)))
+                if significant_fps_drop(rate):
+                    LOGGER.warning("Significant application FPS decrease: %.2f FPS is below %.0f%% "
+                                   "of the reported Phase 2.1 baseline %.2f FPS. "
+                                   "Two-hand inference may cost more; inspect stage timings.",
+                                   rate, PERFORMANCE_DROP_RATIO * 100, ONE_HAND_REFERENCE_FPS)
+                    timings.report()
             if key in (ord("q"), ord("Q")):
                 return 0
             if key in (ord("h"), ord("H")):
@@ -135,7 +146,9 @@ def run(args):
                 return 1
             configure_capture(cap, args)
             capture_snapshot(cap, args, "After configuration")
-            LOGGER.info("MediaPipe Hand Landmarker: VIDEO mode | CPU | maximum one hand")
+            LOGGER.info("MediaPipe Hand Landmarker: VIDEO mode | CPU | maximum %d hands", MAX_HANDS)
+            LOGGER.info("Preview/input: unmirrored. Left/Right identify the subject's hands; "
+                        "colors follow each frame's handedness predictions, not detection order.")
             LOGGER.info("Q: Quit | H: Toggle help. No camera throughput claim is made by inference FPS.")
             cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)
             resources.callback(cv2.destroyAllWindows)

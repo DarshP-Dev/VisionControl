@@ -136,14 +136,14 @@ class TrackingLifecycleTest(unittest.TestCase):
                     self.assertEqual(len(timestamps), 2)
                     self.assertGreater(timestamps[1], timestamps[0])
 
-    def test_landmarker_options_are_video_cpu_and_single_hand(self):
+    def test_landmarker_options_are_video_cpu_and_two_hands(self):
         import mediapipe as mp
 
         with patch.object(mp.tasks.vision.HandLandmarker, "create_from_options") as factory:
             tracker.create_landmarker(Path("not-loaded-by-mock.task"))
         options = factory.call_args.args[0]
         self.assertEqual(options.running_mode, mp.tasks.vision.RunningMode.VIDEO)
-        self.assertEqual(options.num_hands, 1)
+        self.assertEqual(options.num_hands, 2)
         self.assertEqual(options.base_options.delegate, mp.tasks.BaseOptions.Delegate.CPU)
 
 

@@ -1,6 +1,6 @@
-# Phase 2.1: MediaPipe hand landmarks
+# Phase 2.2: Simultaneous two-hand landmarks
 
-Detect and draw **one hand's 21 landmarks** and connecting skeleton using the
+Detect and draw **up to two hands**, each with 21 landmarks and a skeleton, using the
 MediaPipe Tasks Hand Landmarker API in synchronous **VIDEO** mode on the CPU.
 This milestone does not recognize gestures or control the cursor, voice or motors.
 The existing Phase 1 camera applications are unchanged.
@@ -45,22 +45,60 @@ Focus the preview to use keys. Closing the window or pressing Ctrl+C also releas
 the webcam and landmarker. The preview fits inside 1100 × 650 pixels while the
 capture request remains unchanged. The camera frame is converted from BGR to RGB
 at capture resolution before inference. Landmarks are mapped from normalized
-coordinates onto the resized preview, without mirroring the feed. Small yellow
-points with dark borders and green lines mark the hand. A compact black status
-panel shows application FPS, the hand count (0 or 1), and exit instructions.
+coordinates onto the resized preview, without mirroring the feed. Colored points
+with dark borders and matching skeleton lines mark each hand. A label near each
+wrist displays its handedness prediction. A compact black status panel shows
+application FPS, the hand count (0, 1 or 2), and exit instructions.
+
+### Handedness, colors and detection order
+
+The application does not horizontally flip either inference input or preview.
+With the pinned current Tasks API and unmirrored camera input, `Left` and `Right`
+refer to the subject's anatomical hands, not the left/right side of the screen.
+Keep any vendor/driver mirroring disabled as well. Do not apply the legacy
+`mp.solutions.hands` mirrored-input label-swapping rule to this Tasks pipeline.
+The Tasks label mapping changed in
+[Google's handedness update](https://github.com/google-ai-edge/mediapipe/commit/ed0c8d8).
+Validate the labels by showing each of your hands individually during local testing.
+
+- **Left:** green skeleton, points and wrist label.
+- **Right:** blue skeleton, points and wrist label.
+- **Unknown:** gray if the prediction is missing or unrecognized.
+- If both detections have the same predicted label, both are retained. The second
+  uses purple so the skeletons remain distinguishable. The displayed labels are
+  not forcibly reassigned to make one Left and one Right.
+
+Each frame pairs landmark entry `i` with handedness entry `i` from that same
+result. Detection order can change between frames; it is never treated as a
+persistent ID. Colors follow handedness, not screen position. In ambiguous cases,
+labels and colors may change, including during crossing or occlusion; there is
+no identity tracker or smoothing layer. The purple fallback is not a persistent ID.
+Frames are drawn from scratch, so missing detections never reuse old skeletons.
+Malformed landmark sets are skipped without discarding another valid hand.
 
 For local hardware validation:
 
 1. Close the Phase 1 preview and other webcam apps, then start the tracker.
 2. Show one hand with fingers spread. Check that all five fingers and the wrist
    have points and connected lines, aligned with the displayed hand.
-3. Move the hand slowly, then quickly, near/far and toward the frame edges.
-4. Remove the hand: the count should return to 0 and the skeleton disappear.
-5. Test H, Q, and closing the window; confirm the camera is available afterward.
+3. Show the other hand alone and check both Left/Right labels against your own
+   hands. Then show both: confirm two sets of 21 landmarks, different colors and
+   labels beside the corresponding wrists.
+4. Move both hands slowly, then rapidly, near/far and toward the frame edges.
+   Cross and overlap them, separate them again, and observe recovery from loss.
+5. Remove either hand, reintroduce it, then remove both. Counts should change
+   2 → 1 → 2 → 0 without stale skeletons or crashes. Colors must follow the
+   predicted anatomical side when the hands exchange screen positions.
+6. Test H, Q, and closing the window; confirm the camera is available afterward.
+7. Compare application FPS and stage timing logs for one and two visible hands
+   under the same lighting, camera settings and movements.
 
-No physical tracking or tracking FPS has been verified by the implementation
-agent. The earlier camera's ~60 FPS result is capture throughput, not a promise
-of 60 FPS inference. Low light, occlusion, framing and motion can affect detection.
+The owner physically tested Phase 2.1: **35.81 average application FPS**, about
+**13.51 ms inference per frame**, and excellent one-hand tracking during movement.
+These are historical one-hand measurements, not measured two-hand performance.
+Phase 2.2 physical tracking and FPS remain unverified pending the owner's local
+test. The camera's ~60 FPS capture rate does not guarantee 60 FPS inference.
+Low light, occlusion, framing and motion can affect detection.
 
 ## Performance and failure handling
 
@@ -71,9 +109,17 @@ timestamps collide. The timestamp is not derived from requested camera FPS.
 The application counts completed capture/conversion/inference/preview/event-pump
 iterations over roughly two-second windows. FPS initially shows `--`. Logs give
 the end-to-end rate and a final average. On exit, simple mean/max timing reports
-separate camera reads, RGB conversion plus inference, and preview plus GUI. Use
+separate camera reads, RGB conversion, MediaPipe inference, and preview plus GUI. Use
 these to report the dominant stage if performance is poor. They include startup
 and are not a full profiler. Setup/cleanup is excluded from loop timing.
+
+Every completed roughly two-second FPS window is compared with the owner's
+35.81 FPS Phase 2.1 reference. Below 75% of that rate (about **26.86 FPS**), a
+significant-decrease warning and cumulative stage timing report are logged.
+The reference is not a guaranteed target or a sensor measurement. Startup,
+redetection and two-hand inference may make a window slower; repeat the test
+under comparable conditions before drawing conclusions. Two hands may cost more
+than one, and no two-hand FPS target is assumed.
 
 No processing threads or asynchronous capture are introduced. If inference is
 slow, this synchronous loop can receive buffered frames and accumulate latency;
@@ -143,8 +189,10 @@ leave the application without a model and produce a clear setup error.
 ```
 
 The hand-tracking tests cover arguments, timestamps, FPS, RGB conversion,
-landmark scaling/topology, 0-hand handling, help, VIDEO/CPU/one-hand options,
-model checksums and error/cleanup paths with mocked cameras. Phase 1 tests cover
+landmark scaling/topology, 0/1/2-hand rendering, help, VIDEO/CPU/two-hand options,
+handedness pairing, order changes, duplicate/missing predictions, disappearing
+hands, invalid detections, performance warnings, model checksums and error/cleanup
+paths with mocked cameras. Phase 1 tests cover
 the preserved camera tester. A separate smoke check also initialized the actual
 downloaded model and processed two blank 1080p RGB images in VIDEO mode, returning
 0 hands for both. These checks do not establish real-world detection quality.
@@ -152,8 +200,9 @@ downloaded model and processed two blank 1080p RGB images in VIDEO mode, returni
 Suggested commit after local hardware testing:
 
 ```text
-feat(hand-tracking): add MediaPipe hand landmark detection
+feat(hand-tracking): support simultaneous two-hand tracking
 ```
 
-This implementation is limited to Phase 2.1. Use local hardware results to decide
+This implementation is limited to Phase 2.2. No automatic commit or push is made.
+Use local hardware results to decide
 the next milestone.
