@@ -2,8 +2,10 @@
 
 import math
 from dataclasses import dataclass
+import time
 
 import cv2
+import numpy as np
 
 
 MAX_HANDS = 2
@@ -144,14 +146,38 @@ def significant_fps_drop(rate):
             and rate < ONE_HAND_REFERENCE_FPS * PERFORMANCE_DROP_RATIO)
 
 
-def make_preview(frame, result, fps, show_help):
+class PreviewRenderer:
+    """One reusable BGR display buffer, refreshed completely on each frame."""
+
+    def __init__(self):
+        self.buffer = None
+
+    def resize(self, frame, size):
+        shape = (size[1], size[0], 3)
+        if self.buffer is None or self.buffer.shape != shape or self.buffer.dtype != frame.dtype:
+            self.buffer = np.empty(shape, dtype=frame.dtype)
+        if frame.shape[:2] == shape[:2]:
+            np.copyto(self.buffer, frame)
+        else:
+            cv2.resize(frame, size, dst=self.buffer)
+        return self.buffer
+
+
+def make_preview(frame, result, fps, show_help, renderer=None, timings=None):
+    start = time.perf_counter()
     height, width = frame.shape[:2]
     scale = min(1100 / width, 650 / height, 1.0)
-    preview = cv2.resize(frame, (max(1, round(width * scale)),
-                                 max(1, round(height * scale))))
+    renderer = renderer if renderer is not None else PreviewRenderer()
+    preview = renderer.resize(frame, (max(1, round(width * scale)), max(1, round(height * scale))))
+    resized = time.perf_counter()
+    if timings is not None:
+        timings.add("preview_resize", resized - start)
     hands = hand_overlays(result, preview.shape[1], preview.shape[0])
     for hand in hands:
         draw_hand(preview, hand, top_margin=54 if show_help else 27)
+    drawn = time.perf_counter()
+    if timings is not None:
+        timings.add("landmark_drawing", drawn - resized)
     rate = "--" if fps is None else f"{fps:.1f}"
     lines = [f"App FPS: {rate} | Hands: {len(hands)} | {width} x {height} | Q: Quit | H: Help"]
     if show_help:
@@ -163,4 +189,6 @@ def make_preview(frame, result, fps, show_help):
         preview[top:top + 27, :text_width + 16] = 0
         cv2.putText(preview, text, (8, top + text_height + 4),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
+    if timings is not None:
+        timings.add("text_overlay", time.perf_counter() - drawn)
     return preview

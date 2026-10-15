@@ -1,9 +1,12 @@
-# Phase 2.2: Simultaneous two-hand landmarks
+# Phase 2.3: Hand tracking performance
 
 Detect and draw **up to two hands**, each with 21 landmarks and a skeleton, using the
 MediaPipe Tasks Hand Landmarker API in synchronous **VIDEO** mode on the CPU.
 This milestone does not recognize gestures or control the cursor, voice or motors.
 The existing Phase 1 camera applications are unchanged.
+Inference size is configurable independently of capture; detailed benchmarking
+and host timing reports are available. See [PERFORMANCE.md](PERFORMANCE.md) for
+the measured synthetic baseline, limitations and full comparison procedure.
 
 ## Run on Windows
 
@@ -12,6 +15,18 @@ From `C:\Users\Darsh\VisionControl` in PowerShell:
 ```powershell
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker
 ```
+
+To try a smaller inference image while keeping 1080p capture and a clear preview:
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --inference-resolution 960x540
+```
+
+Inference defaults to `full` to preserve the established path until local quality
+testing. Also supported: `1280x720`, `640x360`, or positive `WIDTHxHEIGHT` bounds.
+The image fits within those bounds without cropping, padding, stretching or
+upscaling. Actual inference dimensions are logged; they may differ for another
+camera aspect ratio. `--width` and `--height` still configure capture only.
 
 For a fresh checkout, complete the dependency and model setup below before
 launching. Defaults are
@@ -43,8 +58,9 @@ so the tracker can import its package and the existing camera utilities.
 
 Focus the preview to use keys. Closing the window or pressing Ctrl+C also releases
 the webcam and landmarker. The preview fits inside 1100 × 650 pixels while the
-capture request remains unchanged. The camera frame is converted from BGR to RGB
-at capture resolution before inference. Landmarks are mapped from normalized
+capture request remains unchanged. A separate inference image is optionally
+downscaled before BGR-to-RGB conversion. The clear preview uses the original BGR
+capture, not the smaller inference image. Landmarks are mapped from normalized
 coordinates onto the resized preview, without mirroring the feed. Colored points
 with dark borders and matching skeleton lines mark each hand. A label near each
 wrist displays its handedness prediction. A compact black status panel shows
@@ -95,9 +111,10 @@ For local hardware validation:
 
 The owner physically tested Phase 2.1: **35.81 average application FPS**, about
 **13.51 ms inference per frame**, and excellent one-hand tracking during movement.
-These are historical one-hand measurements, not measured two-hand performance.
-Phase 2.2 physical tracking and FPS remain unverified pending the owner's local
-test. The camera's ~60 FPS capture rate does not guarantee 60 FPS inference.
+The owner subsequently measured approximately **31 application FPS** with two
+hands in Phase 2.2, with 42 landmarks. Phase 2.3 improvement and tracking quality
+at lower inference sizes remain unverified pending local hardware testing.
+The camera's ~60 FPS capture rate does not guarantee 60 FPS inference.
 Low light, occlusion, framing and motion can affect detection.
 
 ## Performance and failure handling
@@ -108,14 +125,17 @@ timestamps collide. The timestamp is not derived from requested camera FPS.
 
 The application counts completed capture/conversion/inference/preview/event-pump
 iterations over roughly two-second windows. FPS initially shows `--`. Logs give
-the end-to-end rate and a final average. On exit, simple mean/max timing reports
-separate camera reads, RGB conversion, MediaPipe inference, and preview plus GUI. Use
-these to report the dominant stage if performance is poor. They include startup
-and are not a full profiler. Setup/cleanup is excluded from loop timing.
+the end-to-end rate and a final average. On exit, profiling reports mean, p50,
+p95, p99 and maximum times for camera reads, inference resize, BGR-to-RGB,
+MediaPipe image wrapping, inference, preview resize, drawing/labels, text, imshow,
+waitKey, processing and the loop. Means/maxima cover all measured samples;
+percentiles use the most recent 8192 per stage. Interactive runs include startup;
+`--benchmark` excludes warm-up. Setup/cleanup and JSON writing are excluded.
 
 Every completed roughly two-second FPS window is compared with the owner's
 35.81 FPS Phase 2.1 reference. Below 75% of that rate (about **26.86 FPS**), a
-significant-decrease warning and cumulative stage timing report are logged.
+significant-decrease warning is logged when entering a slow period. Profiling
+details are logged once on exit. Benchmark measurement has no periodic logging.
 The reference is not a guaranteed target or a sensor measurement. Startup,
 redetection and two-hand inference may make a window slower; repeat the test
 under comparable conditions before drawing conclusions. Two hands may cost more
@@ -126,6 +146,21 @@ slow, this synchronous loop can receive buffered frames and accumulate latency;
 this milestone does not attempt buffer management or dropped-frame optimization.
 Driver read calls can block; cleanup occurs once they return. Requested modes
 and positive driver-reported FPS do not establish actual throughput.
+Buffer reuse reduces Python-side allocations; it does not control camera buffers
+or establish sensor-to-display latency. See the buffering discussion in PERFORMANCE.md.
+
+Run one full-resolution benchmark (30 measured seconds after 3 seconds of warm-up):
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --benchmark --inference-resolution full --warmup 3 --duration 30 --report hand_tracking\benchmarks\full-run1.json
+```
+
+The normal preview and Q/H controls remain active. Reports include actual capture
+and inference dimensions, detected-hand counts, FPS, timing percentiles, requested
+settings and driver readbacks. Report directories are created automatically and
+ignored by Git; existing reports are protected from overwrite. Use a fresh filename
+for each run. A run stopped with Q is marked `stopped`; Ctrl+C marks `interrupted`.
+Only a benchmark reaching its requested duration is marked `completed`.
 
 A missing/empty model produces setup instructions before opening the camera.
 Invalid model bundles, dependency errors, failed camera opens and failed reads
@@ -191,7 +226,8 @@ leave the application without a model and produce a clear setup error.
 The hand-tracking tests cover arguments, timestamps, FPS, RGB conversion,
 landmark scaling/topology, 0/1/2-hand rendering, help, VIDEO/CPU/two-hand options,
 handedness pairing, order changes, duplicate/missing predictions, disappearing
-hands, invalid detections, performance warnings, model checksums and error/cleanup
+hands, invalid detections, performance warnings, model checksums, inference sizes,
+buffer reuse, percentile calculations, warm-up exclusion, JSON reports and error/cleanup
 paths with mocked cameras. Phase 1 tests cover
 the preserved camera tester. A separate smoke check also initialized the actual
 downloaded model and processed two blank 1080p RGB images in VIDEO mode, returning
@@ -200,9 +236,9 @@ downloaded model and processed two blank 1080p RGB images in VIDEO mode, returni
 Suggested commit after local hardware testing:
 
 ```text
-feat(hand-tracking): support simultaneous two-hand tracking
+perf(hand-tracking): optimize real-time landmark processing
 ```
 
-This implementation is limited to Phase 2.2. No automatic commit or push is made.
+This implementation is limited to Phase 2.3. No automatic commit or push is made.
 Use local hardware results to decide
 the next milestone.

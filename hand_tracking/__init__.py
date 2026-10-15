@@ -1,1 +1,1 @@
-"""VisionControl Phase 2.2: simultaneous two-hand landmark visualization."""
+"""VisionControl Phase 2.3: profiled two-hand tracking with configurable inference."""
