@@ -1,8 +1,9 @@
-# Phase 2.5: Targeted hand tracking performance optimization
+# Hand tracking with optional Phase 3.2 static gesture labels
 
 Detect and draw **up to two hands**, each with 21 landmarks and a skeleton, using the
 MediaPipe Tasks Hand Landmarker API in synchronous **VIDEO** mode on the CPU.
-This milestone does not recognize gestures or control the cursor, voice or motors.
+Optional static recognition labels open palm, fist, pointing and unknown poses.
+No gesture-triggered actions, cursor, voice or motor controls are implemented.
 The existing Phase 1 camera applications are unchanged.
 Inference size is configurable independently of capture; detailed benchmarking
 and host timing reports are available. See [PERFORMANCE.md](PERFORMANCE.md) for
@@ -12,7 +13,9 @@ raw comparison and explicit reset behavior described below.
 Phase 2.5 uses native Win32 GUI polling when supported, retaining an explicit
 `waitKey(1)` baseline and a timed headless comparison. Full inference, MSMF,
 two-hand model options, drawing, confidence thresholds and EMA alpha 0.75 are
-unchanged. Webcam FPS gains and quality acceptance await local testing.
+unchanged. The owner's Phase 2.5 comparison measured 28.98 FPS with the old GUI
+path and 38.77 FPS with native polling. Phase 3.2 gesture accuracy/FPS still await
+local hardware testing.
 
 ## Run on Windows
 
@@ -21,6 +24,26 @@ From `C:\Users\Darsh\VisionControl` in PowerShell:
 ```powershell
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker
 ```
+
+To enable per-hand static gesture labels in this same preview:
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --no-gestures
+```
+
+Recognition is **off by default**: synthetic measurements show measurable extra
+work, and physical accuracy/performance is pending. `--gestures` uses the selected
+raw/EMA coordinates with actual capture aspect correction, without modifying
+MediaPipe results. Each wrist label includes `OPEN_PALM`, `FIST`, `POINTING` or
+`UNKNOWN`. No observation means no gesture label; nothing persists after loss.
+Q/H, colors, handedness, full inference and all previous arguments remain active.
+`--show-raw-landmarks` adds comparison markers without changing recognition input.
+The rules are immediate per-frame heuristics and may flicker; they do not produce
+calibrated confidence percentages. See [gesture rules, thresholds and manual
+testing](../gestures/README.md) for limitations and repeatable off/on benchmarks.
+`gesture_features`, `gesture_classification` and `gesture_total` profile the new
+work separately, including in headless runs and per-hand-count reports.
 
 To try a smaller inference image while keeping 1080p capture and a clear preview:
 
@@ -230,7 +253,8 @@ hands in Phase 2.2, with 42 landmarks, and about **28–29 FPS** after Phase 2.3
 using full inference. The owner's Phase 2.4 measurements were **42.00 FPS** with
 no hands, **28.42 FPS** with one hand, **28.76 FPS** with two, and **28.87 FPS**
 with two hands and smoothing. Smoothing slightly improved stability without
-noticeable lag. Phase 2.5 hardware performance remains unverified.
+noticeable lag. Phase 2.5 later reached 38.77 FPS with native Win32 polling in
+the owner's hardware comparison; Phase 3.2's recognition accuracy/FPS are unverified.
 The camera's ~60 FPS capture rate does not guarantee 60 FPS inference.
 Low light, occlusion, framing and motion can affect detection.
 
@@ -362,6 +386,7 @@ leave the application without a model and produce a clear setup error.
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s hand_tracking -t . -v
+.\.venv\Scripts\python.exe -m unittest discover -s gestures/tests -t . -v
 .\.venv\Scripts\python.exe -m unittest discover -s camera -v
 .\.venv\Scripts\python.exe -m compileall -q hand_tracking camera
 .\.venv\Scripts\python.exe -m pip check
@@ -377,7 +402,10 @@ ambiguous identity, reset rules and error/cleanup paths with mocked cameras.
 Phase 2.5 adds checks for native polling, guarded fallbacks, Q/H/window close,
 headless execution without GUI calls, per-hand-count profiles, CPU calculations,
 new CLI constraints and warm-up exclusion.
-All **77 automated tests pass**: 61 tracking tests and 16 Phase 1 camera tests.
+All **134 automated tests pass**: 70 tracking tests, 48 gesture foundation/rule
+tests and 16 Phase 1 camera tests, including all 113 earlier tests.
+Phase 3.2 coverage includes static labels, detection order and loss, EMA input,
+malformed-hand fallback, native polling/Q/H and gesture profiling/warm-up/counts.
 Phase 1 tests cover
 the preserved camera tester. A separate smoke check also initialized the actual
 downloaded model and processed two blank 1080p RGB images in VIDEO mode, returning
@@ -394,9 +422,9 @@ tracking quality still require the owner's webcam checks.
 Suggested commit after local hardware testing:
 
 ```text
-perf(hand-tracking): reduce Win32 preview event overhead
+feat(gestures): recognize static hand poses with unknown fallback
 ```
 
-This implementation is limited to Phase 2.5. No automatic commit or push is made.
+The current milestone stops at Phase 3.2. No automatic commit or push is made.
 Use local hardware results to decide
 the next milestone.

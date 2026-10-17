@@ -1,8 +1,9 @@
-"""Phase 2.5: synchronous tracking with guarded GUI polling and workload profiles."""
+"""Synchronous two-hand tracking with optional Phase 3.2 static gesture labels."""
 
 import argparse
 from collections import Counter
 from contextlib import ExitStack
+from dataclasses import asdict
 import logging
 import math
 import os
@@ -12,10 +13,13 @@ import time
 
 import cv2
 
+from gestures.models import ImageSize
+from gestures.static_gestures import DEFAULT_THRESHOLDS
 from camera.camera_diagnostics import (
     BACKENDS, capture_snapshot, configure_capture, read_frame,
 )
 from .download_model import MODEL_PATH
+from .gesture_preview import classify_result
 from .gui import GuiEvents
 from .performance import (
     InferenceInput, WorkloadProfile, inference_resolution, process_cpu_usage, write_report,
@@ -84,6 +88,8 @@ def parse_args(argv=None):
                         help="auto uses native Win32 pollKey; waitkey preserves the earlier GUI path")
     parser.add_argument("--headless", action="store_true",
                         help="benchmark capture/inference/smoothing without rendering or GUI")
+    parser.add_argument("--gestures", action=argparse.BooleanOptionalAction, default=False,
+                        help="enable static gesture labels; --no-gestures preserves tracking only (default)")
     args = parser.parse_args(argv)
     if args.headless and not args.benchmark:
         parser.error("--headless requires --benchmark for a timed run (Ctrl+C can interrupt)")
@@ -122,6 +128,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
     gui = GuiEvents(args.gui_mode) if not args.headless else None
     smoother = LandmarkSmoother(enabled=args.smoothing, alpha=args.smoothing_alpha)
     capture_sizes, inference_sizes, hand_counts = Counter(), Counter(), Counter()
+    gesture_counts = Counter()
+    gesture_image_size = None
     frames = 0
     capture_logged = False
     warned_slow = False
@@ -153,6 +161,12 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
             before_smoothing = time.perf_counter()
             result = smoother.apply(raw_result, timestamp_ms, frame.shape[:2])
             timings.add("smoothing", time.perf_counter() - before_smoothing)
+            classifications = None
+            if args.gestures:
+                if (gesture_image_size is None or
+                        (gesture_image_size.height, gesture_image_size.width) != frame.shape[:2]):
+                    gesture_image_size = ImageSize(frame.shape[1], frame.shape[0])
+                classifications = classify_result(result, timestamp_ms, gesture_image_size, timings)
             if not capture_logged:
                 LOGGER.info("Actual capture: %d x %d | actual inference: %d x %d",
                             frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])
@@ -161,7 +175,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
             if not args.headless:
                 preview = make_preview(frame, result, fps.current, show_help,
                                        renderer=renderer, timings=timings,
-                                       raw_result=raw_result if args.show_raw_landmarks else None)
+                                       raw_result=raw_result if args.show_raw_landmarks else None,
+                                       gesture_results=classifications)
                 before_display = time.perf_counter()
                 cv2.imshow(WINDOW, preview)
                 before_events = time.perf_counter()
@@ -184,6 +199,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 capture_sizes[f"{frame.shape[1]}x{frame.shape[0]}"] += 1
                 inference_sizes[f"{rgb.shape[1]}x{rgb.shape[0]}"] += 1
                 hand_counts[str(min(MAX_HANDS, len(result.hand_landmarks)))] += 1
+                if classifications is not None:
+                    gesture_counts.update(item.gesture.value for item in classifications)
                 timings.finish_frame(min(MAX_HANDS, len(raw_result.hand_landmarks)))
                 rate = fps.record(end)
             if rate is not None and not args.benchmark:
@@ -244,6 +261,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 "gui": gui.metadata() if gui else {"requested": args.gui_mode, "effective": "none",
                                                   "backend": None, "fallback_reason": None},
                 "resources": resources,
+                "gestures": {"enabled": args.gestures,
+                             "input": "smoothed" if args.smoothing else "raw",
+                             "thresholds": asdict(DEFAULT_THRESHOLDS),
+                             "classification_counts": dict(gesture_counts)},
                 "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown.",
             })
         LOGGER.info("Application FPS includes capture, preparation, inference, smoothing%s; "
@@ -261,6 +282,7 @@ def run(args, report=None):
                                  "show_raw_landmarks": args.show_raw_landmarks},
                    "execution_mode": "headless_tracking" if args.headless else "preview",
                    "gui_mode_requested": args.gui_mode,
+                   "gestures_enabled": args.gestures,
                    "logical_cpu_count": os.cpu_count(),
                    "python": platform.python_version(), "opencv": cv2.__version__})
     try:
@@ -287,6 +309,7 @@ def run(args, report=None):
             LOGGER.info("MediaPipe Hand Landmarker: VIDEO mode | CPU | maximum %d hands", MAX_HANDS)
             LOGGER.info("Landmark smoothing: %s | alpha: %.2f | raw comparison markers: %s",
                         args.smoothing, args.smoothing_alpha, args.show_raw_landmarks)
+            LOGGER.info("Static gestures: %s (heuristic rules; no confidence probability)", args.gestures)
             LOGGER.info("Preview/input: unmirrored. Left/Right identify the subject's hands; "
                         "colors follow each frame's handedness predictions, not detection order.")
             LOGGER.info("%s No camera throughput claim is made by inference FPS.",

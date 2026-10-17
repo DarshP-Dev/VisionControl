@@ -1,10 +1,12 @@
-# Phase 3.1: Gesture recognition foundation
+# Phase 3.2: Static gesture recognition
 
-This package turns landmark observations into validated data and reusable
-geometric measurements. It extracts **features**, not gesture names or pose
-classes. It has no recognition thresholds, motion history, desktop actions,
-capture, rendering, threads or model inference. Nothing calls it from the live
-hand tracker yet; the Phase 2.5 pipeline and its CLI are unchanged.
+This package provides the Phase 3.1 landmark geometry foundation and Phase 3.2
+deterministic static rules: **OPEN_PALM, FIST, POINTING, UNKNOWN**. Feature
+extraction stays separate from classification. The existing hand-tracking
+preview can show per-hand gesture labels with `--gestures`; recognition is
+opt-in pending physical accuracy and performance validation. The classifier
+imports no camera, GUI, MediaPipe or desktop-control code. No motion history,
+additional model, threads, cooldowns or gesture-triggered actions are added.
 
 The package uses only Python's standard library (Python 3.11+; the existing
 environment is Python 3.13.7). No requirements changes or installations are needed.
@@ -17,6 +19,7 @@ environment is Python 3.13.7). No requirements changes or installations are need
 | `landmarks.py` | Snapshot adapter for raw/EMA Tasks results; explicit image-coordinate conversion |
 | `geometry.py` | Stateless distances, vectors, unit directions, dot products, angles, palm scale and distance ratios |
 | `features.py` | Named per-finger/per-hand features and the lightweight `FrameFeatures` consumer contract |
+| `static_gestures.py` | Typed gesture/result/threshold records and stateless conservative rules |
 | `__init__.py` | Public observation/feature/adapter exports |
 | `tests/` | Synthetic fixtures and hardware-independent model, adapter, geometry and feature tests |
 
@@ -24,6 +27,128 @@ Existing tracking helpers are display-oriented and import OpenCV/NumPy. The new
 models add validation, metadata and immutable snapshots without importing that
 rendering stack. The adapter also accepts the existing EMA `DisplayLandmark`
 objects structurally; neither the tracker nor its smoothing code is refactored.
+
+## Run static recognition on Windows
+
+From `C:\Users\Darsh\VisionControl` in PowerShell, use the existing environment/model:
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --no-gestures
+```
+
+`--gestures` enables recognition; `--no-gestures` disables it (the default).
+All existing arguments remain available. With recognition enabled, capture
+remains 1080p60/MSMF, inference defaults to full, EMA defaults to alpha 0.75,
+and native Win32 polling, skeleton colors, Left/Right and Q/H remain active.
+Labels use ASCII `Left - OPEN_PALM` / `Right - POINTING` on the existing black
+wrist-label background so OpenCV's font can render every character.
+
+## Conservative recognition rules
+
+The classifier consumes `HandFeatures`; geometry is computed once using the
+Phase 3.1 utilities with the **actual capture aspect ratio**. Every required long
+finger must have valid measurements. The four long fingers are index, middle,
+ring and pinky. Thumb posture is not a gate: a relaxed/tucked thumb is allowed,
+and four clearly extended long fingers count as most fingers extended.
+
+| Long-finger condition | Clearly extended | Clearly curled |
+| --- | ---: | ---: |
+| PIP interior angle | at least 155° | at most 110° |
+| DIP interior angle | at least 145° | at most 160° |
+| Base-to-tip chord / chain length | at least 0.88 | at most 0.75 |
+| Tip-to-wrist distance / palm scale | at least 1.15 | at most 1.25 |
+
+All four measurements must meet the relevant column. These initial engineering
+thresholds allow modest bending of extended fingers, require multiple signs of
+curling and leave a gap for partial poses. They are **not learned or calibrated
+from real hands**. Articulated synthetic fixtures test geometry and invariance;
+webcam results must determine whether future tuning is appropriate. They are
+named in the frozen `StaticThresholds` record for explicit Python configuration;
+the live preview uses `DEFAULT_THRESHOLDS`, also recorded in JSON. No extra CLI
+threshold knobs are introduced in this milestone.
+
+- `OPEN_PALM`: all four long fingers clearly extended; thumb may be relaxed.
+- `FIST`: all four long fingers clearly curled.
+- `POINTING`: index clearly extended, the other three clearly curled.
+- `UNKNOWN`: no rule matches, multiple rules match, or required features are
+  missing, non-finite, out of range, duplicated or degenerate. A valid but
+  unsupported finger combination also stays UNKNOWN. Invalid thumb-only
+  features do not invalidate otherwise sufficient long-finger geometry.
+
+There is no rule priority that forces a conflicting pose into a class.
+`GestureResult` contains the enum, frame timestamp, available handedness
+predictions, `matched_rules` and a diagnostic `reason`. `unique_rule_match` is a
+boolean rule indicator, **not a confidence probability or an accuracy claim**.
+An empty frame produces an empty result tuple, not a phantom UNKNOWN hand.
+
+```python
+from gestures import ImageSize, classify_frame, extract_frame_features, from_mediapipe
+
+# tasks_result and timestamp_ms come from the existing tracker/API.
+frame = from_mediapipe(tasks_result, timestamp_ms, ImageSize(1920, 1080))
+results = classify_frame(extract_frame_features(frame))
+for result in results:
+    print(result.gesture, result.timestamp_ms, result.matched_rules, result.reason)
+```
+
+The live bridge (`hand_tracking/gesture_preview.py`) uses the output of the
+existing smoother; `--no-smoothing` makes recognition use raw coordinates.
+Raw comparison crosses do not change the classifier input. Adaptation preserves
+current-result slots, even if handedness predictions duplicate or detection order
+changes. A malformed hand becomes UNKNOWN without shifting the other hand's
+classification. If geometry cannot be adapted, its result has no handedness
+metadata; the existing renderer still uses the original frame-local label when
+that hand's x/y coordinates are drawable. No previous classifications are held.
+Labels disappear immediately when observations disappear. Near thresholds labels
+may flicker; temporal debouncing/states/events belong to Phase 3.4. Pinches and
+other later gesture algorithms are not implemented in Phase 3.2.
+
+## Manual webcam validation and performance
+
+Run with `--gestures` and test both hands separately, then simultaneously:
+
+1. Open palm, closed fist and pointing; vary natural thumb posture.
+2. Unsupported configurations (for example two extended fingers) should read UNKNOWN.
+3. Slowly curl/extend fingers through intermediate poses; inspect UNKNOWN and flicker.
+4. Rotate in the image plane, then tilt modestly toward/away from the camera.
+5. Use different gestures on each hand, then the same gesture on both. Cross hands,
+   overlap them, and leave/reenter the frame; check current hand/label association.
+6. Check Q, H, window responsiveness and `--show-raw-landmarks`; inspect EMA lag
+   and compare `--no-smoothing` separately if needed.
+7. Compare FPS, stage means/p95 and process CPU with recognition off/on under
+   identical lighting, framing, hand distance/movement, capture and inference.
+
+```powershell
+$runStamp = Get-Date -Format 'yyyyMMdd_HHmmss_fff'
+foreach ($mode in @('no-gestures', 'gestures')) {
+    & .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker "--$mode" --benchmark --backend msmf --width 1920 --height 1080 --fps 60 --inference-resolution full --warmup 3 --duration 30 --report "hand_tracking\benchmarks\${runStamp}_${mode}.json"
+    if ($LASTEXITCODE -ne 0) { throw "Benchmark failed or interrupted: $mode" }
+}
+```
+
+Use only reports with `status=completed`. Repeat at least three times, reverse
+mode order on a repeat, and run separate zero-, one- and two-hand comparisons.
+`--headless` can be added to both runs to remove drawing/GUI; those results are
+headless throughput, not preview FPS. With `--no-gestures`, adaptation, features,
+rules and gesture timing stages are skipped entirely.
+
+`gesture_features` includes adapter/snapshot plus feature extraction;
+`gesture_classification` measures rule evaluation/result creation for the entire
+frame; `gesture_total` contains both and must not be added to its sub-stages.
+All retain mean, p50/p95/p99/max, exclude benchmark warm-up, and appear in the
+per-detected-hand-count profiles. JSON includes the enabled flag, configured
+raw/EMA input, thresholds and measured per-classification counts. Counts are
+predictions, not accuracy or ground truth; zero hands adds no classification.
+
+A synthetic check with two fabricated hands (100 warm-up / 1000 measured
+iterations, no camera, inference or GUI) measured means/p95s of **1.006/1.338 ms**
+for adaptation/features, **0.024/0.032 ms** for rules and **1.030/1.366 ms** total.
+A separate preview-only check (20 warm-up / 300 samples, sequential batches)
+measured **0.769/0.972 ms** without gesture labels and **0.822/1.097 ms** with them.
+These are host microbenchmarks, not physical camera FPS or recognition accuracy.
+The extra work is measurable, so recognition remains opt-in while local hardware
+validation is pending. The 35–40 FPS target has not been verified.
 
 ## Observations and indices
 
@@ -143,8 +268,8 @@ not later be treated as recognized gestures or silently replaced by zeros.
 Future classifiers can consume this record's timestamp, raw/smoothed coordinates,
 metadata and cached geometry. This supports later static comparisons and later
 temporal consumers retaining consecutive records for movement/transitions. Empty
-frames explicitly represent no observations. **No classifier, matching, temporal
-state, recognition result, event interface or gesture algorithm is implemented.**
+frames explicitly represent no observations. Phase 3.2 static rules now consume
+this contract; no matching, temporal state or gesture event system is implemented.
 Future temporal code must solve hand association explicitly; tuple order and
 Left/Right predictions are insufficient for persistent identity.
 
@@ -176,7 +301,8 @@ print(normalized_distance(hand, I.THUMB_TIP, I.INDEX_FINGER_TIP, image_size=size
 
 ## Adapting MediaPipe Tasks output
 
-Call this **outside the existing live loop** when using the foundation explicitly:
+For direct use of the foundation (the live bridge performs this work only when
+`--gestures` is enabled):
 
 ```python
 from gestures import ImageSize, extract_frame_features, from_mediapipe
@@ -218,8 +344,11 @@ points, model jitter, handedness errors and EMA lag remain caller considerations
 
 No gesture accuracy, new hardware FPS or true camera-to-display latency has been
 measured for this foundation. The owner's verified Phase 2.5 two-hand result was
-38.77 FPS; this package adds no work to that tracker. Live recognition integration
-and physical accuracy/performance evaluation belong to later milestones.
+38.77 FPS before live gesture integration. Disabling recognition skips all new
+classification work; enabled recognition's physical accuracy/performance still
+requires local evaluation. Geometry can satisfy these broad rules for unsupported
+poses, especially under occlusion or strong perspective. There is no guarantee
+that every unsupported physical pose will return UNKNOWN.
 
 From `C:\Users\Darsh\VisionControl` in PowerShell:
 
@@ -231,17 +360,27 @@ From `C:\Users\Darsh\VisionControl` in PowerShell:
 .\.venv\Scripts\python.exe -m pip check
 ```
 
-The 36 new tests cover indexing/validation/immutability, adapter cardinality and
+The 36 Phase 3.1 tests cover indexing/validation/immutability, adapter cardinality and
 metadata pairing, input snapshots, distances/vectors/angles/degeneracy, aspect and
 image conversion, expected feature measurements, translation/scaling, planar
-rotation, projection limits and independent hands/loss. All 77 prior tests are
-also run. Compatibility smoke checks additionally use the installed Tasks enum,
+rotation, projection limits and independent hands/loss. Phase 3.2 adds rule and
+live-bridge tests for articulated poses, natural thumb variations, both sides,
+scale/rotation, moderate synthetic foreshortening, ambiguous/invalid/conflicting
+features, detection order, EMA input, rendering, Q/H/native polling, warm-up and
+JSON timing/count behavior. All earlier camera/tracking tests are also run.
+Compatibility smoke checks additionally use the installed Tasks enum,
 real Tasks result containers and the existing EMA output without a camera.
+All **134 automated tests pass**: 48 gesture tests, 70 tracking tests and 16 camera tests.
+An additional smoke test loaded the real installed model, processed blank 1080p
+synthetic frames with `--gestures` in a native Win32 preview, recorded gesture
+timings with no phantom classifications, and released the simulated capture/window.
+This was an integration check without a physical webcam. Synthetic label layout
+was also rendered and visually inspected; physical accuracy remains unverified.
 
 Suggested commit after review:
 
 ```text
-feat(gestures): add recognition foundation and geometry utilities
+feat(gestures): recognize static hand poses with unknown fallback
 ```
 
-Phase 3.1 stops here. No automatic commit or push is performed.
+Phase 3.2 stops here. No automatic commit or push is performed.

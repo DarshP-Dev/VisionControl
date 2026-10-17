@@ -81,6 +81,7 @@ class HandOverlay:
     label: str
     color: tuple
     points: list
+    gesture: str | None = None
 
 
 def handedness_label(categories):
@@ -99,7 +100,7 @@ def handedness_label(categories):
     return name if name in ("Left", "Right") else "Unknown"
 
 
-def hand_overlays(result, width, height):
+def hand_overlays(result, width, height, gesture_results=None):
     """Pair landmarks and handedness within this result only; retain no track IDs."""
     overlays = []
     handedness = getattr(result, "handedness", None) or []
@@ -118,7 +119,11 @@ def hand_overlays(result, width, height):
         if color in used_colors:
             color = ALTERNATE_COLOR
         used_colors.add(color)
-        overlays.append(HandOverlay(label, color, points))
+        gesture = None
+        if gesture_results is not None:
+            gesture = (gesture_results[index].gesture.value if index < len(gesture_results)
+                       else "UNKNOWN")
+        overlays.append(HandOverlay(label, color, points, gesture))
     return overlays
 
 
@@ -129,7 +134,7 @@ def draw_hand(preview, hand, top_margin=27):
     for point in hand.points:
         cv2.circle(preview, point, 4, (0, 0, 0), -1, cv2.LINE_AA)
         cv2.circle(preview, point, 3, hand.color, -1, cv2.LINE_AA)
-    text = f"{hand.label} hand"
+    text = f"{hand.label} - {hand.gesture}" if hand.gesture is not None else f"{hand.label} hand"
     (width, height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 1)
     x = max(4, min(hand.points[0][0] + 8, preview.shape[1] - width - 5))
     y = max(top_margin + height + 4,
@@ -163,7 +168,8 @@ class PreviewRenderer:
         return self.buffer
 
 
-def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw_result=None):
+def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw_result=None,
+                 gesture_results=None):
     start = time.perf_counter()
     height, width = frame.shape[:2]
     scale = min(1100 / width, 650 / height, 1.0)
@@ -172,7 +178,7 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
     resized = time.perf_counter()
     if timings is not None:
         timings.add("preview_resize", resized - start)
-    hands = hand_overlays(result, preview.shape[1], preview.shape[0])
+    hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results)
     for hand in hands:
         draw_hand(preview, hand, top_margin=54 if show_help else 27)
     if raw_result is not None:

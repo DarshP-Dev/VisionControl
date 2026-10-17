@@ -1,4 +1,43 @@
-# Phase 2.5: targeted GUI optimization and workload profiling
+# Phase 3.2: static gesture overhead
+
+The owner's verified Phase 2.5 two-hand comparison was 28.98 FPS for the original
+GUI path and 38.77 FPS with native Win32 polling. Gesture recognition is opt-in
+with `--gestures`; `--no-gestures` (default) skips the adapter/features/classifier.
+The capture backend, model, inference size, EMA and event pump are preserved.
+
+New per-frame stages are `gesture_features` (adaptation plus geometry),
+`gesture_classification` (rules/results) and their containing `gesture_total`.
+They retain all existing timing statistics and warm-up behavior, appear in
+per-hand-count profiles, and are included in existing processing/loop/FPS timing.
+JSON also records gesture settings, thresholds and measured classification counts.
+
+Synthetic measurements in the existing environment used two articulated fabricated
+hands, 100 warm-up and 1000 measured recognition iterations, without camera,
+inference or GUI. All values are milliseconds per two-hand frame:
+
+| Stage | Mean | p50 | p95 | p99 | Max |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Adaptation/features | 1.006 | 0.956 | 1.338 | 1.713 | 2.495 |
+| Static rules/results | 0.024 | 0.022 | 0.032 | 0.048 | 0.103 |
+| Total recognition | 1.030 | 0.979 | 1.366 | 1.742 | 2.540 |
+
+Separate preview-only batches (20 warm-up, 300 samples each) measured mean/p95
+0.769/0.972 ms without gesture labels and 0.822/1.097 ms with them. These checks
+do not measure live application FPS, physical gesture accuracy or frame age.
+No physical Phase 3.2 performance claim is made. Extra work is measurable;
+keeping recognition opt-in protects the established default until local tests.
+
+See [the gesture README](../gestures/README.md#manual-webcam-validation-and-performance)
+for exact PowerShell off/on commands and the manual quality checklist. Use the
+same capture/inference/smoothing settings, repeat matched zero/one/two-hand
+conditions, compare only completed reports and reverse order on a repeat.
+Headless tracking includes recognition when enabled but excludes drawing/GUI;
+compare it separately from preview FPS. Future pinches and temporal gesture
+states/events are deferred to later milestones.
+
+---
+
+# Historical Phase 2.5: targeted GUI optimization and workload profiling
 
 ## Findings before changing the pipeline
 
