@@ -13,6 +13,7 @@ import time
 
 import cv2
 
+from controls import cli as control_cli
 from gestures.models import ImageSize
 from gestures.pinch import PinchThresholds, PinchTracker
 from gestures.state_machine import GestureStateManager, StateSettings
@@ -128,6 +129,7 @@ def parse_args(argv=None):
     parser.add_argument("--swipe-feedback-ms", type=nonnegative_int, default=350, help="short confirmation feedback duration")
     parser.add_argument("--swipe-max-scale-change", type=positive_float, default=.25)
     parser.add_argument("--swipe-pose", choices=("open-palm", "open-palm-or-fist"), default="open-palm")
+    control_cli.add_arguments(parser)
     args = parser.parse_args(argv)
     if args.headless and not args.benchmark:
         parser.error("--headless requires --benchmark for a timed run (Ctrl+C can interrupt)")
@@ -154,6 +156,7 @@ def parse_args(argv=None):
         parser.error("--swipes requires --gestures --pinch --gesture-states (pose eligibility, pinch safety and events)")
     if args.swipe_debug and not args.swipes:
         parser.error("--swipe-debug requires --swipes")
+    control_cli.validate(parser, args)
     return args
 
 
@@ -194,8 +197,13 @@ def create_landmarker(model_path):
     return mp, mp.tasks.vision.HandLandmarker.create_from_options(options)
 
 
-def process_frames(cap, landmarker, mp, args=None, report=None):
+def process_frames(cap, landmarker, mp, args=None, report=None, controller=None):
     args = args if args is not None else parse_args([])
+    if args.controls and controller is None:
+        # Direct callers get the same cleanup and explicit live safety initialization as run().
+        with ExitStack() as resources:
+            configured_controller = control_cli.create_controller(args, resources)
+            return process_frames(cap, landmarker, mp, args, report, configured_controller)
     start = time.perf_counter()
     timestamps = FrameTimestamp(start)
     fps = ApplicationFPS(start)
@@ -283,6 +291,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                         timings.add("swipe_processing", state_manager.last_swipe_seconds)
                     if args.gesture_event_debug:
                         log_state_events(state_frame.events)
+            if controller is not None:
+                before_controls = time.perf_counter()
+                controller.update(state_frame, tuple(prepared), pinches)
+                timings.add("controller_processing", time.perf_counter() - before_controls)
             if not capture_logged:
                 LOGGER.info("Actual capture: %d x %d | actual inference: %d x %d",
                             frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])
@@ -296,7 +308,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                                        pinch_thresholds=pinch_thresholds if args.pinch_debug else None,
                                        gesture_states=state_frame.hands if state_frame is not None else None,
                                        swipe_results=state_frame.motion if state_frame is not None and args.swipes else None,
-                                       swipe_config=configured_swipes if args.swipe_debug else None)
+                                       swipe_config=configured_swipes if args.swipe_debug else None,
+                                       control_status=controller.status() if controller is not None else None)
                 before_display = time.perf_counter()
                 cv2.imshow(WINDOW, preview)
                 before_events = time.perf_counter()
@@ -344,6 +357,11 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 return 0
             if key in (ord("h"), ord("H")):
                 show_help = not show_help
+            if controller is not None:
+                if key in (ord("a"), ord("A")):
+                    controller.arm()
+                elif key in (ord("d"), ord("D")):
+                    controller.disarm()
             if not args.headless and cv2.getWindowProperty(WINDOW, cv2.WND_PROP_VISIBLE) < 1:
                 return 0
             if not measuring and end - start >= args.warmup:
@@ -357,6 +375,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 status = "completed"
                 return 0
     finally:
+        if controller is not None:
+            controller.disarm("Tracking shutdown")
         cpu_end = time.process_time()
         cpu_wall_seconds = (max(0.0, time.perf_counter() - measurement_start)
                             if measurement_start is not None else 0.0)
@@ -411,6 +431,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                            "settings": asdict(configured_swipes), "confirmation_counts": dict(swipe_counts),
                            "coordinates": "unmirrored image: right increases x, left decreases x",
                            "event_policy": "one STARTED then ENDED at confirmation; consume STARTED once"},
+                "controls": {"enabled": args.controls, "settings": asdict(control_cli.settings(args)),
+                             "final_status": asdict(controller.status()) if controller is not None else None,
+                             "mapping": "relative aspect-correct smoothed index tip; activation anchors cursor",
+                             "emergency_stop": "Ctrl+Alt+Esc (live only); 500 ms host-stall watchdog"},
                 "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown.",
             })
         LOGGER.info("Application FPS includes capture, preparation, inference, smoothing%s; "
@@ -442,6 +466,7 @@ def run(args, report=None):
                          args.model)
             return 1
         with ExitStack() as resources:
+            controller = control_cli.create_controller(args, resources) if args.controls else None
             mp, landmarker = create_landmarker(args.model)
             report["mediapipe"] = getattr(mp, "__version__", "unavailable")
             resources.callback(landmarker.close)
@@ -462,19 +487,24 @@ def run(args, report=None):
             LOGGER.info("Pinch: %s | activation < %.3f | release > %.3f | projected proximity only; "
                         "open fingers to arm/rearm after startup or loss", args.pinch,
                         args.pinch_activation, args.pinch_release)
-            LOGGER.info("Gesture states: %s | settings: %s | PINCH precedence; no desktop actions",
+            LOGGER.info("Gesture states: %s | settings: %s | recognition emits intent events only",
                         args.gesture_states, asdict(state_settings(args)))
-            LOGGER.info("Swipes: %s | settings: %s | unmirrored image directions; no desktop actions",
+            LOGGER.info("Swipes: %s | settings: %s | unmirrored image directions; separate opt-in action mapper",
                         args.swipes, asdict(swipe_settings(args)))
             LOGGER.info("Preview/input: unmirrored. Left/Right identify the subject's hands; "
                         "colors follow each frame's handedness predictions, not detection order.")
             LOGGER.info("%s No camera throughput claim is made by inference FPS.",
                         "Timed headless run; Ctrl+C interrupts." if args.headless
                         else "Q: Quit | H: Toggle help.")
+            if controller is not None:
+                LOGGER.info("Controls: %s | starts DISARMED | selected %s | clicks=%s tabs=%s | "
+                            "A: Arm, D: Disarm, Q: Quit | live global stop: Ctrl+Alt+Esc",
+                            args.control_mode, args.control_hand, args.control_mouse, args.control_tabs)
             if not args.headless:
                 cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)
                 resources.callback(cv2.destroyAllWindows)
-            return process_frames(cap, landmarker, mp, args=args, report=report)
+            options = {"controller": controller} if controller is not None else {}
+            return process_frames(cap, landmarker, mp, args=args, report=report, **options)
     except (ImportError, OSError, ValueError, RuntimeError, cv2.error) as exc:
         report.update(status="error", error=str(exc))
         LOGGER.error("Hand tracking failed: %s. Check the model and install dependencies with "

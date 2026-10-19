@@ -9,7 +9,11 @@ Phase 3.4 optionally stabilizes static results and resolves pinch precedence int
 typed events; raw recognition remains visible and unchanged.
 Phase 3.5 optionally recognizes palm-trajectory SWIPE_LEFT/SWIPE_RIGHT through
 the same event manager, with pose eligibility, motion metrics and reset safeguards.
-No gesture-triggered actions, cursor, voice or motor controls are implemented.
+Phase 3.6 adds a separate opt-in desktop mapper: simulation by default, explicit
+arming, relative cursor, pinch click/drag and independently enabled browser tabs.
+See [controls/README.md](../controls/README.md) for commands, global
+**Ctrl+Alt+Esc** stop, safety gates and staged local testing. Tracking/recognition
+commands alone still send no desktop input. Voice and motor controls are absent.
 The existing Phase 1 camera applications are unchanged.
 Inference size is configurable independently of capture; detailed benchmarking
 and host timing reports are available. See [PERFORMANCE.md](PERFORMANCE.md) for

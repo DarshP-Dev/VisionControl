@@ -1,4 +1,28 @@
-# Recognition performance: Phase 3.5 swipes and existing recognition
+# Recognition and controls performance
+
+## Phase 3.6 controller overhead
+
+Opt-in controls reuse the current shared features, smoothed landmarks and
+StateFrame/events. `controller_processing` measures the mapper and input-backend
+calls; it is nested within `processing`/`end_to_end`, not additive. JSON includes
+settings and final controls status. Defaults skip this work entirely. GUI status
+rendering is included in `text_overlay`. No camera/inference worker or extra
+inference was added; only live mode has a global emergency/watchdog thread.
+
+Use the recognition versus armed simulation preview benchmarks in
+[controls/README.md](../controls/README.md), keeping scene, lighting, movement,
+number of hands, inference and GUI settings alike. Mark disarmed versus armed
+runs; disabled actions do not measure their cost. No new physical camera FPS or
+Windows delivery latency has been measured. Synthetic virtual-backend timings
+cannot establish hardware improvement or the previous ~36 FPS baseline's retention.
+
+Implementation-time synthetic check: 500 warm-up + 5000 measured controller calls,
+two cached confidently separated hands, armed POINTING, simulation backend,
+1920x1080 virtual screen. Controller-only mean **0.01566 ms**, p50 **0.01530 ms**,
+p95 **0.01650 ms**, p99 **0.01940 ms**, max **0.23190 ms** on this host. Frame
+timestamps advanced 33 ms deterministically; capture, feature extraction, event
+recognition, GUI, actual Windows API calls and the live safety thread were excluded.
+This is a local cost illustration, not application FPS or live input latency.
 
 ## Phase 3.5 swipe overhead
 

@@ -252,7 +252,7 @@ class PreviewRenderer:
 
 def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw_result=None,
                  gesture_results=None, pinch_results=None, pinch_thresholds=None, gesture_states=None,
-                 swipe_results=None, swipe_config=None):
+                 swipe_results=None, swipe_config=None, control_status=None):
     start = time.perf_counter()
     height, width = frame.shape[:2]
     scale = min(1100 / width, 650 / height, 1.0)
@@ -270,7 +270,7 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
         if columns:
             column = columns[id(hand)]
             bounds = (column*preview.shape[1]//2+4,(column+1)*preview.shape[1]//2-6)
-        draw_hand(preview, hand, top_margin=54 if show_help else 27, pinch_thresholds=pinch_thresholds,
+        draw_hand(preview, hand, top_margin=(54 if show_help else 27)+(54 if control_status else 0), pinch_thresholds=pinch_thresholds,
                   swipe_config=swipe_config, capture_aspect=height/width, annotation_bounds=bounds)
     if raw_result is not None:
         for hand in hand_overlays(raw_result, preview.shape[1], preview.shape[0]):
@@ -286,13 +286,17 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
         lines.append("Left: green | Right: blue | Raw: white + | H: Hide help"
                      if raw_result is not None else
                      "Show one or two hands. Left: green | Right: blue | H: Hide help")
+    if control_status is not None:
+        lines.extend(control_status.lines())
     for index, text in enumerate(lines):
+        font = (min(.5, max(.12, (preview.shape[1]-16) / max(1, cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, .5, 1)[0][0]) * .5))
+                if control_status is not None else .5)
         (text_width, text_height), baseline = cv2.getTextSize(
-            text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+            text, cv2.FONT_HERSHEY_SIMPLEX, font, 1)
         top = index * 27
         preview[top:top + 27, :text_width + 16] = 0
         cv2.putText(preview, text, (8, top + text_height + 4),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
+                    cv2.FONT_HERSHEY_SIMPLEX, font, (255, 255, 255), 1, cv2.LINE_AA)
     if timings is not None:
         timings.add("text_overlay", time.perf_counter() - drawn)
     return preview

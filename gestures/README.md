@@ -1,5 +1,9 @@
 # Phase 3.5: Static, pinch and directional swipe recognition
 
+Phase 3.6's separate [desktop action mapper](../controls/README.md) can optionally
+consume these existing events. This package remains independent of Windows input;
+recognition flags alone send no actions. Thresholds and event semantics are unchanged.
+
 This package provides the Phase 3.1 landmark geometry foundation and Phase 3.2
 deterministic static rules: **OPEN_PALM, FIST, POINTING, UNKNOWN**. Feature
 extraction stays separate from classification. The existing hand-tracking
