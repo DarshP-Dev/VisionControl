@@ -1,4 +1,31 @@
-# Phase 3.2: static gesture overhead
+# Recognition performance: Phase 3.3 pinch and existing static gestures
+
+Phase 3.3 adds synchronous opt-in `--pinch`, independent of `--gestures`. Both
+channels share the smoothed observation and one extraction per hand. Separate
+`pinch_processing` includes cached measurement validation and conservative state
+tracking; `pinch_features` appears only in pinch-only runs (combined runs share
+`gesture_features`). New overlay work remains in `landmark_drawing`. All stages
+are included in existing end-to-end/FPS/per-hand-count timings and warm-up rules.
+
+A two-hand interleaved host comparison (100 warm-up/1000 measured samples per
+configuration, five repeated approach/release poses, alternating order, disabled
+Profile collection) measured mean/p50/p95/p99 in ms:
+
+| Work | Mean | p50 | p95 | p99 |
+| --- | ---: | ---: | ---: | ---: |
+| Static bridge | 1.479 | 1.042 | 3.906 | 5.692 |
+| Static bridge + pinch | 1.555 | 1.112 | 4.186 | 6.060 |
+| Pinch portion of combined run | 0.105 | 0.072 | 0.279 | 0.405 |
+
+This includes SDK-result adaptation, geometry and rules, but excludes camera,
+inference, smoothing and preview. Host scheduling noise affects tails; it cannot
+predict physical accuracy, responsiveness or webcam FPS. The target is ~35+ FPS
+against the owner's ~36 FPS static baseline. Follow the [sequential preview
+benchmark commands](../gestures/README.md#manual-calibration-and-acceptance-checklist)
+with the same lighting/motion/hand count; disable both diagnostic flags for FPS
+comparisons. The new pinch implementation has not been physically tested.
+
+## Earlier Phase 3.2 measurements
 
 The owner subsequently measured approximately **36 FPS with recognition** and
 accepted its overhead. The targeted POINTING calibration adds no capture/GUI/model

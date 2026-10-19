@@ -1,8 +1,10 @@
-# Hand tracking with optional Phase 3.2 static gesture labels
+# Hand tracking with independent static gestures and Phase 3.3 pinch detection
 
 Detect and draw **up to two hands**, each with 21 landmarks and a skeleton, using the
 MediaPipe Tasks Hand Landmarker API in synchronous **VIDEO** mode on the CPU.
 Optional static recognition labels open palm, fist, pointing and unknown poses.
+Optional pinch recognition measures normalized thumb/index proximity with a
+separate OPEN/STARTED/HELD/RELEASED/UNAVAILABLE lifecycle; it adds no static class.
 No gesture-triggered actions, cursor, voice or motor controls are implemented.
 The existing Phase 1 camera applications are unchanged.
 Inference size is configurable independently of capture; detailed benchmarking
@@ -14,8 +16,9 @@ Phase 2.5 uses native Win32 GUI polling when supported, retaining an explicit
 `waitKey(1)` baseline and a timed headless comparison. Full inference, MSMF,
 two-hand model options, drawing, confidence thresholds and EMA alpha 0.75 are
 unchanged. The owner's Phase 2.5 comparison measured 28.98 FPS with the old GUI
-path and 38.77 FPS with native polling. Phase 3.2 gesture accuracy/FPS still await
-local hardware testing.
+path and 38.77 FPS with native polling. The owner verified static gestures after
+POINTING calibration at approximately 36 FPS. New Phase 3.3 pinch accuracy/FPS
+still await local hardware testing; backward-rotation static ambiguity is unchanged.
 
 ## Run on Windows
 
@@ -32,8 +35,7 @@ To enable per-hand static gesture labels in this same preview:
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --no-gestures
 ```
 
-Recognition is **off by default**: synthetic measurements show measurable extra
-work, and physical accuracy/performance is pending. `--gestures` uses the selected
+Recognition is **off by default**. `--gestures` uses the selected
 raw/EMA coordinates with actual capture aspect correction, without modifying
 MediaPipe results. Each wrist label includes `OPEN_PALM`, `FIST`, `POINTING` or
 `UNKNOWN`. No observation means no gesture label; nothing persists after loss.
@@ -44,6 +46,54 @@ calibrated confidence percentages. See [gesture rules, thresholds and manual
 testing](../gestures/README.md) for limitations and repeatable off/on benchmarks.
 `gesture_features`, `gesture_classification` and `gesture_total` profile the new
 work separately, including in headless runs and per-hand-count reports.
+
+## Phase 3.3 pinch channel
+
+```powershell
+# Pinch alone; open fingers once before pinching to arm the lifecycle
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --pinch
+
+# Live numeric distance, bounds, geometry validity, state/rearm diagnostics
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --pinch --pinch-debug --pinch-activation 0.25 --pinch-release 0.40
+
+# Static gestures and pinch together, sharing extracted features
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch
+```
+
+`--pinch` is independent of `--gestures` / `--no-gestures`. No flag means the
+original tracking behavior. `--pinch-debug` requires `--pinch` and adds one small
+numeric row near each hand, with no per-frame console logging. The main label
+shows pinch state; highlighted thumb/index tips and their line are gray OPEN,
+yellow STARTED, green HELD, orange RELEASED or purple UNAVAILABLE. Skeleton
+colors, static labels, Q/H, MSMF and native polling remain unchanged.
+
+Pinch distance is aspect-correct 2D tip distance (indices 4 and 8) divided by the
+existing mean palm length/width. Defaults start **below 0.25** and release **above
+0.40** palm units; CLI values must satisfy `0 < activation < release <= 2`.
+These are uncalibrated starter thresholds, not physical contact detection.
+Projected overlap, perspective and occlusion remain limitations.
+
+After startup or tracking loss, open beyond release to arm/rearm. Closed
+reacquisition is UNAVAILABLE, never a fabricated STARTED/RELEASED. Unique confident
+side labels support independent histories without assuming detection order;
+uncertain/duplicate labels, overlap, large wrist jumps, invalid geometry or timing
+invalidate histories conservatively. Left/Right predictions are not persistent IDs.
+STARTED/RELEASED last one observation and can be visually brief. Geometry validity
+can be true while identity/rearming makes the pinch state UNAVAILABLE.
+
+The existing smoothed results feed both channels, with one feature extraction per
+hand when combined. `pinch_processing` measures the lifecycle separately;
+`pinch_features` is adaptation/geometry for pinch-only runs. Combined runs share
+`gesture_features`; preview drawing and full-loop profiles include the new work.
+Warm-up remains excluded, and JSON contains pinch settings/status counts and
+per-hand-count timings. No additional model, inference, threads or dependencies.
+See [pinch calibration, sequential benchmark commands, tests and manual checklist](../gestures/README.md#phase-33-real-time-pinch-proximity).
+
+The synthetic combined recognition bridge averaged 1.555 ms vs 1.479 ms for
+static-only in an interleaved test; the pinch portion averaged 0.105 ms. This
+excludes camera, inference and rendering and does not verify the 35+ FPS target.
+
+## Existing POINTING diagnostics
 
 For the focused POINTING calibration, enable sampled numeric diagnostics:
 
@@ -56,8 +106,8 @@ measurements and PASS/FAIL blockers at most once every two seconds, with no
 images or raw landmark coordinates. This is logging cadence only; classifications
 remain immediate. See [calibration findings and log collection](../gestures/README.md#targeted-pointing-calibration-and-diagnostics)
 for the bounded POINTING-only tolerances and narrow thumbs-up exclusion from FIST.
-The owner verified the original open-palm/fist/unknown behavior and approximately
-36 FPS recognition, but the new POINTING calibration still needs webcam testing.
+The owner verified static behavior after POINTING calibration and approximately
+36 FPS recognition. New pinch recognition still needs webcam testing.
 Disable debugging when comparing performance.
 
 To try a smaller inference image while keeping 1080p capture and a clear preview:
@@ -420,7 +470,9 @@ new CLI constraints and warm-up exclusion.
 The original Phase 3.2 baseline was **134 tests**. The targeted POINTING
 calibration adds 14 focused geometry/diagnostic regressions; all previous tests
 continue to run, including Phase 1 camera tests.
-The complete result is **148 passing tests** (56 gesture, 76 tracking, 16 camera).
+Phase 3.2 completed with 148 passing tests (56 gesture, 76 tracking, 16 camera).
+Phase 3.3 adds 26 pinch regressions: **174 tests pass** (73 gesture, 85 tracking,
+16 camera), including all earlier tests without weakening their expectations.
 Phase 3.2 coverage includes static labels, detection order and loss, EMA input,
 malformed-hand fallback, native polling/Q/H and gesture profiling/warm-up/counts.
 Phase 1 tests cover

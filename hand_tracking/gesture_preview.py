@@ -1,9 +1,9 @@
-"""Bridge displayed Tasks results to static rules; keep frame-local result slots."""
+"""Share displayed Tasks geometry across static rules and pinch, retaining slots."""
 
 import time
 from types import SimpleNamespace
 
-from gestures.features import extract_features
+from gestures.features import HandFeatures, extract_features
 from gestures.landmarks import from_mediapipe
 from gestures.models import ImageSize
 from gestures.static_gestures import GestureResult, classify_hand
@@ -12,15 +12,14 @@ from .performance import Profile
 from .tracking_utils import MAX_HANDS
 
 
-def classify_result(result: object, timestamp_ms: int, image_size: ImageSize,
-                    timings: Profile, *, diagnostics: bool = False) -> tuple[GestureResult, ...]:
-    """Include adaptation/features in gesture_features, rules in gesture_classification.
+def prepare_features(result: object, timestamp_ms: int, image_size: ImageSize) -> tuple[HandFeatures | None, ...]:
+    """Adapt/extract once, retaining invalid slots for both recognition channels.
 
     The usual path snapshots the whole frame once. If a malformed hand makes
     strict adaptation fail, adapt individual slots so the other hand still works.
-    Invalid slots become UNKNOWN; zero detections produce an empty tuple.
+    Invalid slots become None (static UNKNOWN / pinch UNAVAILABLE); no detections
+    produce an empty tuple.
     """
-    start = time.perf_counter()
     hands = (getattr(result, "hand_landmarks", None) or [])[:MAX_HANDS]
     try:
         observations = from_mediapipe(result, timestamp_ms, image_size).hands
@@ -40,6 +39,17 @@ def classify_result(result: object, timestamp_ms: int, image_size: ImageSize,
             prepared.append(extract_features(hand, image_size=image_size) if hand is not None else None)
         except ValueError:
             prepared.append(None)
+    return tuple(prepared)
+
+
+def classify_result(result: object, timestamp_ms: int, image_size: ImageSize,
+                    timings: Profile, *, diagnostics: bool = False,
+                    features_out: list[HandFeatures | None] | None = None) -> tuple[GestureResult, ...]:
+    """Profile static rules; optionally share prepared geometry with pinch."""
+    start = time.perf_counter()
+    prepared = prepare_features(result, timestamp_ms, image_size)
+    if features_out is not None:
+        features_out.extend(prepared)
     before_rules = time.perf_counter()
     classifications = tuple(classify_hand(hand, timestamp_ms, diagnostics=diagnostics) for hand in prepared)
     end = time.perf_counter()

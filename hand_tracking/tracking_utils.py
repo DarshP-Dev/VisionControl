@@ -3,9 +3,13 @@
 import math
 from dataclasses import dataclass
 import time
+from typing import TYPE_CHECKING
 
 import cv2
 import numpy as np
+
+if TYPE_CHECKING:
+    from gestures.pinch import PinchResult
 
 
 MAX_HANDS = 2
@@ -13,6 +17,8 @@ HAND_COLORS = {"Left": (80, 220, 80), "Right": (255, 160, 60), "Unknown": (180, 
 ALTERNATE_COLOR = (200, 80, 220)
 ONE_HAND_REFERENCE_FPS = 35.81
 PERFORMANCE_DROP_RATIO = 0.75
+PINCH_COLORS = {"OPEN": (180, 180, 180), "STARTED": (0, 255, 255),
+                "HELD": (80, 255, 80), "RELEASED": (0, 160, 255), "UNAVAILABLE": (180, 100, 220)}
 
 
 # MediaPipe's 21-landmark hand topology: wrist, fingers and palm edges.
@@ -82,6 +88,7 @@ class HandOverlay:
     color: tuple
     points: list
     gesture: str | None = None
+    pinch: "PinchResult | None" = None
 
 
 def handedness_label(categories):
@@ -100,7 +107,7 @@ def handedness_label(categories):
     return name if name in ("Left", "Right") else "Unknown"
 
 
-def hand_overlays(result, width, height, gesture_results=None):
+def hand_overlays(result, width, height, gesture_results=None, pinch_results=None):
     """Pair landmarks and handedness within this result only; retain no track IDs."""
     overlays = []
     handedness = getattr(result, "handedness", None) or []
@@ -123,11 +130,12 @@ def hand_overlays(result, width, height, gesture_results=None):
         if gesture_results is not None:
             gesture = (gesture_results[index].gesture.value if index < len(gesture_results)
                        else "UNKNOWN")
-        overlays.append(HandOverlay(label, color, points, gesture))
+        pinch = pinch_results[index] if pinch_results is not None and index < len(pinch_results) else None
+        overlays.append(HandOverlay(label, color, points, gesture, pinch))
     return overlays
 
 
-def draw_hand(preview, hand, top_margin=27):
+def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None):
     """Shared drawing path for either hand, with a label close to its wrist."""
     for start, end in HAND_CONNECTIONS:
         cv2.line(preview, hand.points[start], hand.points[end], hand.color, 2, cv2.LINE_AA)
@@ -135,14 +143,35 @@ def draw_hand(preview, hand, top_margin=27):
         cv2.circle(preview, point, 4, (0, 0, 0), -1, cv2.LINE_AA)
         cv2.circle(preview, point, 3, hand.color, -1, cv2.LINE_AA)
     text = f"{hand.label} - {hand.gesture}" if hand.gesture is not None else f"{hand.label} hand"
+    if hand.pinch is not None:
+        status = hand.pinch.status.value
+        text += f" | Pinch: {status}"
+        color = PINCH_COLORS[status]
+        cv2.line(preview, hand.points[4], hand.points[8], color, 2, cv2.LINE_AA)
+        for index in (4, 8):
+            cv2.circle(preview, hand.points[index], 7, (0, 0, 0), -1, cv2.LINE_AA)
+            cv2.circle(preview, hand.points[index], 5, color, -1, cv2.LINE_AA)
     (width, height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 1)
     x = max(4, min(hand.points[0][0] + 8, preview.shape[1] - width - 5))
+    diagnostic_row = 23 if hand.pinch is not None and pinch_thresholds is not None else 0
     y = max(top_margin + height + 4,
-            min(hand.points[0][1] + 22, preview.shape[0] - baseline - 5))
+            min(hand.points[0][1] + 22, preview.shape[0] - baseline - 5 - diagnostic_row))
     cv2.rectangle(preview, (x - 3, y - height - 3), (x + width + 3, y + baseline + 3),
                   (0, 0, 0), -1)
     cv2.putText(preview, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX,
                 0.55, hand.color, 1, cv2.LINE_AA)
+    if diagnostic_row:
+        measurement = hand.pinch.measurement
+        distance = "--" if measurement.normalized_distance is None else f"{measurement.normalized_distance:.3f}"
+        debug = (f"d={distance} A<{pinch_thresholds.activation:g} R>{pinch_thresholds.release:g} "
+                 f"valid={'yes' if measurement.valid else 'no'}")
+        if hand.pinch.reason:
+            debug += f" | {hand.pinch.reason}"
+        (width, height), baseline = cv2.getTextSize(debug, cv2.FONT_HERSHEY_SIMPLEX, .45, 1)
+        x = max(4, min(x, preview.shape[1] - width - 5))
+        y += diagnostic_row
+        cv2.rectangle(preview, (x - 3, y - height - 3), (x + width + 3, y + baseline + 3), (0, 0, 0), -1)
+        cv2.putText(preview, debug, (x, y), cv2.FONT_HERSHEY_SIMPLEX, .45, (255, 255, 255), 1, cv2.LINE_AA)
 
 
 def significant_fps_drop(rate):
@@ -169,7 +198,7 @@ class PreviewRenderer:
 
 
 def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw_result=None,
-                 gesture_results=None):
+                 gesture_results=None, pinch_results=None, pinch_thresholds=None):
     start = time.perf_counter()
     height, width = frame.shape[:2]
     scale = min(1100 / width, 650 / height, 1.0)
@@ -178,9 +207,9 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
     resized = time.perf_counter()
     if timings is not None:
         timings.add("preview_resize", resized - start)
-    hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results)
+    hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results, pinch_results)
     for hand in hands:
-        draw_hand(preview, hand, top_margin=54 if show_help else 27)
+        draw_hand(preview, hand, top_margin=54 if show_help else 27, pinch_thresholds=pinch_thresholds)
     if raw_result is not None:
         for hand in hand_overlays(raw_result, preview.shape[1], preview.shape[0]):
             for point in hand.points:

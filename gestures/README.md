@@ -1,12 +1,14 @@
-# Phase 3.2: Static gesture recognition
+# Phase 3.3: Pinch detection and static gestures
 
 This package provides the Phase 3.1 landmark geometry foundation and Phase 3.2
 deterministic static rules: **OPEN_PALM, FIST, POINTING, UNKNOWN**. Feature
 extraction stays separate from classification. The existing hand-tracking
 preview can show per-hand gesture labels with `--gestures`; recognition is
-opt-in pending physical accuracy and performance validation. The classifier
-imports no camera, GUI, MediaPipe or desktop-control code. No motion history,
-additional model, threads, cooldowns or gesture-triggered actions are added.
+opt-in. The owner has verified static recognition at approximately 36 FPS after
+POINTING calibration; occasional backward-rotation POINTING/FIST ambiguity is
+unchanged. The static classifier imports no camera, GUI, MediaPipe or desktop-control
+code and retains no motion history. Phase 3.3 adds only a separate pinch lifecycle;
+no additional model, threads, cooldowns or gesture-triggered actions are added.
 
 The package uses only Python's standard library (Python 3.11+; the existing
 environment is Python 3.13.7). No requirements changes or installations are needed.
@@ -20,6 +22,7 @@ environment is Python 3.13.7). No requirements changes or installations are need
 | `geometry.py` | Stateless distances, vectors, unit directions, dot products, angles, palm scale and distance ratios |
 | `features.py` | Named per-finger/per-hand features and the lightweight `FrameFeatures` consumer contract |
 | `static_gestures.py` | Typed gesture/result/threshold records and stateless conservative rules |
+| `pinch.py` | Cached proximity measurement, typed pinch results and conservative per-side hysteresis/recovery |
 | `__init__.py` | Public observation/feature/adapter exports |
 | `tests/` | Synthetic fixtures and hardware-independent model, adapter, geometry and feature tests |
 
@@ -27,6 +30,195 @@ Existing tracking helpers are display-oriented and import OpenCV/NumPy. The new
 models add validation, metadata and immutable snapshots without importing that
 rendering stack. The adapter also accepts the existing EMA `DisplayLandmark`
 objects structurally; neither the tracker nor its smoothing code is refactored.
+
+## Phase 3.3: real-time pinch proximity
+
+Pinch is a **separate opt-in channel**, not a static PINCH class. Static
+OPEN_PALM/FIST/POINTING/UNKNOWN rules and thresholds are unchanged. For example,
+`Left - UNKNOWN | Pinch: HELD` is a valid combination. No desktop controls,
+generalized gesture state machine, arbitration, swipe detection or actions are
+implemented. Physical pinch accuracy and current FPS still require owner testing.
+
+### Geometry and starting thresholds
+
+Use **THUMB_TIP (4)** and **INDEX_FINGER_TIP (8)** from the current raw/EMA
+observation. Phase 3.1 already computes their `distance_2d` and `thumb_index_ratio`:
+
+```text
+common-axis point = (x, y * image_height / image_width)
+palm scale = (distance(wrist, middle MCP) + distance(index MCP, pinky MCP)) / 2
+pinch distance = distance(thumb tip, index tip) / palm scale
+```
+
+Both numerator and denominator use the same aspect-correct 2D space. There are
+no pixel-distance thresholds. Uniform scale/in-plane rotation do not change the
+ratio; out-of-plane rotation/foreshortening can change it. Non-finite or missing
+features, absent image dimensions, inconsistent cached ratios and zero/negligible
+palm scale give an invalid measurement, never an assumed OPEN state.
+
+Defaults are **activation 0.25**, **release 0.40 palm units**. These use a small
+fraction of palm size for activation and a 0.15-unit hysteresis band to reduce
+boundary chatter. They are conservative initial heuristics, **not physically
+calibrated thresholds or proof of contact**. Valid CLI/configuration values must
+satisfy `0 < activation < release <= 2`; the upper bound excludes thresholds
+spanning several palm sizes, which would no longer describe near-fingertip proximity.
+Projected 2D overlap can appear close even when fingers are separated in depth.
+
+### Narrow pinch lifecycle and recovery
+
+| Previous state | Current observation | Result |
+| --- | --- | --- |
+| Startup / reset / reacquisition | Distance above release | OPEN, armed |
+| Startup / reset / reacquisition | Distance at/below release | UNAVAILABLE, `open_to_rearm` |
+| OPEN / RELEASED | Distance below activation | STARTED, once |
+| OPEN / RELEASED | Distance at/above activation | OPEN |
+| STARTED / HELD | Distance at/below release | HELD |
+| STARTED / HELD | Distance above release | RELEASED, once; then OPEN on the next separated frame |
+| Any | Invalid geometry or unreliable identity/time | UNAVAILABLE, history invalidated |
+| Any | No hand observation | No result/overlay for that hand; history removed |
+
+STARTED and RELEASED are one-frame observations, not latched labels or actions.
+At exact thresholds, the existing active/inactive state is retained. There is no
+debouncing, cooldown or generalized gesture history. A hand already closed when
+the application starts must **separate beyond release once before it can start**.
+After loss/ambiguity, an already-closed returning hand likewise remains
+UNAVAILABLE until observed open. Tracking loss never fabricates intentional
+RELEASED or stale STARTED events.
+
+State association uses only unique Left/Right predictions with one category and
+score **at least 0.8** in consecutive frames. Detection order is never an identity.
+Unknown/uncertain/duplicate/conflicting labels invalidate both histories. Missing
+hands are removed immediately; invalid geometry invalidates the affected history.
+A malformed slot with unknown identity invalidates both rather than assigning it.
+Close wrists (<0.10 in image-width common-axis units), overlapping hand landmark
+bounding boxes, or conflicting image sizes also invalidate both. A wrist jump
+>0.10 invalidates that side rather than guessing a match. These are conservative
+continuity gates, not pixel pinch thresholds or persistent tracking algorithms.
+Histories reset on a timestamp gap >250 ms or a capture dimension change. Invalid
+timestamps raise ValueError after clearing state; duplicate/backward timestamps
+produce UNAVAILABLE and clear history until time passes the last accepted timestamp.
+
+Left/Right are predictions, **not guaranteed persistent identities**. Crossing,
+occlusion and overlapping boxes may interrupt a real pinch. A confident label
+swap or missed identity change that bypasses these simple gates is still possible.
+No speculative matching is attempted. This lifecycle is preparation for later
+controls; it does not dispatch any input actions.
+
+### Exact PowerShell commands
+
+Run from `C:\Users\Darsh\VisionControl` using the existing environment/model:
+
+```powershell
+# Normal hand tracking; both recognition channels off
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker
+
+# Pinch alone (also works with explicit --no-gestures)
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --pinch
+
+# Numeric on-screen diagnostics and adjustable starter thresholds
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --pinch --pinch-debug --pinch-activation 0.25 --pinch-release 0.40
+
+# Independent static gesture labels and pinch together
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch
+
+# Raw comparison, with all other settings unchanged
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --pinch-debug --no-smoothing
+```
+
+`--pinch` defaults off and does not implicitly enable `--gestures`. `--pinch-debug`
+requires `--pinch`; it adds one compact row near each wrist with current `d`,
+activation/release bounds, geometry `valid=yes/no` and any reset/rearm reason.
+Geometry can be valid while state is UNAVAILABLE due to identity or rearming.
+The main wrist label always shows pinch status when enabled. Thumb/index tips and
+their connecting line use **gray OPEN, yellow STARTED, green HELD, orange RELEASED,
+purple UNAVAILABLE**. Skeleton side colors and static labels remain unchanged.
+Brief transitions can be hard to see at normal FPS; they are deliberately not held.
+Diagnostics produce no per-frame console logs and are off by default. Q quits;
+H toggles existing help. MSMF, full inference, EMA alpha 0.75 and native polling
+are preserved. Raw comparison markers do not change recognition input.
+
+### Manual calibration and acceptance checklist
+
+1. Use `--pinch-debug`, show one hand and **open fingers first**. Hold separated,
+   approaching, touching, held and releasing poses for several seconds each.
+   Watch `d`, validity, state and `open_to_rearm`. Repeat with each hand.
+2. Note the largest stable ratio during your intended pinch and the smallest
+   stable ratio when clearly released. If those ranges overlap, improve lighting
+   or pose first. Set activation slightly above the intended-pinch range and
+   release clearly above activation but below the separated range. If overlap
+   persists, no single threshold pair can reliably separate those views.
+3. Hover near both thresholds: holding must remain HELD without repeated STARTED;
+   deliberate separation gives RELEASED once, then OPEN. One-frame transitions
+   may flash briefly. A timed report's `pinch.status_counts` can help check the
+   total transitions in a controlled sequence; it is not a per-hand event log.
+4. Repeat at different camera distances, in-plane rotations and moderate hand
+   tilts; verify that projected overlap without physical contact remains a known
+   limitation. Backward-rotation static gesture ambiguity is outside this phase.
+5. Pinch both hands independently and together, change detection order, cross
+   them, and leave/reenter the frame. Overlap/loss must clear active state without
+   a deliberate RELEASED event; closed reacquisition must require opening first.
+6. Enable `--gestures --pinch`, repeat open palm/fist/pointing/unsupported poses,
+   check skeletons, Q/H, responsiveness and FPS. Use the same hand count, motion,
+   lighting and capture settings for performance comparisons; turn debug off.
+
+For a matched preview comparison (run **sequentially**, close each run before
+the next), reports exclude 3 seconds of warm-up and refuse existing paths:
+
+```powershell
+$pinchRun = Get-Date -Format 'yyyyMMdd_HHmmss_fff'
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --benchmark --warmup 3 --duration 30 --report "hand_tracking\benchmarks\static_${pinchRun}.json"
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --benchmark --warmup 3 --duration 30 --report "hand_tracking\benchmarks\pinch_${pinchRun}.json"
+```
+
+Reports use the already ignored local benchmarks directory; no camera images or
+model assets are added. Compare application FPS, existing end-to-end/processing
+timings, rendering and `pinch_processing` mean/p95/p99. Capture/driver frame age
+is unknown. Approximately 35+ FPS is a target, not a measured result here.
+
+### Tests and synthetic overhead
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s gestures/tests -t . -q
+.\.venv\Scripts\python.exe -m unittest discover -s hand_tracking -t . -q
+.\.venv\Scripts\python.exe -m unittest discover -s camera -q
+.\.venv\Scripts\python.exe -m compileall -q gestures hand_tracking camera
+.\.venv\Scripts\python.exe -m pip check
+```
+
+All **174 automated tests pass**: 73 gesture, 85 tracking and 16 camera tests.
+All 148 previous tests remain unchanged and passing; 26 new tests cover geometry,
+articulated approach/hold/release, hysteresis/equality, rearming, loss, time and
+identity checks, simultaneous hands/order changes, EMA input, shared extraction,
+unchanged static results/UNKNOWN, rendering, CLI and headless/warm-up/native GUI.
+
+Recognition shares the current smoothed snapshot and cached Phase 3.1 features.
+With both channels on, each detected hand is adapted/extracted once. Static
+feature timing remains `gesture_features`; pinch-only uses `pinch_features`.
+`pinch_processing` separately includes measurement validation/continuity/state;
+pinch overlays are included in existing drawing timing. Both new stages appear
+in per-hand-count profiles. JSON records thresholds, mode, input and status counts
+for measured frames only; no inference, threads, frame copies or dependencies added.
+
+An interleaved synthetic comparison used two articulated hands, five repeating
+approach/release poses, 100 warm-up and 1000 measured samples per configuration,
+alternating configuration order, existing venv and disabled Profile collection.
+It excluded camera, inference, smoothing and rendering. All values below are ms
+per two-hand observation; scheduling noise affects tail values:
+
+| Stage | Mean | p50 | p95 | p99 |
+| --- | ---: | ---: | ---: | ---: |
+| Static bridge (adaptation + cached features + static rules) | 1.479 | 1.042 | 3.906 | 5.692 |
+| Static bridge + shared-feature pinch | 1.555 | 1.112 | 4.186 | 6.060 |
+| Pinch portion within combined run | 0.105 | 0.072 | 0.279 | 0.405 |
+
+These host microbenchmarks establish neither real camera FPS nor physical
+accuracy. The owner's previous approximately 36 FPS static baseline is the
+comparison target for the next webcam run. New pinch defaults remain uncalibrated.
+Suggested commit after hardware acceptance:
+`feat(gestures): add real-time pinch detection with hysteresis`.
+
+The remaining sections document the existing stateless classifier and earlier
+milestone measurements; Phase 3.3 does not retune those rules.
 
 ## Run static recognition on Windows
 
@@ -51,8 +243,10 @@ wrist-label background so OpenCV's font can render every character.
 The owner physically tested the original Phase 3.2 implementation: OPEN_PALM,
 FIST, UNKNOWN, two-hand independence, recovery and performance passed; POINTING
 was intermittent. Recognition ran at approximately 36 FPS versus the earlier
-38.77 FPS tracking baseline. **The changes below have synthetic validation only;
-their webcam accuracy/performance still require a new owner test.**
+38.77 FPS tracking baseline. The bounded calibration below was initially validated
+synthetically; the owner subsequently confirmed the static gestures work well
+after calibration. Occasional backward-rotation POINTING/FIST ambiguity remains
+outside Phase 3.3. New pinch accuracy/performance still need webcam validation.
 
 Inspection showed POINTING reused the strict FIST curl test. Articulated
 synthetic relaxed curls had PIP 90–100°, DIP 110–115° and straightness 0.47–0.56,
@@ -457,7 +651,7 @@ The original Phase 3.2 baseline was 134 tests. Calibration adds 14 regressions f
 relaxed curls, slight index bends, side/scale/rotation, peace/three-finger/thumbs-up
 exclusions, separation safeguards, malformed features, shared diagnostic decisions,
 rate limiting, opt-in behavior and independent live two-hand outputs.
-All **148 tests pass**: 56 gesture tests, 76 tracking tests and 16 camera tests.
+The **Phase 3.2 baseline** was 148 passing tests: 56 gesture, 76 tracking and 16 camera tests.
 An additional smoke test loaded the real installed model, processed blank 1080p
 synthetic frames with `--gestures` in a native Win32 preview, recorded gesture
 timings with no phantom classifications, and released the simulated capture/window.

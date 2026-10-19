@@ -1,4 +1,4 @@
-"""Synchronous two-hand tracking with optional Phase 3.2 static gesture labels."""
+"""Synchronous two-hand tracking with independent opt-in static and pinch recognition."""
 
 import argparse
 from collections import Counter
@@ -14,13 +14,14 @@ import time
 import cv2
 
 from gestures.models import ImageSize
+from gestures.pinch import PinchThresholds, PinchTracker
 from gestures.static_gestures import DEFAULT_THRESHOLDS
 from camera.camera_diagnostics import (
     BACKENDS, capture_snapshot, configure_capture, read_frame,
 )
 from .download_model import MODEL_PATH
 from .gesture_debug import GestureDebug
-from .gesture_preview import classify_result
+from .gesture_preview import classify_result, prepare_features
 from .gui import GuiEvents
 from .performance import (
     InferenceInput, WorkloadProfile, inference_resolution, process_cpu_usage, write_report,
@@ -93,6 +94,12 @@ def parse_args(argv=None):
                         help="enable static gesture labels; --no-gestures preserves tracking only (default)")
     parser.add_argument("--gesture-debug", action="store_true",
                         help="requires --gestures; log numeric POINTING checks at most once every 2 seconds")
+    parser.add_argument("--pinch", action="store_true", help="enable independent pinch lifecycle (default: off)")
+    parser.add_argument("--pinch-debug", action="store_true", help="requires --pinch; show numeric distance/thresholds")
+    parser.add_argument("--pinch-activation", type=positive_float, default=.25,
+                        help="start below this normalized distance (default: 0.25 palm units)")
+    parser.add_argument("--pinch-release", type=positive_float, default=.40,
+                        help="release above this distance (default: 0.40; activation < release <= 2)")
     args = parser.parse_args(argv)
     if args.headless and not args.benchmark:
         parser.error("--headless requires --benchmark for a timed run (Ctrl+C can interrupt)")
@@ -100,6 +107,12 @@ def parse_args(argv=None):
         parser.error("--show-raw-landmarks needs a preview and cannot be used with --headless")
     if args.gesture_debug and not args.gestures:
         parser.error("--gesture-debug requires --gestures")
+    if args.pinch_debug and not args.pinch:
+        parser.error("--pinch-debug requires --pinch")
+    try:
+        PinchThresholds(args.pinch_activation, args.pinch_release)
+    except ValueError as exc:
+        parser.error(str(exc))
     return args
 
 
@@ -136,6 +149,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
     gesture_counts = Counter()
     gesture_image_size = None
     gesture_debug = GestureDebug() if args.gesture_debug else None
+    pinch_thresholds = PinchThresholds(args.pinch_activation, args.pinch_release)
+    pinch_tracker = PinchTracker(pinch_thresholds) if args.pinch else None
+    pinch_counts = Counter()
     frames = 0
     capture_logged = False
     warned_slow = False
@@ -168,15 +184,27 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
             result = smoother.apply(raw_result, timestamp_ms, frame.shape[:2])
             timings.add("smoothing", time.perf_counter() - before_smoothing)
             classifications = None
-            if args.gestures:
+            pinches = None
+            if args.gestures or args.pinch:
                 if (gesture_image_size is None or
                         (gesture_image_size.height, gesture_image_size.width) != frame.shape[:2]):
                     gesture_image_size = ImageSize(frame.shape[1], frame.shape[0])
-                sampled = gesture_debug is not None and gesture_debug.due(timestamp_ms)
-                classifications = classify_result(result, timestamp_ms, gesture_image_size, timings,
-                                                  diagnostics=sampled)
-                if sampled:
-                    gesture_debug.log(classifications, timestamp_ms)
+                prepared = [] if args.pinch else None
+                if args.gestures:
+                    sampled = gesture_debug is not None and gesture_debug.due(timestamp_ms)
+                    shared = {"features_out": prepared} if args.pinch else {}
+                    classifications = classify_result(result, timestamp_ms, gesture_image_size, timings,
+                                                      diagnostics=sampled, **shared)
+                    if sampled:
+                        gesture_debug.log(classifications, timestamp_ms)
+                else:
+                    before_features = time.perf_counter()
+                    prepared = prepare_features(result, timestamp_ms, gesture_image_size)
+                    timings.add("pinch_features", time.perf_counter() - before_features)
+                if pinch_tracker is not None:
+                    before_pinch = time.perf_counter()
+                    pinches = pinch_tracker.update(tuple(prepared), timestamp_ms)
+                    timings.add("pinch_processing", time.perf_counter() - before_pinch)
             if not capture_logged:
                 LOGGER.info("Actual capture: %d x %d | actual inference: %d x %d",
                             frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])
@@ -186,7 +214,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 preview = make_preview(frame, result, fps.current, show_help,
                                        renderer=renderer, timings=timings,
                                        raw_result=raw_result if args.show_raw_landmarks else None,
-                                       gesture_results=classifications)
+                                       gesture_results=classifications, pinch_results=pinches,
+                                       pinch_thresholds=pinch_thresholds if args.pinch_debug else None)
                 before_display = time.perf_counter()
                 cv2.imshow(WINDOW, preview)
                 before_events = time.perf_counter()
@@ -211,6 +240,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 hand_counts[str(min(MAX_HANDS, len(result.hand_landmarks)))] += 1
                 if classifications is not None:
                     gesture_counts.update(item.gesture.value for item in classifications)
+                if pinches is not None:
+                    pinch_counts.update(item.status.value for item in pinches)
                 timings.finish_frame(min(MAX_HANDS, len(raw_result.hand_landmarks)))
                 rate = fps.record(end)
             if rate is not None and not args.benchmark:
@@ -244,6 +275,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
         cpu_wall_seconds = (max(0.0, time.perf_counter() - measurement_start)
                             if measurement_start is not None else 0.0)
         smoother.reset()
+        if pinch_tracker is not None:
+            pinch_tracker.reset()
         duration = (measurement_end - measurement_start
                     if measurement_start is not None and measurement_end is not None else 0.0)
         average = frames / duration if duration > 0 else None
@@ -276,6 +309,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                              "input": "smoothed" if args.smoothing else "raw",
                              "thresholds": asdict(DEFAULT_THRESHOLDS),
                              "classification_counts": dict(gesture_counts)},
+                "pinch": {"enabled": args.pinch, "debug_enabled": args.pinch_debug,
+                          "thresholds": asdict(pinch_thresholds), "status_counts": dict(pinch_counts),
+                          "input": "smoothed" if args.smoothing else "raw",
+                          "recovery": "open beyond release threshold to rearm; no release on loss"},
                 "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown.",
             })
         LOGGER.info("Application FPS includes capture, preparation, inference, smoothing%s; "
@@ -322,6 +359,9 @@ def run(args, report=None):
             LOGGER.info("Landmark smoothing: %s | alpha: %.2f | raw comparison markers: %s",
                         args.smoothing, args.smoothing_alpha, args.show_raw_landmarks)
             LOGGER.info("Static gestures: %s (heuristic rules; no confidence probability)", args.gestures)
+            LOGGER.info("Pinch: %s | activation < %.3f | release > %.3f | projected proximity only; "
+                        "open fingers to arm/rearm after startup or loss", args.pinch,
+                        args.pinch_activation, args.pinch_release)
             LOGGER.info("Preview/input: unmirrored. Left/Right identify the subject's hands; "
                         "colors follow each frame's handedness predictions, not detection order.")
             LOGGER.info("%s No camera throughput claim is made by inference FPS.",
