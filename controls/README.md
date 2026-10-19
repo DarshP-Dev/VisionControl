@@ -83,6 +83,29 @@ absolute packets only deliver the computed physical-pixel target without Windows
 relative acceleration; they are not an absolute camera mapping. Right/down in
 the unmirrored image moves right/down. No optical FOV/pointing-angle calibration.
 
+### Horizontal cursor calibration
+
+Some users prefer mirrored horizontal cursor motion: a left/right hand movement
+can feel reversed with an unmirrored camera view. Add **`--control-invert-x`** to
+reverse only the relative horizontal cursor delta in simulation or live mode.
+It defaults **off**, preserving existing commands. Vertical motion stays unchanged.
+The sign changes after active-region/aspect correction, before target accumulation,
+clamping and screen-space EMA; acquisition/reacquisition still anchors without a
+jump. The same cursor mapping is used during an already valid drag, without
+changing pinch/drag lifecycle rules. Preview, handedness, gesture coordinates,
+static classification, swipe directions and tab actions are unaffected.
+
+```powershell
+# Simulation: horizontal inversion with pinch click/drag enabled
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --controls --control-mode simulate --control-hand right --control-mouse --control-invert-x
+
+# Live: same mapping, starts DISARMED; A arms, D disarms, Ctrl+Alt+Esc stops globally
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --controls --control-mode live --control-hand right --control-mouse --control-invert-x
+```
+
+Omit `--control-mouse` for cursor-only testing. Remove `--control-invert-x` to
+restore the original horizontal mapping. No vertical inversion option is added.
+
 Live startup establishes per-monitor DPI awareness before OpenCV creates a window;
 physical cursor/monitor coordinates receive no second scaling multiplier.
 `--control-monitor 0` is primary; others sort by left/top desktop origin, including
@@ -217,15 +240,22 @@ Win32 contracts: [SendInput](https://learn.microsoft.com/en-us/windows/win32/api
 
 ## Implementation validation
 
-**335 tests passed**: 16 camera, 135 gestures, 115 tracking (13 new controls
+The initial Phase 3.6 implementation passed **335 tests**: 16 camera, 135 gestures, 115 tracking (13 new controls
 integration tests), 69 new controls/backend/safety tests. The prior 253 tests are
-retained. Syntax compilation, CLI help, all ten tracker commands above, dependency
+retained. Syntax compilation, CLI help, the original ten tracker commands, dependency
 consistency and diff whitespace checks passed. The 69 controls tests also pass
 with Python `-S` (no third-party site packages). Required Win32 DLL entry points
 resolved on this Windows host and the INPUT ABI size was 40 bytes; this read-only
 check performed no input, DPI changes or actual hotkey registration. A synthetic
 preview was visually inspected for compact white text on black and both skeletons.
 Physical input and emergency shortcut delivery remain manual acceptance checks.
+
+Horizontal-inversion calibration: **341 tests passed** (16 camera, 135 gestures,
+116 tracking, 74 controls). Six focused tests cover signed horizontal deltas,
+unchanged vertical motion, jump-free anchoring/reset, simulated control, the live
+backend path with fake Win32 input, and CLI defaults/options. Syntax, whitespace
+and all twelve documented tracker commands passed validation. No real input was
+sent; confirm preferred horizontal direction on the webcam locally.
 
 Suggested commit after local validation:
 `feat(controls): add safe gesture-based Windows desktop controls`.

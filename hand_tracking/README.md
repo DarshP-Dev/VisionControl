@@ -14,6 +14,9 @@ arming, relative cursor, pinch click/drag and independently enabled browser tabs
 See [controls/README.md](../controls/README.md) for commands, global
 **Ctrl+Alt+Esc** stop, safety gates and staged local testing. Tracking/recognition
 commands alone still send no desktop input. Voice and motor controls are absent.
+For reversed-feeling horizontal pointer movement, add `--control-invert-x` to a
+controls command. This opt-in calibration changes only the cursor's horizontal
+delta; vertical movement, the unmirrored preview and recognition remain unchanged.
 The existing Phase 1 camera applications are unchanged.
 Inference size is configurable independently of capture; detailed benchmarking
 and host timing reports are available. See [PERFORMANCE.md](PERFORMANCE.md) for

@@ -38,10 +38,13 @@ class ControlSettings:
     monitor: int = 0
     debug: bool = False
     browsers: tuple[str, ...] = ("chrome.exe", "msedge.exe", "firefox.exe")
+    invert_x: bool = False
 
     def __post_init__(self):
         if self.mode not in ("simulate", "live") or self.hand not in (HandSide.LEFT, HandSide.RIGHT):
             raise ValueError("Controls require simulate/live mode and left/right hand")
+        if not isinstance(self.invert_x, bool):
+            raise ValueError("Control invert_x must be a boolean")
         for name, lo, hi in (("sensitivity", .1, 5.), ("alpha", .01, 1.), ("margin", 0., .4)):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not lo <= value <= hi:

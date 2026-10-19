@@ -58,6 +58,43 @@ def reliable_name(item):
 
 
 class CursorTest(unittest.TestCase):
+    def test_horizontal_inversion_reverses_delta_with_same_gain_and_vertical_motion(self):
+        size = ImageSize(1920, 1080)
+        for alpha in (1., .6):
+            for dx in (-.02, .02):
+                with self.subTest(alpha=alpha, dx=dx):
+                    targets = []
+                    for invert_x in (False, True):
+                        cursor = RelativeCursor(ControlSettings(alpha=alpha, invert_x=invert_x), Screen())
+                        self.assertIsNone(cursor.update((.5, .5), size, (960, 540)))
+                        targets.append(cursor.update((.5+dx, .52), size, (0, 0)))
+                    self.assertEqual(targets[0][0]-960, -(targets[1][0]-960))
+                    self.assertEqual(targets[0][1], targets[1][1])
+                    self.assertGreater(targets[0][1], 540)
+                    self.assertGreater((targets[0][0]-960)*dx, 0)
+                    self.assertLess((targets[1][0]-960)*dx, 0)
+
+    def test_vertical_only_motion_unchanged_with_horizontal_inversion(self):
+        for dy in (-.02, .02):
+            targets = []
+            for invert_x in (False, True):
+                cursor = RelativeCursor(ControlSettings(invert_x=invert_x), Screen())
+                cursor.update((.5, .5), ImageSize(1920, 1080), (960, 540))
+                targets.append(cursor.update((.5, .5+dy), ImageSize(1920, 1080), (0, 0)))
+            self.assertEqual(targets[0], targets[1])
+            self.assertEqual(targets[0][0], 960)
+            self.assertGreater((targets[0][1]-540)*dy, 0)
+
+    def test_inversion_keeps_activation_reset_and_resolution_change_jump_free(self):
+        cursor = RelativeCursor(ControlSettings(invert_x=True), Screen())
+        size = ImageSize(1920, 1080)
+        self.assertIsNone(cursor.update((.2, .3), size, (960, 540)))
+        self.assertEqual(cursor.update((.2, .3), size, (0, 0)), (960, 540))
+        cursor.reset()
+        self.assertIsNone(cursor.update((.8, .7), size, (700, 300)))
+        self.assertEqual(cursor.update((.8, .7), size, (0, 0)), (700, 300))
+        self.assertIsNone(cursor.update((.1, .2), ImageSize(640, 480), (700, 300)))
+
     def test_activation_has_no_move_and_relative_displacement(self):
         c = RelativeCursor(ControlSettings(alpha=1., sensitivity=1.), Screen())
         size = ImageSize(1920, 1080)
@@ -121,6 +158,21 @@ class CursorTest(unittest.TestCase):
 
 
 class ControlTest(unittest.TestCase):
+    def test_simulated_controller_respects_horizontal_inversion(self):
+        for invert_x in (False, True):
+            with self.subTest(invert_x=invert_x):
+                h = Harness(invert_x=invert_x)
+                h.arm()
+                initial = h.backend.position
+                self.assertEqual(h.backend.counts["move"], 0)
+                h.step(dx=.02)
+                change = h.backend.position[0]-initial[0]
+                if invert_x:
+                    self.assertLess(change, 0)
+                else:
+                    self.assertGreater(change, 0)
+                self.assertEqual(h.backend.position[1], initial[1])
+
     def test_simulation_starts_disarmed_and_does_no_input(self):
         h = Harness(mouse=True, tabs=True)
         h.step()
@@ -477,7 +529,7 @@ class ControlTest(unittest.TestCase):
     def test_configuration_rejects_invalid_values(self):
         for kw in ({"alpha": 0}, {"alpha": float("nan")}, {"sensitivity": 0}, {"margin": .5},
                    {"monitor": -1}, {"mode": "auto"}, {"hand": H.UNKNOWN}, {"browsers": ()},
-                   {"browsers": ("C:\\chrome.exe",)}):
+                   {"browsers": ("C:\\chrome.exe",)}, {"invert_x": 1}):
             with self.subTest(kw=kw), self.assertRaises(ValueError):
                 ControlSettings(**kw)
 

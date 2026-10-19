@@ -11,6 +11,7 @@ from controls.controller import DesktopController
 from controls.models import ControlSettings, Screen
 from controls.safety import GlobalSafety
 from controls.windows import Input, WindowsAPI, WindowsBackend
+from .test_controls import Harness
 
 
 class FakeAPI:
@@ -32,6 +33,29 @@ class FakeAPI:
 
 
 class WindowsBackendTest(unittest.TestCase):
+    def test_live_controller_maps_inverted_delta_before_virtual_desktop_packet(self):
+        for invert_x in (False, True):
+            with self.subTest(invert_x=invert_x):
+                api = FakeAPI()
+                backend = WindowsBackend(api=api)
+                h = Harness()
+                h.controller = DesktopController(backend, ControlSettings(mode="live", invert_x=invert_x),
+                                                 clock=lambda: h.now)
+                h.controller.safety_ready = True  # Fake emergency readiness; never register a real hotkey.
+                h.arm()
+                self.assertEqual(api.sent, [])  # Live activation sends no move.
+                h.step(dx=.02)
+                self.assertEqual(len(api.sent), 1)
+                packet = api.sent[0][0].mi
+                initial_x = round((100-backend.desktop.left)*65535/(backend.desktop.width-1))
+                initial_y = round(200*65535/(backend.desktop.height-1))
+                if invert_x:
+                    self.assertLess(packet.dx, initial_x)
+                else:
+                    self.assertGreater(packet.dx, initial_x)
+                self.assertEqual(packet.dy, initial_y)
+                self.assertEqual(packet.dwFlags, 0xC001)
+
     def test_constructor_dpi_monitors_and_no_input_until_action(self):
         api = FakeAPI()
         backend = WindowsBackend(1, api=api)

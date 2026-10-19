@@ -29,7 +29,10 @@ class RelativeCursor:
             return None  # Acquisition anchors to the existing cursor; never teleports.
         gain = self.settings.sensitivity * min((self.screen.width-1)/(1-2*margin),
                                                (self.screen.height-1)/(aspect*(1-2*margin)))
-        self.target = self.screen.clamp(*(self.target[i] + (common[i]-self.previous[i])*gain for i in (0, 1)))
+        dx, dy = common[0]-self.previous[0], common[1]-self.previous[1]
+        if self.settings.invert_x:
+            dx = -dx  # Invert displacement, never the anchor or recognition coordinates.
+        self.target = self.screen.clamp(self.target[0]+dx*gain, self.target[1]+dy*gain)
         self.previous = common
         alpha = self.settings.alpha
         self.filtered = tuple(alpha*self.target[i]+(1-alpha)*self.filtered[i] for i in (0, 1))

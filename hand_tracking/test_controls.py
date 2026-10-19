@@ -28,6 +28,16 @@ FLAGS = ["--gestures", "--pinch", "--gesture-states", "--controls"]
 
 
 class ControlApplicationTest(unittest.TestCase):
+    def test_horizontal_inversion_cli_defaults_and_both_modes(self):
+        self.assertFalse(tracker.parse_args([]).control_invert_x)
+        self.assertFalse(cli.settings(tracker.parse_args(FLAGS)).invert_x)
+        for mode in ("simulate", "live"):
+            args = tracker.parse_args(FLAGS+["--control-mode", mode, "--control-invert-x"])
+            self.assertTrue(cli.settings(args).invert_x)
+            self.assertEqual(cli.settings(args).mode, mode)
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            tracker.parse_args(["--control-invert-x"])
+
     def test_defaults_do_not_change_tracking_or_enable_controls(self):
         args = tracker.parse_args([])
         self.assertFalse(args.controls)
