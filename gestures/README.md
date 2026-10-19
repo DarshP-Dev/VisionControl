@@ -46,11 +46,93 @@ wrist-label background so OpenCV's font can render every character.
 
 ## Conservative recognition rules
 
+### Targeted POINTING calibration and diagnostics
+
+The owner physically tested the original Phase 3.2 implementation: OPEN_PALM,
+FIST, UNKNOWN, two-hand independence, recovery and performance passed; POINTING
+was intermittent. Recognition ran at approximately 36 FPS versus the earlier
+38.77 FPS tracking baseline. **The changes below have synthetic validation only;
+their webcam accuracy/performance still require a new owner test.**
+
+Inspection showed POINTING reused the strict FIST curl test. Articulated
+synthetic relaxed curls had PIP 90–100°, DIP 110–115° and straightness 0.47–0.56,
+all passing the strict curl gates, but tip-to-wrist/palm ratios 1.40–1.58 exceeded
+1.25 and caused UNKNOWN. A slightly bent synthetic index with PIP 150–152°
+also missed the original 155° extension gate. These demonstrate concrete failure
+paths, **not proof of which gate failed on the owner's real hand**. Debug samples
+are needed to establish the actual camera failure.
+
+The calibration changes only these POINTING gates:
+
+- Index PIP minimum: **150°** instead of 155°. Index DIP ≥145°, straightness
+  ≥0.88 and tip/wrist ≥1.15 remain required; a generally bent index does not qualify.
+- Middle/ring/pinky tip/wrist maximum: **1.65** instead of 1.25. Their PIP ≤110°,
+  DIP ≤160° and straightness ≤0.75 remain required. This allows tips further from
+  the wrist while preserving clear geometric evidence of curling.
+- Each of those fingers must also lie at least **0.25 palm-scale units closer
+  to the wrist than the index tip**. This additional separation guard rejects a
+  short/insufficiently protruding index and limits partially open false positives.
+
+OPEN_PALM and the strict FIST curl thresholds below are unchanged. Peace signs
+and three-finger poses still fail the curl requirements. Broader partial curls
+and ambiguous/invalid features remain UNKNOWN. There is also one narrow FIST
+exclusion required by the unsupported-pose checklist: if only the thumb is
+clearly extended (its MCP/IP angles and straightness meet the strict extension
+limits, with tip/wrist ≥1.35), the result is UNKNOWN instead of FIST. The original
+FIST rule ignored the thumb and could accept this thumbs-up-like geometry.
+Wrapped/relaxed-thumb fists retain their original rule; this exclusion neither
+adds a thumbs-up class nor restricts natural thumb posture during POINTING.
+
+Run normal recognition or enable sampled numeric diagnostics:
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --gesture-debug
+```
+
+`--gesture-debug` requires `--gestures`, is disabled by default, and samples at
+most once every **two seconds** using the existing frame timestamps. Every frame
+is still classified immediately. No debouncing, label hold or cooldown is added.
+When inactive, no log sampler or diagnostic-check records are constructed.
+Sampled `GestureResult.pointing_checks` use the same comparisons as classification;
+console output shows each finger's angles, straightness, normalized tip/wrist,
+index separation, PASS/FAIL bounds, classification/reason and POINTING blockers.
+Missing/non-finite values show INVALID; invalid input/palm scale is identified.
+Frame slot numbers are local positions, not persistent hand identities. Logs
+contain numeric features and labels, **not camera images or raw x/y/z coordinates**.
+
+To save a readable local log (the directory is already ignored by Git):
+
+```powershell
+New-Item -ItemType Directory -Force -Path .\hand_tracking\benchmarks | Out-Null
+$runStamp = Get-Date -Format 'yyyyMMdd_HHmmss_fff'
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --gesture-debug 2>&1 | Tee-Object -FilePath "hand_tracking\benchmarks\pointing-debug_${runStamp}.txt"
+```
+
+Hold one hand in natural pointing for 4–6 seconds, then slightly bend the index
+and relax the other fingers. Repeat with the other hand, different distances and
+in-plane rotations. Note which named bounds fail during UNKNOWN. Then test peace
+signs, three fingers, thumbs-up, partially open hands, open palms and ordinary
+fists. Test both hands simultaneously, change their order, and leave/reenter the
+frame. Share several failing and passing numeric samples with a short description
+of the intended pose before further tuning. No images are needed.
+
+Use debug **off** for matched FPS comparisons: optional console logging can
+affect responsiveness. Existing profiling includes calibration work; JSON records
+the additional thresholds and whether debugging was enabled. A sequential
+cached-feature microbenchmark (100 warm-up/2000 measured two-hand iterations,
+no camera, feature extraction or GUI) measured rule means/p95 of 0.021/0.035 ms
+before and 0.053/0.107 ms after calibration with debug off. This is an approximately
+0.032 ms mean host-rule increase, not a webcam FPS measurement or accuracy gain.
+The target remains the owner's approximate 36 FPS, pending local re-testing.
+
 The classifier consumes `HandFeatures`; geometry is computed once using the
 Phase 3.1 utilities with the **actual capture aspect ratio**. Every required long
 finger must have valid measurements. The four long fingers are index, middle,
-ring and pinky. Thumb posture is not a gate: a relaxed/tucked thumb is allowed,
-and four clearly extended long fingers count as most fingers extended.
+ring and pinky. A relaxed/tucked thumb is allowed; four clearly extended long
+fingers count as most fingers extended. The table is the original **strict**
+extended/curl policy for OPEN_PALM and FIST; POINTING uses the bounded exceptions
+above, and FIST excludes clear thumb-only extension as described there.
 
 | Long-finger condition | Clearly extended | Clearly curled |
 | --- | ---: | ---: |
@@ -69,8 +151,9 @@ the live preview uses `DEFAULT_THRESHOLDS`, also recorded in JSON. No extra CLI
 threshold knobs are introduced in this milestone.
 
 - `OPEN_PALM`: all four long fingers clearly extended; thumb may be relaxed.
-- `FIST`: all four long fingers clearly curled.
-- `POINTING`: index clearly extended, the other three clearly curled.
+- `FIST`: all four long fingers strictly curled, without clear thumb-only extension.
+- `POINTING`: index clearly extended, the other three geometrically curled with
+  the POINTING-specific wrist-distance tolerance and index-separation guard.
 - `UNKNOWN`: no rule matches, multiple rules match, or required features are
   missing, non-finite, out of range, duplicated or degenerate. A valid but
   unsupported finger combination also stays UNKNOWN. Invalid thumb-only
@@ -370,7 +453,11 @@ features, detection order, EMA input, rendering, Q/H/native polling, warm-up and
 JSON timing/count behavior. All earlier camera/tracking tests are also run.
 Compatibility smoke checks additionally use the installed Tasks enum,
 real Tasks result containers and the existing EMA output without a camera.
-All **134 automated tests pass**: 48 gesture tests, 70 tracking tests and 16 camera tests.
+The original Phase 3.2 baseline was 134 tests. Calibration adds 14 regressions for
+relaxed curls, slight index bends, side/scale/rotation, peace/three-finger/thumbs-up
+exclusions, separation safeguards, malformed features, shared diagnostic decisions,
+rate limiting, opt-in behavior and independent live two-hand outputs.
+All **148 tests pass**: 56 gesture tests, 76 tracking tests and 16 camera tests.
 An additional smoke test loaded the real installed model, processed blank 1080p
 synthetic frames with `--gestures` in a native Win32 preview, recorded gesture
 timings with no phantom classifications, and released the simulated capture/window.

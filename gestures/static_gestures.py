@@ -24,6 +24,10 @@ class StaticThresholds:
     curled_distal_max_degrees: float = 160
     curled_straightness_max: float = .75
     curled_tip_to_wrist_max: float = 1.25
+    pointing_index_joint_min_degrees: float = 150
+    pointing_curled_tip_to_wrist_max: float = 1.65
+    pointing_tip_separation_min: float = .25
+    unsupported_thumb_tip_to_wrist_min: float = 1.35
 
     def __post_init__(self) -> None:
         for field in fields(self):
@@ -39,12 +43,23 @@ LONG_FINGERS = (Finger.INDEX, Finger.MIDDLE, Finger.RING, Finger.PINKY)
 
 
 @dataclass(frozen=True, slots=True)
+class PointingCheck:
+    finger: Finger | None
+    measurement: str
+    value: float | None
+    comparison: str
+    threshold: float
+    passed: bool
+
+
+@dataclass(frozen=True, slots=True)
 class GestureResult:
     gesture: Gesture
     timestamp_ms: int
     handedness: tuple[HandednessPrediction, ...] = ()
     matched_rules: tuple[Gesture, ...] = ()
     reason: str = ""
+    pointing_checks: tuple[PointingCheck, ...] = ()
 
     def __post_init__(self) -> None:
         if (not isinstance(self.timestamp_ms, int) or isinstance(self.timestamp_ms, bool)
@@ -81,9 +96,78 @@ def _required_measurements(features: HandFeatures | None) -> tuple[tuple[float, 
         return None
 
 
+def _pointing_evaluation(values: tuple[tuple[float, ...], ...] | None,
+                         features: HandFeatures | None, thresholds: StaticThresholds,
+                         collect: bool) -> tuple[bool, tuple[PointingCheck, ...]]:
+    """The same comparisons drive classification and optional sampled diagnostics."""
+    if values is None and not collect:
+        return False, ()
+    checks = [] if collect else None
+    matched = values is not None
+
+    def require(finger: Finger | None, name: str, value: float | None,
+                comparison: str, bound: float) -> None:
+        nonlocal matched
+        try:
+            actual = finite_number(value, name)
+        except ValueError:
+            actual = None
+        passed = actual is not None and (actual >= bound if comparison == ">=" else
+                                        actual <= bound if comparison == "<=" else actual > bound)
+        matched = matched and passed
+        if checks is not None:
+            checks.append(PointingCheck(finger, name, actual, comparison, bound, passed))
+
+    if values is None:
+        rows = []
+        for finger in LONG_FINGERS:
+            try:
+                item = features.finger(finger)
+                rows.append((item.joint_angle_degrees, item.distal_angle_degrees,
+                             item.straightness_ratio, item.tip_to_wrist_ratio))
+            except (ValueError, AttributeError, TypeError):
+                rows.append((None,) * 4)
+        require(None, "required_features_valid", 0, ">=", 1)
+        require(None, "palm_scale", getattr(features, "palm_scale", None), ">", 0)
+    else:
+        rows = values
+    index_tip = rows[0][3]
+    for index, (finger, row) in enumerate(zip(LONG_FINGERS, rows)):
+        joint, distal, straight, tip = row
+        if index == 0:
+            require(finger, "PIP_degrees", joint, ">=", thresholds.pointing_index_joint_min_degrees)
+            require(finger, "DIP_degrees", distal, ">=", thresholds.extended_distal_min_degrees)
+            require(finger, "straightness", straight, ">=", thresholds.extended_straightness_min)
+            require(finger, "tip_to_wrist", tip, ">=", thresholds.extended_tip_to_wrist_min)
+        else:
+            require(finger, "PIP_degrees", joint, "<=", thresholds.curled_joint_max_degrees)
+            require(finger, "DIP_degrees", distal, "<=", thresholds.curled_distal_max_degrees)
+            require(finger, "straightness", straight, "<=", thresholds.curled_straightness_max)
+            require(finger, "tip_to_wrist", tip, "<=", thresholds.pointing_curled_tip_to_wrist_max)
+            try:
+                gap = finite_number(index_tip, "Index tip ratio") - finite_number(tip, "Other tip ratio")
+            except ValueError:
+                gap = None
+            require(finger, "index_tip_separation", gap, ">=", thresholds.pointing_tip_separation_min)
+    return matched, tuple(checks) if checks is not None else ()
+
+
+def _clearly_extended_thumb(features: HandFeatures, thresholds: StaticThresholds) -> bool:
+    """Exclude unsupported thumb-only extension from FIST; do not gate POINTING."""
+    try:
+        thumb = features.finger(Finger.THUMB)
+        return (finite_number(thumb.joint_angle_degrees, "Thumb joint") >= thresholds.extended_joint_min_degrees
+                and finite_number(thumb.distal_angle_degrees, "Thumb distal") >= thresholds.extended_distal_min_degrees
+                and finite_number(thumb.straightness_ratio, "Thumb straightness") >= thresholds.extended_straightness_min
+                and finite_number(thumb.tip_to_wrist_ratio, "Thumb tip") >= thresholds.unsupported_thumb_tip_to_wrist_min)
+    except (ValueError, AttributeError, TypeError):
+        return False
+
+
 def classify_hand(features: HandFeatures | None, timestamp_ms: int,
-                  *, thresholds: StaticThresholds = DEFAULT_THRESHOLDS) -> GestureResult:
-    """Classify cached 2D features; thumb posture is deliberately not a rule gate.
+                  *, thresholds: StaticThresholds = DEFAULT_THRESHOLDS,
+                  diagnostics: bool = False) -> GestureResult:
+    """Classify cached 2D features; thumb posture does not gate POINTING.
 
     Supply aspect-correct features for camera inputs. A detected hand with invalid
     required features is UNKNOWN; no observation is represented by no call/result.
@@ -92,8 +176,10 @@ def classify_hand(features: HandFeatures | None, timestamp_ms: int,
                   if isinstance(features, HandFeatures) and isinstance(features.observation, HandObservation)
                   else ())
     values = _required_measurements(features)
+    pointing, checks = _pointing_evaluation(values, features, thresholds, diagnostics)
     if values is None:
-        return GestureResult(Gesture.UNKNOWN, timestamp_ms, handedness, reason="invalid_or_missing_features")
+        return GestureResult(Gesture.UNKNOWN, timestamp_ms, handedness,
+                             reason="invalid_or_missing_features", pointing_checks=checks)
     extended, curled = [], []
     for joint, distal, straight, tip in values:
         extended.append(joint >= thresholds.extended_joint_min_degrees
@@ -107,14 +193,16 @@ def classify_hand(features: HandFeatures | None, timestamp_ms: int,
     matches = []
     if all(extended):
         matches.append(Gesture.OPEN_PALM)
-    if all(curled):
+    thumb_veto = all(curled) and _clearly_extended_thumb(features, thresholds)
+    if all(curled) and not thumb_veto:
         matches.append(Gesture.FIST)
-    if extended[0] and all(curled[1:]):  # LONG_FINGERS starts with the index finger.
+    if pointing:
         matches.append(Gesture.POINTING)
     if len(matches) == 1:
-        return GestureResult(matches[0], timestamp_ms, handedness, tuple(matches), "unique_rule_match")
+        return GestureResult(matches[0], timestamp_ms, handedness, tuple(matches), "unique_rule_match", checks)
     return GestureResult(Gesture.UNKNOWN, timestamp_ms, handedness, tuple(matches),
-                         "conflicting_rules" if matches else "ambiguous_or_unsupported_pose")
+                         "conflicting_rules" if matches else "unsupported_thumb_extension" if thumb_veto
+                         else "ambiguous_or_unsupported_pose", checks)
 
 
 def classify_frame(features: FrameFeatures,

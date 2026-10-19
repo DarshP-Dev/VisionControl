@@ -19,6 +19,7 @@ from camera.camera_diagnostics import (
     BACKENDS, capture_snapshot, configure_capture, read_frame,
 )
 from .download_model import MODEL_PATH
+from .gesture_debug import GestureDebug
 from .gesture_preview import classify_result
 from .gui import GuiEvents
 from .performance import (
@@ -90,11 +91,15 @@ def parse_args(argv=None):
                         help="benchmark capture/inference/smoothing without rendering or GUI")
     parser.add_argument("--gestures", action=argparse.BooleanOptionalAction, default=False,
                         help="enable static gesture labels; --no-gestures preserves tracking only (default)")
+    parser.add_argument("--gesture-debug", action="store_true",
+                        help="requires --gestures; log numeric POINTING checks at most once every 2 seconds")
     args = parser.parse_args(argv)
     if args.headless and not args.benchmark:
         parser.error("--headless requires --benchmark for a timed run (Ctrl+C can interrupt)")
     if args.headless and args.show_raw_landmarks:
         parser.error("--show-raw-landmarks needs a preview and cannot be used with --headless")
+    if args.gesture_debug and not args.gestures:
+        parser.error("--gesture-debug requires --gestures")
     return args
 
 
@@ -130,6 +135,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
     capture_sizes, inference_sizes, hand_counts = Counter(), Counter(), Counter()
     gesture_counts = Counter()
     gesture_image_size = None
+    gesture_debug = GestureDebug() if args.gesture_debug else None
     frames = 0
     capture_logged = False
     warned_slow = False
@@ -166,7 +172,11 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 if (gesture_image_size is None or
                         (gesture_image_size.height, gesture_image_size.width) != frame.shape[:2]):
                     gesture_image_size = ImageSize(frame.shape[1], frame.shape[0])
-                classifications = classify_result(result, timestamp_ms, gesture_image_size, timings)
+                sampled = gesture_debug is not None and gesture_debug.due(timestamp_ms)
+                classifications = classify_result(result, timestamp_ms, gesture_image_size, timings,
+                                                  diagnostics=sampled)
+                if sampled:
+                    gesture_debug.log(classifications, timestamp_ms)
             if not capture_logged:
                 LOGGER.info("Actual capture: %d x %d | actual inference: %d x %d",
                             frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])
@@ -262,6 +272,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                                                   "backend": None, "fallback_reason": None},
                 "resources": resources,
                 "gestures": {"enabled": args.gestures,
+                             "debug_enabled": args.gesture_debug,
                              "input": "smoothed" if args.smoothing else "raw",
                              "thresholds": asdict(DEFAULT_THRESHOLDS),
                              "classification_counts": dict(gesture_counts)},
@@ -283,6 +294,7 @@ def run(args, report=None):
                    "execution_mode": "headless_tracking" if args.headless else "preview",
                    "gui_mode_requested": args.gui_mode,
                    "gestures_enabled": args.gestures,
+                   "gesture_debug_enabled": args.gesture_debug,
                    "logical_cpu_count": os.cpu_count(),
                    "python": platform.python_version(), "opencv": cv2.__version__})
     try:

@@ -45,6 +45,21 @@ testing](../gestures/README.md) for limitations and repeatable off/on benchmarks
 `gesture_features`, `gesture_classification` and `gesture_total` profile the new
 work separately, including in headless runs and per-hand-count reports.
 
+For the focused POINTING calibration, enable sampled numeric diagnostics:
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --gesture-debug
+```
+
+Debugging is off by default and requires `--gestures`. It logs POINTING
+measurements and PASS/FAIL blockers at most once every two seconds, with no
+images or raw landmark coordinates. This is logging cadence only; classifications
+remain immediate. See [calibration findings and log collection](../gestures/README.md#targeted-pointing-calibration-and-diagnostics)
+for the bounded POINTING-only tolerances and narrow thumbs-up exclusion from FIST.
+The owner verified the original open-palm/fist/unknown behavior and approximately
+36 FPS recognition, but the new POINTING calibration still needs webcam testing.
+Disable debugging when comparing performance.
+
 To try a smaller inference image while keeping 1080p capture and a clear preview:
 
 ```powershell
@@ -388,7 +403,7 @@ leave the application without a model and produce a clear setup error.
 .\.venv\Scripts\python.exe -m unittest discover -s hand_tracking -t . -v
 .\.venv\Scripts\python.exe -m unittest discover -s gestures/tests -t . -v
 .\.venv\Scripts\python.exe -m unittest discover -s camera -v
-.\.venv\Scripts\python.exe -m compileall -q hand_tracking camera
+.\.venv\Scripts\python.exe -m compileall -q gestures hand_tracking camera
 .\.venv\Scripts\python.exe -m pip check
 ```
 
@@ -402,8 +417,10 @@ ambiguous identity, reset rules and error/cleanup paths with mocked cameras.
 Phase 2.5 adds checks for native polling, guarded fallbacks, Q/H/window close,
 headless execution without GUI calls, per-hand-count profiles, CPU calculations,
 new CLI constraints and warm-up exclusion.
-All **134 automated tests pass**: 70 tracking tests, 48 gesture foundation/rule
-tests and 16 Phase 1 camera tests, including all 113 earlier tests.
+The original Phase 3.2 baseline was **134 tests**. The targeted POINTING
+calibration adds 14 focused geometry/diagnostic regressions; all previous tests
+continue to run, including Phase 1 camera tests.
+The complete result is **148 passing tests** (56 gesture, 76 tracking, 16 camera).
 Phase 3.2 coverage includes static labels, detection order and loss, EMA input,
 malformed-hand fallback, native polling/Q/H and gesture profiling/warm-up/counts.
 Phase 1 tests cover

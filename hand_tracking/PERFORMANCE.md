@@ -1,5 +1,15 @@
 # Phase 3.2: static gesture overhead
 
+The owner subsequently measured approximately **36 FPS with recognition** and
+accepted its overhead. The targeted POINTING calibration adds no capture/GUI/model
+changes. Its optional `--gesture-debug` logs sampled numeric checks once per two
+seconds; keep it disabled for performance comparisons. JSON records that flag.
+In a sequential cached-feature two-hand check (100 warm-up/2000 measured iterations,
+no camera/feature extraction/GUI), original vs calibrated debug-off rule evaluation
+measured mean/p95 **0.021/0.035 ms** vs **0.053/0.107 ms**. These host timings do not
+establish current webcam FPS or accuracy; local validation is still required.
+The remaining measurements below record the original Phase 3.2 implementation.
+
 The owner's verified Phase 2.5 two-hand comparison was 28.98 FPS for the original
 GUI path and 38.77 FPS with native Win32 polling. Gesture recognition is opt-in
 with `--gestures`; `--no-gestures` (default) skips the adapter/features/classifier.

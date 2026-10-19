@@ -13,7 +13,7 @@ from .tracking_utils import MAX_HANDS
 
 
 def classify_result(result: object, timestamp_ms: int, image_size: ImageSize,
-                    timings: Profile) -> tuple[GestureResult, ...]:
+                    timings: Profile, *, diagnostics: bool = False) -> tuple[GestureResult, ...]:
     """Include adaptation/features in gesture_features, rules in gesture_classification.
 
     The usual path snapshots the whole frame once. If a malformed hand makes
@@ -41,7 +41,7 @@ def classify_result(result: object, timestamp_ms: int, image_size: ImageSize,
         except ValueError:
             prepared.append(None)
     before_rules = time.perf_counter()
-    classifications = tuple(classify_hand(hand, timestamp_ms) for hand in prepared)
+    classifications = tuple(classify_hand(hand, timestamp_ms, diagnostics=diagnostics) for hand in prepared)
     end = time.perf_counter()
     timings.add("gesture_features", before_rules - start)
     timings.add("gesture_classification", end - before_rules)

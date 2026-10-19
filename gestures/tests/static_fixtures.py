@@ -13,7 +13,8 @@ I = LandmarkIndex
 
 def pose_hand(*, curled: tuple[Finger, ...] = (), partial: tuple[Finger, ...] = (),
               side: str | None = "Left", thumb: str = "relaxed", scale: float = .07,
-              rotation: float = 0, image_size: ImageSize = SIZE) -> HandObservation:
+              rotation: float = 0, image_size: ImageSize = SIZE,
+              chain_angles: dict[Finger, tuple[float, float, float]] | None = None) -> HandObservation:
     # Geometry lives in a common-axis plane; convert to normalized image coordinates last.
     positions = {I.WRIST: (0, 0)}
     bases = {Finger.INDEX: (-.8, 1.6), Finger.MIDDLE: (0, 1.8),
@@ -34,6 +35,8 @@ def pose_hand(*, curled: tuple[Finger, ...] = (), partial: tuple[Finger, ...] = 
         x, y = bases[finger]
         positions[chain[0]] = (x, y)
         angles = (90, -25, -120) if finger in curled else (90, 20, -20) if finger in partial else (90, 78, 70)
+        if chain_angles and finger in chain_angles:
+            angles = chain_angles[finger]
         for index, length, angle in zip(chain[1:], lengths[finger], angles):
             radians = math.radians(angle + fan[finger])
             x, y = x + length * math.cos(radians), y + length * math.sin(radians)
