@@ -16,6 +16,7 @@ import cv2
 from gestures.models import ImageSize
 from gestures.pinch import PinchThresholds, PinchTracker
 from gestures.state_machine import GestureStateManager, StateSettings
+from gestures.swipe import SwipeSettings
 from gestures.static_gestures import DEFAULT_THRESHOLDS
 from camera.camera_diagnostics import (
     BACKENDS, capture_snapshot, configure_capture, read_frame,
@@ -113,6 +114,20 @@ def parse_args(argv=None):
                         help="same static gesture reactivation block per hand, 0-5000 ms (default: 150)")
     parser.add_argument("--gesture-update-ms", type=nonnegative_int, default=250,
                         help="pinch distance update interval; 0 disables UPDATED events (default: 250 ms)")
+    parser.add_argument("--swipes", action="store_true",
+                        help="requires --gestures --pinch --gesture-states; recognize horizontal palm movements")
+    parser.add_argument("--swipe-debug", action="store_true", help="requires --swipes; numeric motion overlay and trail")
+    parser.add_argument("--swipe-distance", type=positive_float, default=1.5, help="minimum net displacement in palm units")
+    parser.add_argument("--swipe-velocity", type=positive_float, default=3., help="minimum average/recent speed in palms/s")
+    parser.add_argument("--swipe-dominance", type=positive_float, default=3., help="net horizontal / total vertical travel")
+    parser.add_argument("--swipe-consistency", type=positive_float, default=.85, help="net horizontal / horizontal path")
+    parser.add_argument("--swipe-min-ms", type=positive_int, default=120)
+    parser.add_argument("--swipe-max-ms", type=positive_int, default=600)
+    parser.add_argument("--swipe-cooldown-ms", type=nonnegative_int, default=800)
+    parser.add_argument("--swipe-reset-ms", type=nonnegative_int, default=250, help="eligible stationary hold before arming")
+    parser.add_argument("--swipe-feedback-ms", type=nonnegative_int, default=350, help="short confirmation feedback duration")
+    parser.add_argument("--swipe-max-scale-change", type=positive_float, default=.25)
+    parser.add_argument("--swipe-pose", choices=("open-palm", "open-palm-or-fist"), default="open-palm")
     args = parser.parse_args(argv)
     if args.headless and not args.benchmark:
         parser.error("--headless requires --benchmark for a timed run (Ctrl+C can interrupt)")
@@ -132,8 +147,13 @@ def parse_args(argv=None):
         parser.error("--gesture-event-debug requires --gesture-states")
     try:
         state_settings(args)
+        swipe_settings(args)
     except ValueError as exc:
         parser.error(str(exc))
+    if args.swipes and not (args.gestures and args.pinch and args.gesture_states):
+        parser.error("--swipes requires --gestures --pinch --gesture-states (pose eligibility, pinch safety and events)")
+    if args.swipe_debug and not args.swipes:
+        parser.error("--swipe-debug requires --swipes")
     return args
 
 
@@ -142,11 +162,21 @@ def state_settings(args):
                          args.gesture_cooldown_ms, args.gesture_update_ms)
 
 
+def swipe_settings(args):
+    return SwipeSettings(args.swipe_distance, args.swipe_velocity, args.swipe_dominance, args.swipe_consistency,
+                         args.swipe_min_ms, args.swipe_max_ms, args.swipe_cooldown_ms, args.swipe_reset_ms,
+                         args.swipe_feedback_ms, args.swipe_max_scale_change, args.swipe_pose)
+
+
 def log_state_events(events):
     for event in events:
-        LOGGER.info("%s | %s | %s | t=%d ms | %s%s", event.side.value, event.gesture,
+        motion = event.metadata.motion
+        details = (f" | dx={motion.dx:.3f} dy={motion.dy:.3f} vx={motion.velocity_x:.3f} "
+                   f"duration={motion.duration_ms}ms cons={motion.consistency:.3f} dom={motion.dominance:.3f}"
+                   if motion is not None else "")
+        LOGGER.info("%s | %s | %s | t=%d ms | %s%s%s", event.side.value, event.gesture,
                     event.event_type.value, event.timestamp_ms, event.metadata.reason,
-                    " (former association)" if not event.metadata.association_current else "")
+                    " (former association)" if not event.metadata.association_current else "", details)
 
 
 def create_landmarker(model_path):
@@ -185,8 +215,12 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
     pinch_thresholds = PinchThresholds(args.pinch_activation, args.pinch_release)
     pinch_tracker = PinchTracker(pinch_thresholds) if args.pinch else None
     pinch_counts = Counter()
-    state_manager = GestureStateManager(state_settings(args)) if args.gesture_states else None
+    configured_swipes = swipe_settings(args)
+    state_manager = (GestureStateManager(state_settings(args),
+                                       swipe_settings=configured_swipes if args.swipes else None,
+                                       swipe_diagnostics=args.swipe_debug) if args.gesture_states else None)
     state_counts, event_counts = Counter(), Counter()
+    swipe_counts = Counter()
     frames = 0
     capture_logged = False
     warned_slow = False
@@ -245,6 +279,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                     before_states = time.perf_counter()
                     state_frame = state_manager.update(tuple(prepared), timestamp_ms, classifications, pinches)
                     timings.add("state_management", time.perf_counter() - before_states)
+                    if args.swipes:
+                        timings.add("swipe_processing", state_manager.last_swipe_seconds)
                     if args.gesture_event_debug:
                         log_state_events(state_frame.events)
             if not capture_logged:
@@ -258,7 +294,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                                        raw_result=raw_result if args.show_raw_landmarks else None,
                                        gesture_results=classifications, pinch_results=pinches,
                                        pinch_thresholds=pinch_thresholds if args.pinch_debug else None,
-                                       gesture_states=state_frame.hands if state_frame is not None else None)
+                                       gesture_states=state_frame.hands if state_frame is not None else None,
+                                       swipe_results=state_frame.motion if state_frame is not None and args.swipes else None,
+                                       swipe_config=configured_swipes if args.swipe_debug else None)
                 before_display = time.perf_counter()
                 cv2.imshow(WINDOW, preview)
                 before_events = time.perf_counter()
@@ -288,6 +326,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                 if state_frame is not None:
                     state_counts.update(item.state.value for item in state_frame.hands)
                     event_counts.update(f"{item.event_type.value}:{item.gesture}" for item in state_frame.events)
+                    swipe_counts.update(item.gesture for item in state_frame.motion
+                                        if item is not None and item.confirmed and item.admitted)
                 timings.finish_frame(min(MAX_HANDS, len(raw_result.hand_landmarks)))
                 rate = fps.record(end)
             if rate is not None and not args.benchmark:
@@ -367,6 +407,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                                    "state_counts": dict(state_counts), "event_counts": dict(event_counts),
                                    "shutdown_events": [asdict(event) for event in shutdown_events],
                                    "policy": "PINCH takes precedence; UNKNOWN/unavailable cancels; no OS actions"},
+                "swipes": {"enabled": args.swipes, "debug_enabled": args.swipe_debug,
+                           "settings": asdict(configured_swipes), "confirmation_counts": dict(swipe_counts),
+                           "coordinates": "unmirrored image: right increases x, left decreases x",
+                           "event_policy": "one STARTED then ENDED at confirmation; consume STARTED once"},
                 "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown.",
             })
         LOGGER.info("Application FPS includes capture, preparation, inference, smoothing%s; "
@@ -387,6 +431,7 @@ def run(args, report=None):
                    "gestures_enabled": args.gestures,
                    "gesture_debug_enabled": args.gesture_debug,
                    "gesture_states_enabled": args.gesture_states,
+                   "swipes_enabled": args.swipes,
                    "logical_cpu_count": os.cpu_count(),
                    "python": platform.python_version(), "opencv": cv2.__version__})
     try:
@@ -419,6 +464,8 @@ def run(args, report=None):
                         args.pinch_activation, args.pinch_release)
             LOGGER.info("Gesture states: %s | settings: %s | PINCH precedence; no desktop actions",
                         args.gesture_states, asdict(state_settings(args)))
+            LOGGER.info("Swipes: %s | settings: %s | unmirrored image directions; no desktop actions",
+                        args.swipes, asdict(swipe_settings(args)))
             LOGGER.info("Preview/input: unmirrored. Left/Right identify the subject's hands; "
                         "colors follow each frame's handedness predictions, not detection order.")
             LOGGER.info("%s No camera throughput claim is made by inference FPS.",

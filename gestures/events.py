@@ -2,14 +2,22 @@
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Literal, TypeAlias
+from typing import TYPE_CHECKING, Literal, TypeAlias
 
 from .models import HandSide, finite_number
+from .motion import MotionMetrics
 from .static_gestures import Gesture
 
+if TYPE_CHECKING:
+    from .swipe import SwipeObservation
 
-GestureId: TypeAlias = Gesture | Literal["PINCH"]
+
+SwipeId: TypeAlias = Literal["SWIPE_LEFT", "SWIPE_RIGHT"]
+GestureId: TypeAlias = Gesture | Literal["PINCH"] | SwipeId
 PINCH: Literal["PINCH"] = "PINCH"
+SWIPE_LEFT: Literal["SWIPE_LEFT"] = "SWIPE_LEFT"
+SWIPE_RIGHT: Literal["SWIPE_RIGHT"] = "SWIPE_RIGHT"
+SWIPES = (SWIPE_LEFT, SWIPE_RIGHT)
 
 
 class GestureState(StrEnum):
@@ -31,6 +39,8 @@ class EventMetadata:
     reason: str = ""
     normalized_pinch_distance: float | None = None
     association_current: bool = True  # False: cancellation references a former association.
+    motion: MotionMetrics | None = None
+    direction: SwipeId | None = None
 
     def __post_init__(self):
         if self.normalized_pinch_distance is not None:
@@ -49,7 +59,7 @@ class GestureEvent:
     metadata: EventMetadata = EventMetadata()
 
     def __post_init__(self):
-        if (self.gesture not in (Gesture.OPEN_PALM, Gesture.FIST, Gesture.POINTING, PINCH)
+        if (self.gesture not in (Gesture.OPEN_PALM, Gesture.FIST, Gesture.POINTING, PINCH, *SWIPES)
                 or not isinstance(self.event_type, EventType) or not isinstance(self.state, GestureState)
                 or self.side not in (HandSide.LEFT, HandSide.RIGHT)):
             raise ValueError("Events require a supported gesture, event/state type and reliable side")
@@ -73,3 +83,4 @@ class StateFrame:
     timestamp_ms: int
     hands: tuple[HandState, ...]  # Current detection slots, not persistent IDs.
     events: tuple[GestureEvent, ...] = ()
+    motion: tuple["SwipeObservation | None", ...] = ()

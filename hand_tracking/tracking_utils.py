@@ -11,6 +11,7 @@ import numpy as np
 if TYPE_CHECKING:
     from gestures.pinch import PinchResult
     from gestures.events import HandState
+    from gestures.swipe import SwipeObservation
 
 
 MAX_HANDS = 2
@@ -91,6 +92,7 @@ class HandOverlay:
     gesture: str | None = None
     pinch: "PinchResult | None" = None
     stabilized: "HandState | None" = None
+    motion: "SwipeObservation | None" = None
 
 
 def handedness_label(categories):
@@ -109,7 +111,7 @@ def handedness_label(categories):
     return name if name in ("Left", "Right") else "Unknown"
 
 
-def hand_overlays(result, width, height, gesture_results=None, pinch_results=None, gesture_states=None):
+def hand_overlays(result, width, height, gesture_results=None, pinch_results=None, gesture_states=None, swipe_results=None):
     """Pair landmarks and handedness within this result only; retain no track IDs."""
     overlays = []
     handedness = getattr(result, "handedness", None) or []
@@ -134,11 +136,22 @@ def hand_overlays(result, width, height, gesture_results=None, pinch_results=Non
                        else "UNKNOWN")
         pinch = pinch_results[index] if pinch_results is not None and index < len(pinch_results) else None
         stabilized = gesture_states[index] if gesture_states is not None and index < len(gesture_states) else None
-        overlays.append(HandOverlay(label, color, points, gesture, pinch, stabilized))
+        motion = swipe_results[index] if swipe_results is not None and index < len(swipe_results) else None
+        overlays.append(HandOverlay(label, color, points, gesture, pinch, stabilized, motion))
     return overlays
 
 
-def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None):
+def _label_layout(preview, text, font_scale, anchor, bounds=None):
+    left, right = bounds if bounds is not None else (4, preview.shape[1]-5)
+    (width, height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 1)
+    if bounds is not None and width > right-left:
+        font_scale *= (right-left)/width
+        (width, height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 1)
+    return max(left, min(anchor, right-width)), width, height, baseline, font_scale
+
+
+def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None, swipe_config=None, capture_aspect=1.,
+              annotation_bounds=None):
     """Shared drawing path for either hand, with a label close to its wrist."""
     for start, end in HAND_CONNECTIONS:
         cv2.line(preview, hand.points[start], hand.points[end], hand.color, 2, cv2.LINE_AA)
@@ -154,16 +167,16 @@ def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None):
         for index in (4, 8):
             cv2.circle(preview, hand.points[index], 7, (0, 0, 0), -1, cv2.LINE_AA)
             cv2.circle(preview, hand.points[index], 5, color, -1, cv2.LINE_AA)
-    (width, height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 1)
-    x = max(4, min(hand.points[0][0] + 8, preview.shape[1] - width - 5))
+    x,width,height,baseline,font = _label_layout(preview,text,.55,hand.points[0][0]+8,annotation_bounds)
     diagnostic_row = 23 if hand.pinch is not None and pinch_thresholds is not None else 0
     state_row = 23 if hand.stabilized is not None else 0
+    motion_rows = 23 * (1 + (2 if swipe_config is not None else 0)) if hand.motion is not None else 0
     y = max(top_margin + height + 4,
-            min(hand.points[0][1] + 22, preview.shape[0] - baseline - 5 - diagnostic_row - state_row))
+            min(hand.points[0][1] + 22, preview.shape[0] - baseline - 5 - diagnostic_row - state_row - motion_rows))
     cv2.rectangle(preview, (x - 3, y - height - 3), (x + width + 3, y + baseline + 3),
                   (0, 0, 0), -1)
     cv2.putText(preview, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX,
-                0.55, hand.color, 1, cv2.LINE_AA)
+                font, hand.color, 1, cv2.LINE_AA)
     if diagnostic_row:
         measurement = hand.pinch.measurement
         distance = "--" if measurement.normalized_distance is None else f"{measurement.normalized_distance:.3f}"
@@ -171,11 +184,10 @@ def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None):
                  f"valid={'yes' if measurement.valid else 'no'}")
         if hand.pinch.reason:
             debug += f" | {hand.pinch.reason}"
-        (width, height), baseline = cv2.getTextSize(debug, cv2.FONT_HERSHEY_SIMPLEX, .45, 1)
-        x = max(4, min(x, preview.shape[1] - width - 5))
+        x,width,height,baseline,font = _label_layout(preview,debug,.45,x,annotation_bounds)
         y += diagnostic_row
         cv2.rectangle(preview, (x - 3, y - height - 3), (x + width + 3, y + baseline + 3), (0, 0, 0), -1)
-        cv2.putText(preview, debug, (x, y), cv2.FONT_HERSHEY_SIMPLEX, .45, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(preview, debug, (x, y), cv2.FONT_HERSHEY_SIMPLEX, font, (255, 255, 255), 1, cv2.LINE_AA)
     if state_row:
         state = hand.stabilized
         last = (f"{state.last_event.event_type.value.removeprefix('GESTURE_')}:{state.last_event.gesture}"
@@ -183,11 +195,36 @@ def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None):
         current = state.confirmed or "--"
         candidate = f" ({state.candidate})" if state.candidate is not None else ""
         text = f"{state.state.value}{candidate} | Confirmed: {current} | Last: {last}"
-        (width, height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, .43, 1)
-        x = max(4, min(x, preview.shape[1] - width - 5))
+        x,width,height,baseline,font = _label_layout(preview,text,.43,x,annotation_bounds)
         y += state_row
         cv2.rectangle(preview, (x - 3, y - height - 3), (x + width + 3, y + baseline + 3), (0, 0, 0), -1)
-        cv2.putText(preview, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, .43, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(preview, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, font, (255, 255, 255), 1, cv2.LINE_AA)
+    if hand.motion is not None:
+        motion = hand.motion
+        name = motion.gesture or ("RIGHT" if motion.metrics and motion.metrics.dx > .15 else
+                                  "LEFT" if motion.metrics and motion.metrics.dx < -.15 else "--")
+        result = "accepted" if motion.admitted else "suppressed" if motion.gesture is not None else motion.reason
+        lines = [f"Motion: {name} | {motion.state.value} | {result}"]
+        if swipe_config is not None:
+            m = motion.metrics
+            prefix = "last " if motion.gesture is not None else ""
+            lines.append((f"{prefix}dx={m.dx:.2f}/{swipe_config.min_distance:g} dy={m.dy:.2f} "
+                          f"vx={m.velocity_x:.2f}/{swipe_config.min_velocity:g} recent={m.recent_velocity_x:.2f}"
+                          if m is not None else "dx=-- dy=-- vx=-- (collecting motion)") + f" | cooldown={motion.cooldown_ms}ms")
+            lines.append((f"t={m.duration_ms}ms [{swipe_config.min_ms},{swipe_config.max_ms}] "
+                          f"cons={m.consistency:.2f}/{swipe_config.consistency:g} "
+                          f"dom={m.dominance:.1f}/{swipe_config.dominance:g} | {motion.reason}"
+                          if m is not None else motion.reason))
+            points = [(round(max(0.,min(1.,px))*(preview.shape[1]-1)),
+                       round(max(0.,min(1.,py/capture_aspect))*(preview.shape[0]-1)))
+                      for px, py in motion.trajectory]
+            for first, last in zip(points, points[1:]):
+                cv2.line(preview, first, last, (0, 255, 255), 2, cv2.LINE_AA)
+        for text in lines:
+            x,width,height,baseline,font = _label_layout(preview,text,.40,x,annotation_bounds)
+            y += 23
+            cv2.rectangle(preview, (x-3, y-height-3), (x+width+3, y+baseline+3), (0, 0, 0), -1)
+            cv2.putText(preview, text, (x,y), cv2.FONT_HERSHEY_SIMPLEX, font, (255,255,255), 1, cv2.LINE_AA)
 
 
 def significant_fps_drop(rate):
@@ -214,7 +251,8 @@ class PreviewRenderer:
 
 
 def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw_result=None,
-                 gesture_results=None, pinch_results=None, pinch_thresholds=None, gesture_states=None):
+                 gesture_results=None, pinch_results=None, pinch_thresholds=None, gesture_states=None,
+                 swipe_results=None, swipe_config=None):
     start = time.perf_counter()
     height, width = frame.shape[:2]
     scale = min(1100 / width, 650 / height, 1.0)
@@ -223,9 +261,17 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
     resized = time.perf_counter()
     if timings is not None:
         timings.add("preview_resize", resized - start)
-    hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results, pinch_results, gesture_states)
+    hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results, pinch_results, gesture_states, swipe_results)
+    # Screen columns are UI placement only, never tracking identities.
+    columns = ({id(hand): i for i,hand in enumerate(sorted(hands,key=lambda h:h.points[0][0]))}
+               if swipe_results is not None and len(hands)==2 and preview.shape[1]>=400 else {})
     for hand in hands:
-        draw_hand(preview, hand, top_margin=54 if show_help else 27, pinch_thresholds=pinch_thresholds)
+        bounds = None
+        if columns:
+            column = columns[id(hand)]
+            bounds = (column*preview.shape[1]//2+4,(column+1)*preview.shape[1]//2-6)
+        draw_hand(preview, hand, top_margin=54 if show_help else 27, pinch_thresholds=pinch_thresholds,
+                  swipe_config=swipe_config, capture_aspect=height/width, annotation_bounds=bounds)
     if raw_result is not None:
         for hand in hand_overlays(raw_result, preview.shape[1], preview.shape[0]):
             for point in hand.points:

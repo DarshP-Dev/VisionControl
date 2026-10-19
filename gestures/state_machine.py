@@ -1,16 +1,18 @@
 """Deterministic, synchronous per-hand intent state; independent of camera/actions."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 import math
+import time
 
-from .arbitration import resolved_input
+from .arbitration import opposing_swipes, resolved_input, swipe_eligible
 from .association import WRIST_CONTINUITY_DISTANCE, hands_overlap, reliable_side
-from .events import (PINCH, EventMetadata, EventType, GestureEvent, GestureId,
+from .events import (PINCH, SWIPES, EventMetadata, EventType, GestureEvent, GestureId,
                      GestureState as S, HandState, StateFrame)
 from .features import HandFeatures
 from .models import MAX_HANDS, HandSide, ImageSize, finite_number
 from .pinch import MAX_HISTORY_GAP_MS, PinchResult, PinchStatus
 from .static_gestures import Gesture, GestureResult
+from .swipe import SwipeHistory, SwipeSettings
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,6 +45,8 @@ class _Track:
     last_distance: float | None = None
     pinch_armed: bool = False
     reason: str = ""
+    swipe: SwipeHistory | None = None
+    last_swipe: GestureEvent | None = None
 
 
 def _valid_geometry(item: HandFeatures | None) -> bool:
@@ -66,11 +70,14 @@ class GestureStateManager:
     Lost associations generate only historical CANCELED events, never release.
     """
 
-    def __init__(self, settings: StateSettings = StateSettings()):
+    def __init__(self, settings: StateSettings = StateSettings(), *,
+                 swipe_settings: SwipeSettings | None = None, swipe_diagnostics=False):
         self.settings = settings
+        self.swipe_settings, self.swipe_diagnostics = swipe_settings, swipe_diagnostics
         self._tracks: dict[HandSide, _Track] = {}
         self._last_timestamp: int | None = None
         self._image_size: ImageSize | None = None
+        self.last_swipe_seconds = 0.
 
     def _event(self, track, kind, timestamp, reason="", distance=None, current=True):
         event = GestureEvent(track.confirmed, kind, timestamp, track.side, track.state,
@@ -172,6 +179,7 @@ class GestureStateManager:
     def update(self, features: tuple[HandFeatures | None, ...], timestamp_ms: int,
                static: tuple[GestureResult, ...] | None = None,
                pinches: tuple[PinchResult, ...] | None = None) -> StateFrame:
+        self.last_swipe_seconds = 0.
         valid_time = isinstance(timestamp_ms, int) and not isinstance(timestamp_ms, bool) and timestamp_ms >= 0
         clock_bad = not valid_time or (self._last_timestamp is not None and timestamp_ms <= self._last_timestamp)
         if clock_bad:
@@ -203,7 +211,7 @@ class GestureStateManager:
         if reason:
             events = self._cancel_all(timestamp_ms, reason)
             return StateFrame(timestamp_ms, tuple(HandState(side, reason=reason) for side in sides), tuple(events))
-        events, displayed = [], {}
+        events, displayed, ready = [], {}, []
         for side in sorted(tuple(self._tracks), key=lambda value: value.value):
             if side not in sides:
                 events.extend(self._finish(self._tracks.pop(side), EventType.GESTURE_CANCELED,
@@ -245,7 +253,55 @@ class GestureStateManager:
             if track is None:
                 track = self._tracks[side] = _Track(side, wrist)
             track.wrist = wrist
-            events.extend(self._advance(track, raw_static, raw_pinch, timestamp_ms))
+            ready.append((index, track, raw_static, raw_pinch))
+        motion = [None]*len(features) if self.swipe_settings is not None else []
+        if self.swipe_settings is not None:
+            before_motion = time.perf_counter()
+            for index, track, raw_static, raw_pinch in ready:
+                if track.swipe is None:
+                    track.swipe = SwipeHistory(self.swipe_settings, self.swipe_diagnostics)
+                blocked_until = max((track.cooldowns.get(name, 0) for name in SWIPES), default=0)
+                eligible = (track.confirmed != PINCH
+                            and swipe_eligible(raw_static, raw_pinch, self.swipe_settings.pose))
+                motion[index] = track.swipe.observe(features[index], timestamp_ms, eligible, blocked_until)
+            recent = tuple(track.last_swipe.gesture for _, track, _, _ in ready
+                           if track.last_swipe is not None and timestamp_ms-track.last_swipe.timestamp_ms
+                           <= min(200, self.swipe_settings.cooldown_ms))
+            conflict = opposing_swipes(motion, recent)
+            self.last_swipe_seconds = time.perf_counter()-before_motion
+        else:
+            conflict = False
+        for index, track, raw_static, raw_pinch in ready:
+            side = track.side
+            result = motion[index] if motion else None
+            if conflict and result is not None and (result.confirmed or result.state == S.CANDIDATE):
+                # Consume both directions, including a not-yet-confirmed opposite candidate.
+                track.swipe.consume()
+                for name in SWIPES:
+                    track.cooldowns[name] = timestamp_ms+self.swipe_settings.cooldown_ms
+                result = replace(result, admitted=False, reason="opposite_two_hand_motion", state=S.COOLDOWN,
+                                 cooldown_ms=self.swipe_settings.cooldown_ms, trajectory=())
+                track.swipe.outcome(result, False, result.reason)
+                motion[index] = result
+            if result is not None and result.confirmed and not conflict:
+                # One atomic completed-motion lifecycle; no sustained swipe ACTIVE state.
+                events.extend(self._finish(track, EventType.GESTURE_CANCELED, timestamp_ms, "swipe_precedence"))
+                metadata = EventMetadata("swipe_confirmed", motion=result.metrics, direction=result.gesture)
+                events.append(GestureEvent(result.gesture, EventType.GESTURE_STARTED, timestamp_ms,
+                                           track.side, S.ACTIVE, metadata))
+                terminal = GestureEvent(result.gesture, EventType.GESTURE_ENDED, timestamp_ms,
+                                        track.side, S.COOLDOWN, metadata)
+                events.append(terminal)
+                track.last_event, track.state = terminal, S.COOLDOWN
+                track.last_swipe = terminal
+                for name in SWIPES:
+                    track.cooldowns[name] = timestamp_ms+self.swipe_settings.cooldown_ms
+                result = replace(result, admitted=True, state=S.COOLDOWN,
+                                 cooldown_ms=self.swipe_settings.cooldown_ms)
+                track.swipe.outcome(result, True, "swipe_confirmed")
+                motion[index] = result
+            else:
+                events.extend(self._advance(track, raw_static, raw_pinch, timestamp_ms))
             displayed[side] = HandState(side, track.state, track.confirmed,
                                         track.candidate or track.pending, track.last_event, track.reason)
-        return StateFrame(timestamp_ms, tuple(displayed[side] for side in sides), tuple(events))
+        return StateFrame(timestamp_ms, tuple(displayed[side] for side in sides), tuple(events), tuple(motion))

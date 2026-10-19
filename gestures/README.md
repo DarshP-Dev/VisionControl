@@ -1,4 +1,4 @@
-# Phase 3.4: Gesture states and events
+# Phase 3.5: Static, pinch and directional swipe recognition
 
 This package provides the Phase 3.1 landmark geometry foundation and Phase 3.2
 deterministic static rules: **OPEN_PALM, FIST, POINTING, UNKNOWN**. Feature
@@ -9,7 +9,9 @@ POINTING calibration; occasional backward-rotation POINTING/FIST ambiguity is
 unchanged. The static classifier imports no camera, GUI, MediaPipe or desktop-control
 code and retains no motion history. Phase 3.3 adds a separate pinch lifecycle;
 Phase 3.4 adds optional state management and event arbitration above both raw
-recognizers. No additional model, threads or gesture-triggered actions are added.
+recognizers. Phase 3.5 adds opt-in palm-trajectory SWIPE_LEFT/SWIPE_RIGHT evidence
+and completed-motion events through that same manager. No additional model,
+threads or gesture-triggered actions are added.
 
 The package uses only Python's standard library (Python 3.11+; the existing
 environment is Python 3.13.7). No requirements changes or installations are needed.
@@ -28,6 +30,8 @@ environment is Python 3.13.7). No requirements changes or installations are need
 | `events.py` | Immutable event, metadata and current-state snapshots; reuses static Gesture identifiers plus PINCH |
 | `arbitration.py` | Small input precedence policy; preserves raw observations |
 | `state_machine.py` | Per-hand timed confirmation, per-gesture cooldowns, pinch-event admission and cancellation |
+| `motion.py` | Aspect-correct five-landmark palm anchor and normalized trajectory metrics |
+| `swipe.py` | Bounded motion evidence, eligibility reset latch and temporary diagnostic feedback |
 | `__init__.py` | Public observation/feature/adapter exports |
 | `tests/` | Synthetic fixtures and hardware-independent model, adapter, geometry and feature tests |
 
@@ -35,6 +39,28 @@ Existing tracking helpers are display-oriented and import OpenCV/NumPy. The new
 models add validation, metadata and immutable snapshots without importing that
 rendering stack. The adapter also accepts the existing EMA `DisplayLandmark`
 objects structurally; neither the tracker nor its smoothing code is refactored.
+
+## Phase 3.5: directional swipes
+
+See [SWIPES.md](SWIPES.md) for the algorithm, defaults/ranges, exact PowerShell
+commands, event semantics, calibration, sequential benchmarks and hardware checklist.
+`--swipes` requires `--gestures --pinch --gesture-states`; `--swipe-debug` adds
+numeric diagnostics and a short trail. Default OPEN_PALM eligibility blocks
+ordinary POINTING and active/unavailable pinch input. Directions refer to the
+unmirrored image; no OS actions are implemented.
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --swipes
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --swipes --swipe-debug --gesture-event-debug
+```
+
+Priority is PINCH > confirmed SWIPE > static intent. Each admitted swipe has one
+STARTED and one ENDED at the same timestamp; consume STARTED once. Return motion
+with the same eligible pose cannot rearm. Change pose, reposition, reopen, and
+hold still after cooldown. Opposite two-hand evidence is conservatively suppressed;
+raw classifications and motion diagnostics remain distinct. All **253 tests pass**
+(135 gesture, 102 tracking, 16 camera), including the unchanged 214-test baseline.
+Actual swipe accuracy and FPS remain unverified until local webcam testing.
 
 ## Phase 3.4: stabilized gesture events
 
@@ -170,8 +196,8 @@ within each group, side order is fixed. Identical ordered observations and
 timestamps produce identical outputs. No global bus, callbacks, unbounded event
 history, cooldown shared across hands, probability score or action dispatch exists.
 Future desktop controls can consume these immutable records independently;
-future swipe recognition would extend the identifier/input adapter and precedence
-policy rather than coupling this engine to OS APIs. No swipe logic is implemented.
+Phase 3.5 now extends the typed identifiers, motion metadata and precedence policy
+without coupling the engine to OS APIs; see [directional swipes](SWIPES.md).
 
 ### Association, loss and invalid time
 
@@ -202,7 +228,8 @@ geometry/continuity, not another MediaPipe inference or feature extraction.
 Loss/ambiguity cancellations reference the **former reliable side** and carry
 `association_current=False`; they do not assert that this hand is still visible.
 The manager retains at most two histories, three static cooldown timers per side
-and one latest event per side. Confident side swaps that escape the simple gates
+(plus two swipe timers when enabled), a latest general event and latest swipe
+completion per side. Confident side swaps that escape the simple gates
 remain a limitation. Overlap may interrupt real gestures; conservative cancellation
 is preferred to speculative matching. Underlying backward-rotation static ambiguity
 and projected pinch proximity vs physical contact are unchanged.
@@ -256,7 +283,7 @@ Reports are summaries, not an event journal or proof of physical hand identity.
 .\.venv\Scripts\python.exe -m pip check
 ```
 
-All **214 tests pass**: 105 gesture, 93 tracking and 16 camera tests. All 174
+The **Phase 3.4 baseline** was 214 passing tests: 105 gesture, 93 tracking and 16 camera. All 174
 previous tests remain passing without altered expectations; 40 new tests cover
 confirmation/rejection, known changes/UNKNOWN, cooldown boundaries, variable FPS,
 immutable deterministic events, arbitration, simultaneous pinches, rearming/loss,
@@ -289,7 +316,7 @@ Pinch is a **separate opt-in channel**, not a static PINCH class. Static
 OPEN_PALM/FIST/POINTING/UNKNOWN rules and thresholds are unchanged. For example,
 `Left - UNKNOWN | Pinch: HELD` is a valid combination. This raw channel itself adds
 no generalized state/arbitration; opt-in Phase 3.4 handles those above recognition.
-No desktop controls, swipe detection or actions are implemented. Physical pinch
+This raw channel adds no desktop controls, dynamic recognition or actions. Physical pinch
 accuracy and current FPS still require owner testing.
 
 ### Geometry and starting thresholds

@@ -24,3 +24,20 @@ def resolved_input(static: GestureResult | None, pinch: PinchResult | None) -> G
     except (AttributeError, TypeError):
         pass  # Malformed rule metadata cannot produce an actionable candidate.
     return None
+
+
+def swipe_eligible(static: GestureResult | None, pinch: PinchResult | None, pose: str) -> bool:
+    """Require a recognized pose and an observed open/released pinch channel."""
+    selected = resolved_input(static, pinch)
+    return (pinch is not None and pinch.measurement.valid
+            and pinch.status in (PinchStatus.OPEN, PinchStatus.RELEASED)
+            and selected in ((Gesture.OPEN_PALM,) if pose == "open-palm" else (Gesture.OPEN_PALM, Gesture.FIST)))
+
+
+def opposing_swipes(observations, recent=()) -> bool:
+    """Suppress both when one confirms while the other has opposite motion evidence."""
+    directions = {1 if item.metrics.dx > 0 else -1 for item in observations
+                  if item is not None and item.metrics is not None
+                  and (item.confirmed or item.state.value == "CANDIDATE") and abs(item.metrics.dx) >= .15}
+    directions.update(1 if name == "SWIPE_RIGHT" else -1 for name in recent)
+    return len(directions) > 1 and any(item is not None and item.confirmed for item in observations)

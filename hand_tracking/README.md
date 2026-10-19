@@ -7,6 +7,8 @@ Optional pinch recognition measures normalized thumb/index proximity with a
 separate OPEN/STARTED/HELD/RELEASED/UNAVAILABLE lifecycle; it adds no static class.
 Phase 3.4 optionally stabilizes static results and resolves pinch precedence into
 typed events; raw recognition remains visible and unchanged.
+Phase 3.5 optionally recognizes palm-trajectory SWIPE_LEFT/SWIPE_RIGHT through
+the same event manager, with pose eligibility, motion metrics and reset safeguards.
 No gesture-triggered actions, cursor, voice or motor controls are implemented.
 The existing Phase 1 camera applications are unchanged.
 Inference size is configurable independently of capture; detailed benchmarking
@@ -49,6 +51,49 @@ testing](../gestures/README.md) for limitations and repeatable off/on benchmarks
 `gesture_features`, `gesture_classification` and `gesture_total` profile the new
 work separately, including in headless runs and per-hand-count reports.
 
+## Phase 3.5 directional swipes
+
+```powershell
+# Swipes need existing static eligibility, pinch safety, and event state channels
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --swipes
+
+# Optional motion diagnostics/trail and existing event log
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --swipes --swipe-debug --gesture-event-debug
+```
+
+`--swipes` defaults off and requires all three shown recognition/state flags.
+`--swipe-debug` requires swipes. Normal tracking and earlier CLI combinations are
+unchanged. Directions refer to the **unmirrored image**, not anatomical hand side.
+No new model, inference, dependencies, threads, desktop actions or frame copies.
+
+The anchor averages wrist + four MCP landmarks and uses the existing cached palm
+scale in aspect-correct 2D coordinates. Defaults require 1.5 palms horizontal
+displacement, 3 palms/s average/recent speed, horizontal dominance 3, consistency
+0.85, duration 120–600 ms and <=25% scale change. OPEN_PALM is eligible by default;
+POINTING/UNKNOWN and active/unavailable PINCH block swipes. Static thresholds and
+pinch hysteresis remain unchanged. The optional `--swipe-pose open-palm-or-fist`
+widens eligibility while retaining the pinch gate.
+
+PINCH > confirmed SWIPE > static intent. Each swipe emits one STARTED/ENDED pair
+at confirmation through the Phase 3.4 manager; a future consumer uses STARTED once.
+An active static intent is canceled first. A swipe uses both directional cooldown
+timers for that hand (800 ms); no repeat can occur until an ineligible pose is
+observed, followed by an eligible stationary hold (250 ms) after cooldown. Return
+while still OPEN_PALM remains blocked. Feedback expires after 350 ms. Opposing
+two-hand candidates are suppressed, with raw diagnostics retained. Missing/unsafe
+associations discard trajectories. Stable Left/Right predictions are not guaranteed
+persistent identities; projection/rotation and continuity gates remain limitations.
+
+Motion results have a separate row; `--swipe-debug` adds dx/dy, speed, duration,
+consistency/dominance, requirements/reason, cooldown and a cleared-on-reset trail.
+Two-hand annotations use separate screen columns. JSON records admitted swipe
+counts/settings; `swipe_processing` is nested inside `state_management`, while
+preview drawing and existing loop/FPS timings include their respective new work.
+Synthetic nested swipe mean/p95 were 0.182/0.315 ms per two-hand observation;
+physical accuracy and the ~35+ FPS target still require owner webcam validation.
+See [SWIPES.md](../gestures/SWIPES.md) for all CLI ranges, exact test/benchmark
+commands, reset policy, event structure and manual acceptance checklist.
+
 ## Phase 3.4 gesture states and events
 
 ```powershell
@@ -67,7 +112,7 @@ work separately, including in headless runs and per-hand-count reports.
 
 States are **off by default** and require at least one enabled recognition channel;
 `--gesture-event-debug` requires states. All original flag combinations still work.
-No OS actions, cursor, clicks, keys, swipes, voice or new models are implemented.
+No OS actions, cursor, clicks, keys, voice or new models are implemented.
 
 Defaults: `--gesture-activation-ms 100`, `--gesture-transition-ms 60`,
 `--gesture-cooldown-ms 150`, `--gesture-update-ms 250`. Each accepts integer
@@ -535,9 +580,9 @@ The original Phase 3.2 baseline was **134 tests**. The targeted POINTING
 calibration adds 14 focused geometry/diagnostic regressions; all previous tests
 continue to run, including Phase 1 camera tests.
 Phase 3.2 completed with 148 passing tests (56 gesture, 76 tracking, 16 camera).
-Phase 3.3 completed with 174 passing tests. Phase 3.4 adds 40 state/event
-regressions: **214 tests pass** (105 gesture, 93 tracking, 16 camera), including all
-earlier tests without weakening their expectations.
+Phase 3.3 completed with 174 passing tests and Phase 3.4 with 214. Phase 3.5 adds
+39 swipe regressions: **253 tests pass** (135 gesture, 102 tracking, 16 camera),
+including all earlier tests without weakening their expectations.
 Phase 3.2 coverage includes static labels, detection order and loss, EMA input,
 malformed-hand fallback, native polling/Q/H and gesture profiling/warm-up/counts.
 Phase 1 tests cover

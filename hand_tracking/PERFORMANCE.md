@@ -1,6 +1,36 @@
-# Recognition performance: Phase 3.4 states and existing recognition
+# Recognition performance: Phase 3.5 swipes and existing recognition
 
-## Phase 3.4 state-management overhead
+## Phase 3.5 swipe overhead
+
+Swipes reuse the current smoothed features/classifications/pinch results and the
+existing state/event manager. `swipe_processing` covers bounded trajectory
+evaluation and two-hand motion conflict checks; it is **nested within
+`state_management`**, which also covers identity, admission and lifecycle event
+creation. Do not sum the two. Both stages appear in overall/per-hand-count profiles.
+Preview/trail work belongs to landmark drawing, and optional event logging affects
+full-loop FPS. JSON separates admitted swipe confirmation counts from lifecycle
+event counts, which include both STARTED and ENDED. Warm-up is excluded from
+timing/counts while continuity runs throughout. No extra inference, feature
+extraction, frame copies, threads or dependencies are introduced.
+
+An interleaved synthetic two-hand test (100 warm-up/1000 measured per mode,
+alternating order, repeating 40-frame rest/open, move/open, fist-return, rest/open
+cycle with 50 ms input timestamps, disabled Profile collection) measured ms:
+
+| Work | Mean | p50 | p95 | p99 |
+| --- | ---: | ---: | ---: | ---: |
+| Recognition bridge + states | 4.293 | 4.114 | 5.346 | 6.046 |
+| Same pipeline + swipes | 4.547 | 4.371 | 5.773 | 6.386 |
+| Nested swipe portion | 0.182 | 0.183 | 0.315 | 0.523 |
+
+These exclude camera, inference, smoothing, rendering and logs. Host load affects
+numbers; do not compare absolute timings against earlier milestone runs. They do
+not establish camera FPS or physical swipe accuracy. The ~35+ FPS target remains
+pending the owner's webcam results. See [exact sequential commands and calibration](../gestures/SWIPES.md#tests-and-sequential-performance-commands)
+with the same hand count, movement, lighting and capture settings, all diagnostic
+flags disabled. No benchmarks or camera images are added to Git.
+
+## Earlier Phase 3.4 state-management overhead
 
 `--gesture-states` reuses raw static/pinch results and their shared cached features.
 `state_management` measures validation, continuity, arbitration, transitions and
