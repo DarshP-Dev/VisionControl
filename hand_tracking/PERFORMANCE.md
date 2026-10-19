@@ -1,4 +1,38 @@
-# Recognition performance: Phase 3.3 pinch and existing static gestures
+# Recognition performance: Phase 3.4 states and existing recognition
+
+## Phase 3.4 state-management overhead
+
+`--gesture-states` reuses raw static/pinch results and their shared cached features.
+`state_management` measures validation, continuity, arbitration, transitions and
+immutable event creation separately. The stage is included in overall and
+per-hand-count profiles, even for zero-hand frames. Drawing the extra state row is
+included in `landmark_drawing`; optional event logs are outside the engine timer
+but included in end-to-end FPS. No additional inference/feature extraction,
+threads, models, image copies or dependencies are introduced.
+
+An interleaved two-hand synthetic comparison (100 warm-up/1000 measured samples
+per configuration, five repeated approach/release poses, alternating order,
+disabled Profile collection and no logs) measured ms per observation:
+
+| Work | Mean | p50 | p95 | p99 |
+| --- | ---: | ---: | ---: | ---: |
+| Static + pinch recognition bridge | 1.268 | 1.065 | 2.372 | 3.834 |
+| Bridge + state manager | 1.351 | 1.111 | 2.471 | 4.283 |
+| State manager portion | 0.044 | 0.036 | 0.085 | 0.174 |
+
+These exclude camera, inference, smoothing, rendering and GUI. Host scheduling
+noise affects samples and the total difference; this is not a physical FPS or
+accuracy result. Default 100 ms static confirmation adds intentional interaction
+latency independently of the small processing cost. Pinch transitions have no
+additional delay. The ~35+ FPS target still requires the owner's webcam test.
+
+Compare runs sequentially using the [Phase 3.4 commands](../gestures/README.md#manual-acceptance-and-benchmarking)
+with the same hand count, movement, lighting and capture/inference settings. Disable
+all debug flags. JSON `gesture_states` separates measured event/state counts from
+shutdown cancellations; warm-up affects continuity but is excluded from counters
+and timing samples. Reports contain summaries, not an unbounded event journal.
+
+## Earlier Phase 3.3 measurements
 
 Phase 3.3 adds synchronous opt-in `--pinch`, independent of `--gestures`. Both
 channels share the smoothed observation and one extraction per hand. Separate

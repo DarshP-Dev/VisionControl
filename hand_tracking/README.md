@@ -1,10 +1,12 @@
-# Hand tracking with independent static gestures and Phase 3.3 pinch detection
+# Hand tracking with optional gesture recognition, states and events
 
 Detect and draw **up to two hands**, each with 21 landmarks and a skeleton, using the
 MediaPipe Tasks Hand Landmarker API in synchronous **VIDEO** mode on the CPU.
 Optional static recognition labels open palm, fist, pointing and unknown poses.
 Optional pinch recognition measures normalized thumb/index proximity with a
 separate OPEN/STARTED/HELD/RELEASED/UNAVAILABLE lifecycle; it adds no static class.
+Phase 3.4 optionally stabilizes static results and resolves pinch precedence into
+typed events; raw recognition remains visible and unchanged.
 No gesture-triggered actions, cursor, voice or motor controls are implemented.
 The existing Phase 1 camera applications are unchanged.
 Inference size is configurable independently of capture; detailed benchmarking
@@ -46,6 +48,68 @@ calibrated confidence percentages. See [gesture rules, thresholds and manual
 testing](../gestures/README.md) for limitations and repeatable off/on benchmarks.
 `gesture_features`, `gesture_classification` and `gesture_total` profile the new
 work separately, including in headless runs and per-hand-count reports.
+
+## Phase 3.4 gesture states and events
+
+```powershell
+# Static confirmation and events
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --gesture-states
+
+# Independent pinch lifecycle events only (open fingers first)
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --pinch --no-gestures --gesture-states
+
+# Raw static + pinch overlays, plus resolved intent/state and latest event
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states
+
+# Explicit event diagnostics; no images or video recorded
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --gesture-event-debug
+```
+
+States are **off by default** and require at least one enabled recognition channel;
+`--gesture-event-debug` requires states. All original flag combinations still work.
+No OS actions, cursor, clicks, keys, swipes, voice or new models are implemented.
+
+Defaults: `--gesture-activation-ms 100`, `--gesture-transition-ms 60`,
+`--gesture-cooldown-ms 150`, `--gesture-update-ms 250`. Each accepts integer
+0–5000 ms. Zero activation/transition/cooldown removes that delay; zero update
+disables UPDATED events. Confirmation uses the existing monotonic frame timestamp,
+not frame counts. Static candidates require stable recognition; a known replacement
+ends the old pose after transition stability and confirms from its first appearance.
+UNKNOWN/conflicts immediately CANCEL, never become actionable. Same-gesture
+cooldown is per hand and gesture; other gestures can become candidates meanwhile.
+
+PINCH takes precedence in a separate resolved intent stream, canceling an active
+static intent before starting. Its already-confirmed STARTED/RELEASED have no
+additional delay/cooldown. HELD never creates a missing START; UNAVAILABLE cancels
+and suppresses static fallback. The manager must observe OPEN/RELEASED before
+admitting a fresh STARTED, including after loss. Original pinch hysteresis/rearming
+and all raw static thresholds are unchanged. Existing side/overlap helper code is
+shared by both consumers without changing those Phase 3.3 gates.
+
+The compact white-on-black row shows IDLE/CANDIDATE/ACTIVE/COOLDOWN, confirmed
+intent and latest event; the raw static/pinch label and skeleton colors remain.
+Optional logs distinguish STARTED, distance UPDATED, intentional ENDED and CANCELED
+with timestamps/reasons. Unchanged active holds do not repeatedly START or log
+per-frame updates. Pinch distance UPDATED is limited by time and >=0.02 palm-unit
+change. Last-event text is historical, not a new emission. Q/H and native polling
+are preserved. Use `--pinch-debug` independently for numeric recognition diagnostics.
+
+Confident unique Left/Right predictions associate consecutive frames; detection
+order never transfers state. Missing hands, unsafe overlap, uncertain labels,
+invalid geometry/time, dimension changes or >250 ms gaps cancel histories.
+Cancellation on loss references the former side, marked `association_current=False`,
+and never claims intentional release. Fresh static candidates must reconfirm;
+closed pinch reacquisition must reopen. Confident side swaps that escape the
+continuity gates remain a limitation. See the [full transition policies, timestamp
+handling, exact tuning/benchmark commands and manual checklist](../gestures/README.md#phase-34-stabilized-gesture-events).
+
+`state_management` appears in overall/per-hand-count profiles. JSON records state
+settings, measured snapshot/event counts and separate reset/shutdown cancellations.
+Counters exclude warm-up, while state continuity runs throughout. Engine timing
+excludes optional console logging; full-loop timing includes it. Recognition
+features are shared, with no extra inference or feature extraction. Synthetic
+two-hand engine mean/p95 were 0.044/0.085 ms, excluding camera/inference/GUI;
+physical accuracy, responsiveness and the ~35+ FPS target remain unverified.
 
 ## Phase 3.3 pinch channel
 
@@ -471,8 +535,9 @@ The original Phase 3.2 baseline was **134 tests**. The targeted POINTING
 calibration adds 14 focused geometry/diagnostic regressions; all previous tests
 continue to run, including Phase 1 camera tests.
 Phase 3.2 completed with 148 passing tests (56 gesture, 76 tracking, 16 camera).
-Phase 3.3 adds 26 pinch regressions: **174 tests pass** (73 gesture, 85 tracking,
-16 camera), including all earlier tests without weakening their expectations.
+Phase 3.3 completed with 174 passing tests. Phase 3.4 adds 40 state/event
+regressions: **214 tests pass** (105 gesture, 93 tracking, 16 camera), including all
+earlier tests without weakening their expectations.
 Phase 3.2 coverage includes static labels, detection order and loss, EMA input,
 malformed-hand fallback, native polling/Q/H and gesture profiling/warm-up/counts.
 Phase 1 tests cover

@@ -15,6 +15,7 @@ import cv2
 
 from gestures.models import ImageSize
 from gestures.pinch import PinchThresholds, PinchTracker
+from gestures.state_machine import GestureStateManager, StateSettings
 from gestures.static_gestures import DEFAULT_THRESHOLDS
 from camera.camera_diagnostics import (
     BACKENDS, capture_snapshot, configure_capture, read_frame,
@@ -100,6 +101,18 @@ def parse_args(argv=None):
                         help="start below this normalized distance (default: 0.25 palm units)")
     parser.add_argument("--pinch-release", type=positive_float, default=.40,
                         help="release above this distance (default: 0.40; activation < release <= 2)")
+    parser.add_argument("--gesture-states", action="store_true",
+                        help="opt-in stabilized intent events; requires --gestures and/or --pinch")
+    parser.add_argument("--gesture-event-debug", action="store_true",
+                        help="requires --gesture-states; log lifecycle events (no images)")
+    parser.add_argument("--gesture-activation-ms", type=nonnegative_int, default=100,
+                        help="static candidate confirmation, 0-5000 ms (default: 100)")
+    parser.add_argument("--gesture-transition-ms", type=nonnegative_int, default=60,
+                        help="stable known static replacement before END, 0-5000 ms (default: 60)")
+    parser.add_argument("--gesture-cooldown-ms", type=nonnegative_int, default=150,
+                        help="same static gesture reactivation block per hand, 0-5000 ms (default: 150)")
+    parser.add_argument("--gesture-update-ms", type=nonnegative_int, default=250,
+                        help="pinch distance update interval; 0 disables UPDATED events (default: 250 ms)")
     args = parser.parse_args(argv)
     if args.headless and not args.benchmark:
         parser.error("--headless requires --benchmark for a timed run (Ctrl+C can interrupt)")
@@ -113,7 +126,27 @@ def parse_args(argv=None):
         PinchThresholds(args.pinch_activation, args.pinch_release)
     except ValueError as exc:
         parser.error(str(exc))
+    if args.gesture_states and not (args.gestures or args.pinch):
+        parser.error("--gesture-states requires --gestures and/or --pinch")
+    if args.gesture_event_debug and not args.gesture_states:
+        parser.error("--gesture-event-debug requires --gesture-states")
+    try:
+        state_settings(args)
+    except ValueError as exc:
+        parser.error(str(exc))
     return args
+
+
+def state_settings(args):
+    return StateSettings(args.gesture_activation_ms, args.gesture_transition_ms,
+                         args.gesture_cooldown_ms, args.gesture_update_ms)
+
+
+def log_state_events(events):
+    for event in events:
+        LOGGER.info("%s | %s | %s | t=%d ms | %s%s", event.side.value, event.gesture,
+                    event.event_type.value, event.timestamp_ms, event.metadata.reason,
+                    " (former association)" if not event.metadata.association_current else "")
 
 
 def create_landmarker(model_path):
@@ -152,6 +185,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
     pinch_thresholds = PinchThresholds(args.pinch_activation, args.pinch_release)
     pinch_tracker = PinchTracker(pinch_thresholds) if args.pinch else None
     pinch_counts = Counter()
+    state_manager = GestureStateManager(state_settings(args)) if args.gesture_states else None
+    state_counts, event_counts = Counter(), Counter()
     frames = 0
     capture_logged = False
     warned_slow = False
@@ -185,14 +220,15 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
             timings.add("smoothing", time.perf_counter() - before_smoothing)
             classifications = None
             pinches = None
+            state_frame = None
             if args.gestures or args.pinch:
                 if (gesture_image_size is None or
                         (gesture_image_size.height, gesture_image_size.width) != frame.shape[:2]):
                     gesture_image_size = ImageSize(frame.shape[1], frame.shape[0])
-                prepared = [] if args.pinch else None
+                prepared = [] if args.pinch or args.gesture_states else None
                 if args.gestures:
                     sampled = gesture_debug is not None and gesture_debug.due(timestamp_ms)
-                    shared = {"features_out": prepared} if args.pinch else {}
+                    shared = {"features_out": prepared} if prepared is not None else {}
                     classifications = classify_result(result, timestamp_ms, gesture_image_size, timings,
                                                       diagnostics=sampled, **shared)
                     if sampled:
@@ -205,6 +241,12 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                     before_pinch = time.perf_counter()
                     pinches = pinch_tracker.update(tuple(prepared), timestamp_ms)
                     timings.add("pinch_processing", time.perf_counter() - before_pinch)
+                if state_manager is not None:
+                    before_states = time.perf_counter()
+                    state_frame = state_manager.update(tuple(prepared), timestamp_ms, classifications, pinches)
+                    timings.add("state_management", time.perf_counter() - before_states)
+                    if args.gesture_event_debug:
+                        log_state_events(state_frame.events)
             if not capture_logged:
                 LOGGER.info("Actual capture: %d x %d | actual inference: %d x %d",
                             frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])
@@ -215,7 +257,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                                        renderer=renderer, timings=timings,
                                        raw_result=raw_result if args.show_raw_landmarks else None,
                                        gesture_results=classifications, pinch_results=pinches,
-                                       pinch_thresholds=pinch_thresholds if args.pinch_debug else None)
+                                       pinch_thresholds=pinch_thresholds if args.pinch_debug else None,
+                                       gesture_states=state_frame.hands if state_frame is not None else None)
                 before_display = time.perf_counter()
                 cv2.imshow(WINDOW, preview)
                 before_events = time.perf_counter()
@@ -242,6 +285,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                     gesture_counts.update(item.gesture.value for item in classifications)
                 if pinches is not None:
                     pinch_counts.update(item.status.value for item in pinches)
+                if state_frame is not None:
+                    state_counts.update(item.state.value for item in state_frame.hands)
+                    event_counts.update(f"{item.event_type.value}:{item.gesture}" for item in state_frame.events)
                 timings.finish_frame(min(MAX_HANDS, len(raw_result.hand_landmarks)))
                 rate = fps.record(end)
             if rate is not None and not args.benchmark:
@@ -277,6 +323,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
         smoother.reset()
         if pinch_tracker is not None:
             pinch_tracker.reset()
+        shutdown_events = state_manager.reset() if state_manager is not None else ()
+        if args.gesture_event_debug:
+            log_state_events(shutdown_events)
         duration = (measurement_end - measurement_start
                     if measurement_start is not None and measurement_end is not None else 0.0)
         average = frames / duration if duration > 0 else None
@@ -313,6 +362,11 @@ def process_frames(cap, landmarker, mp, args=None, report=None):
                           "thresholds": asdict(pinch_thresholds), "status_counts": dict(pinch_counts),
                           "input": "smoothed" if args.smoothing else "raw",
                           "recovery": "open beyond release threshold to rearm; no release on loss"},
+                "gesture_states": {"enabled": args.gesture_states, "debug_enabled": args.gesture_event_debug,
+                                   "settings": asdict(state_settings(args)),
+                                   "state_counts": dict(state_counts), "event_counts": dict(event_counts),
+                                   "shutdown_events": [asdict(event) for event in shutdown_events],
+                                   "policy": "PINCH takes precedence; UNKNOWN/unavailable cancels; no OS actions"},
                 "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown.",
             })
         LOGGER.info("Application FPS includes capture, preparation, inference, smoothing%s; "
@@ -332,6 +386,7 @@ def run(args, report=None):
                    "gui_mode_requested": args.gui_mode,
                    "gestures_enabled": args.gestures,
                    "gesture_debug_enabled": args.gesture_debug,
+                   "gesture_states_enabled": args.gesture_states,
                    "logical_cpu_count": os.cpu_count(),
                    "python": platform.python_version(), "opencv": cv2.__version__})
     try:
@@ -362,6 +417,8 @@ def run(args, report=None):
             LOGGER.info("Pinch: %s | activation < %.3f | release > %.3f | projected proximity only; "
                         "open fingers to arm/rearm after startup or loss", args.pinch,
                         args.pinch_activation, args.pinch_release)
+            LOGGER.info("Gesture states: %s | settings: %s | PINCH precedence; no desktop actions",
+                        args.gesture_states, asdict(state_settings(args)))
             LOGGER.info("Preview/input: unmirrored. Left/Right identify the subject's hands; "
                         "colors follow each frame's handedness predictions, not detection order.")
             LOGGER.info("%s No camera throughput claim is made by inference FPS.",

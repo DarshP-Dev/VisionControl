@@ -96,7 +96,8 @@ class WorkloadProfile(Profile):
         group = self.by_hands[hand_count]
         for name in ("camera_read", "inference_resize", "bgr_to_rgb", "mediapipe_image",
                      "inference", "smoothing", "gesture_features", "gesture_classification",
-                     "gesture_total", "pinch_features", "pinch_processing", "preview_resize", "landmark_drawing",
+                     "gesture_total", "pinch_features", "pinch_processing", "state_management",
+                     "preview_resize", "landmark_drawing",
                      "text_overlay", "imshow", "gui_events", "gui_total",
                      "processing", "end_to_end", "frame_interval"):
             if name in self.stages:

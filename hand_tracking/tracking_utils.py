@@ -10,6 +10,7 @@ import numpy as np
 
 if TYPE_CHECKING:
     from gestures.pinch import PinchResult
+    from gestures.events import HandState
 
 
 MAX_HANDS = 2
@@ -89,6 +90,7 @@ class HandOverlay:
     points: list
     gesture: str | None = None
     pinch: "PinchResult | None" = None
+    stabilized: "HandState | None" = None
 
 
 def handedness_label(categories):
@@ -107,7 +109,7 @@ def handedness_label(categories):
     return name if name in ("Left", "Right") else "Unknown"
 
 
-def hand_overlays(result, width, height, gesture_results=None, pinch_results=None):
+def hand_overlays(result, width, height, gesture_results=None, pinch_results=None, gesture_states=None):
     """Pair landmarks and handedness within this result only; retain no track IDs."""
     overlays = []
     handedness = getattr(result, "handedness", None) or []
@@ -131,7 +133,8 @@ def hand_overlays(result, width, height, gesture_results=None, pinch_results=Non
             gesture = (gesture_results[index].gesture.value if index < len(gesture_results)
                        else "UNKNOWN")
         pinch = pinch_results[index] if pinch_results is not None and index < len(pinch_results) else None
-        overlays.append(HandOverlay(label, color, points, gesture, pinch))
+        stabilized = gesture_states[index] if gesture_states is not None and index < len(gesture_states) else None
+        overlays.append(HandOverlay(label, color, points, gesture, pinch, stabilized))
     return overlays
 
 
@@ -154,8 +157,9 @@ def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None):
     (width, height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 1)
     x = max(4, min(hand.points[0][0] + 8, preview.shape[1] - width - 5))
     diagnostic_row = 23 if hand.pinch is not None and pinch_thresholds is not None else 0
+    state_row = 23 if hand.stabilized is not None else 0
     y = max(top_margin + height + 4,
-            min(hand.points[0][1] + 22, preview.shape[0] - baseline - 5 - diagnostic_row))
+            min(hand.points[0][1] + 22, preview.shape[0] - baseline - 5 - diagnostic_row - state_row))
     cv2.rectangle(preview, (x - 3, y - height - 3), (x + width + 3, y + baseline + 3),
                   (0, 0, 0), -1)
     cv2.putText(preview, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX,
@@ -172,6 +176,18 @@ def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None):
         y += diagnostic_row
         cv2.rectangle(preview, (x - 3, y - height - 3), (x + width + 3, y + baseline + 3), (0, 0, 0), -1)
         cv2.putText(preview, debug, (x, y), cv2.FONT_HERSHEY_SIMPLEX, .45, (255, 255, 255), 1, cv2.LINE_AA)
+    if state_row:
+        state = hand.stabilized
+        last = (f"{state.last_event.event_type.value.removeprefix('GESTURE_')}:{state.last_event.gesture}"
+                if state.last_event is not None else "--")
+        current = state.confirmed or "--"
+        candidate = f" ({state.candidate})" if state.candidate is not None else ""
+        text = f"{state.state.value}{candidate} | Confirmed: {current} | Last: {last}"
+        (width, height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, .43, 1)
+        x = max(4, min(x, preview.shape[1] - width - 5))
+        y += state_row
+        cv2.rectangle(preview, (x - 3, y - height - 3), (x + width + 3, y + baseline + 3), (0, 0, 0), -1)
+        cv2.putText(preview, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, .43, (255, 255, 255), 1, cv2.LINE_AA)
 
 
 def significant_fps_drop(rate):
@@ -198,7 +214,7 @@ class PreviewRenderer:
 
 
 def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw_result=None,
-                 gesture_results=None, pinch_results=None, pinch_thresholds=None):
+                 gesture_results=None, pinch_results=None, pinch_thresholds=None, gesture_states=None):
     start = time.perf_counter()
     height, width = frame.shape[:2]
     scale = min(1100 / width, 650 / height, 1.0)
@@ -207,7 +223,7 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
     resized = time.perf_counter()
     if timings is not None:
         timings.add("preview_resize", resized - start)
-    hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results, pinch_results)
+    hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results, pinch_results, gesture_states)
     for hand in hands:
         draw_hand(preview, hand, top_margin=54 if show_help else 27, pinch_thresholds=pinch_thresholds)
     if raw_result is not None:

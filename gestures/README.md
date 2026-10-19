@@ -1,4 +1,4 @@
-# Phase 3.3: Pinch detection and static gestures
+# Phase 3.4: Gesture states and events
 
 This package provides the Phase 3.1 landmark geometry foundation and Phase 3.2
 deterministic static rules: **OPEN_PALM, FIST, POINTING, UNKNOWN**. Feature
@@ -7,8 +7,9 @@ preview can show per-hand gesture labels with `--gestures`; recognition is
 opt-in. The owner has verified static recognition at approximately 36 FPS after
 POINTING calibration; occasional backward-rotation POINTING/FIST ambiguity is
 unchanged. The static classifier imports no camera, GUI, MediaPipe or desktop-control
-code and retains no motion history. Phase 3.3 adds only a separate pinch lifecycle;
-no additional model, threads, cooldowns or gesture-triggered actions are added.
+code and retains no motion history. Phase 3.3 adds a separate pinch lifecycle;
+Phase 3.4 adds optional state management and event arbitration above both raw
+recognizers. No additional model, threads or gesture-triggered actions are added.
 
 The package uses only Python's standard library (Python 3.11+; the existing
 environment is Python 3.13.7). No requirements changes or installations are needed.
@@ -23,6 +24,10 @@ environment is Python 3.13.7). No requirements changes or installations are need
 | `features.py` | Named per-finger/per-hand features and the lightweight `FrameFeatures` consumer contract |
 | `static_gestures.py` | Typed gesture/result/threshold records and stateless conservative rules |
 | `pinch.py` | Cached proximity measurement, typed pinch results and conservative per-side hysteresis/recovery |
+| `association.py` | Shared existing unique/confident side and overlapping-hand gates; no persistent IDs |
+| `events.py` | Immutable event, metadata and current-state snapshots; reuses static Gesture identifiers plus PINCH |
+| `arbitration.py` | Small input precedence policy; preserves raw observations |
+| `state_machine.py` | Per-hand timed confirmation, per-gesture cooldowns, pinch-event admission and cancellation |
 | `__init__.py` | Public observation/feature/adapter exports |
 | `tests/` | Synthetic fixtures and hardware-independent model, adapter, geometry and feature tests |
 
@@ -31,13 +36,261 @@ models add validation, metadata and immutable snapshots without importing that
 rendering stack. The adapter also accepts the existing EMA `DisplayLandmark`
 objects structurally; neither the tracker nor its smoothing code is refactored.
 
+## Phase 3.4: stabilized gesture events
+
+The optional manager converts existing recognition results into a **single resolved
+intent stream per hand**, while preserving raw static classifications and all
+Phase 3.3 pinch statuses. It does not rerun inference, extract geometry again,
+reclassify poses, change thresholds or call OS input APIs. The engine is standard
+library Python and is independent of OpenCV, MediaPipe and Windows.
+
+### Launch and diagnostics on Windows
+
+From `C:\Users\Darsh\VisionControl` in PowerShell:
+
+```powershell
+# Original tracking; no recognition or state engine
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker
+
+# Raw static + pinch channels, without generalized state management
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch
+
+# Static states only
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --gesture-states
+
+# Pinch events only; open fingers first to arm
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --pinch --no-gestures --gesture-states
+
+# Both recognition channels, with resolved states and events
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states
+
+# Explicit event diagnostics; numeric pinch diagnostics are independently optional
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --gesture-event-debug --pinch-debug
+
+# Tune time intervals without editing source; 0 update interval disables UPDATED
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --gesture-activation-ms 100 --gesture-transition-ms 60 --gesture-cooldown-ms 150 --gesture-update-ms 0
+```
+
+`--gesture-states` defaults off and **requires `--gestures` and/or `--pinch`**;
+it never silently enables recognition. `--gesture-event-debug` requires states.
+Existing combinations including `--no-gestures --pinch`, Q/H, MSMF 1080p capture,
+full inference, EMA alpha 0.75 and native Win32 polling remain available.
+
+The original wrist label remains raw, e.g. `Left - POINTING | Pinch: HELD`.
+A compact white-on-black row shows state, candidate (if any), confirmed intent
+and last event. Last events are historical display records, not new emissions;
+they are cleared when association becomes unsafe. A brief transition can be hard
+to see at camera speed; use the optional event log to inspect exact timestamps.
+Logging shows side, gesture, event type, monotonic elapsed ms and reason, e.g.
+`Left | PINCH | GESTURE_CANCELED | ... | tracking_lost (former association)`.
+No per-frame state logs, images or video are recorded. Event logging is off by
+default; moving pinches can produce bounded useful UPDATED diagnostics when on.
+
+### Time model, transitions and defaults
+
+Every operation uses the existing frame timestamp in monotonic elapsed integer
+milliseconds. No frame-count assumptions or wall-clock scheduling are introduced.
+
+| Setting / CLI | Default | Policy |
+| --- | ---: | --- |
+| `--gesture-activation-ms` | 100 | Require one unchanged supported static candidate for a short stable interval |
+| `--gesture-transition-ms` | 60 | Require a different supported static pose to persist before ending the old pose |
+| `--gesture-cooldown-ms` | 150 | Block reactivation of the same static gesture for this hand after END/CANCEL |
+| `--gesture-update-ms` | 250 | Minimum interval between useful pinch distance UPDATED events; 0 disables them |
+
+All four intervals must be integers in **[0, 5000] ms**. Zero activation/transition/
+cooldown means immediate/no delay respectively. Defaults are initial tuning
+choices: 100 ms rejects brief classifications, 60 ms tolerates short recognized
+pose changes, and 150 ms limits immediate repeat activations without imposing a
+global lockout. They still add deliberate static interaction latency; tune with
+your webcam. There is **no added activation/release delay or cooldown for PINCH**.
+
+| Situation | State / event behavior |
+| --- | --- |
+| No confirmed gesture | IDLE; UNKNOWN never qualifies |
+| Valid supported pose appears | CANDIDATE; changing it restarts its clock |
+| Candidate stable for activation interval | ACTIVE; emit one GESTURE_STARTED at the confirming observation's timestamp |
+| Matching ACTIVE observations | Remain ACTIVE; no repeated STARTED or static UPDATED events |
+| Brief different supported pose | Keep old ACTIVE until transition interval; returning to it clears the pending replacement |
+| Stable different supported pose | GESTURE_ENDED for old pose, then confirm the new candidate using elapsed time from its first changed frame |
+| UNKNOWN / conflicting rules / invalid input | Immediately GESTURE_CANCELED for an active pose; discard an unconfirmed candidate without an event |
+| Same static gesture returns during its cooldown | COOLDOWN; no candidate time accrues until its timer expires |
+| Pinch STARTED with observed prior OPEN/RELEASED | Immediately ACTIVE PINCH and one GESTURE_STARTED |
+| Pinch HELD | Maintain already-active PINCH; never create a missing STARTED |
+| Pinch RELEASED | One GESTURE_ENDED for active PINCH; static candidates may form again |
+| Pinch UNAVAILABLE / missing release transition | Cancel active intent; no intentional release is invented |
+
+Cooldown is a **per-static-gesture, per-hand timer**, not a global blocking state.
+The displayed state is COOLDOWN only when the currently selected static gesture
+is blocked; other static gestures can form candidates, and PINCH remains immediate.
+UNKNOWN displays IDLE even while a past gesture's cooldown timer remains. Terminal
+static events carry COOLDOWN as their post-termination phase when configured;
+the same frame may display another candidate/IDLE after arbitration.
+
+Example with defaults: POINTING active, FIST first seen at t=130 ms, still valid
+at t=190: end POINTING at 190 (60 ms transition). Confirm FIST at the first valid
+observation at/after t=230 (100 ms since it first appeared). With sparse frames,
+events occur on the next confirming observation, never retroactively on a timer.
+Exact activation/transition/cooldown deadlines are inclusive. A gap **>250 ms**
+is tracking loss rather than evidence that an unseen pose remained stable.
+
+### Typed events, arbitration and pinch recovery
+
+`GestureEvent` is frozen and contains a gesture identifier, `EventType`, timestamp,
+`HandSide`, relevant state and frozen `EventMetadata` (reason, optional normalized
+pinch distance and whether the association is current). Static identifiers reuse
+the existing `Gesture` enum; PINCH is an event-only typed literal, **not** a new
+static class. UNKNOWN cannot be constructed as an actionable event identifier.
+
+- **GESTURE_STARTED:** emitted once on confirmation/admitted pinch STARTED.
+- **GESTURE_UPDATED:** only for active pinch distance changing by at least 0.02
+  palm units since the last emitted distance, and after the update interval.
+  This is metadata, never another activation. Unchanged holds produce no updates.
+- **GESTURE_ENDED:** stable known static replacement or a deliberate pinch RELEASED.
+- **GESTURE_CANCELED:** uncertainty, invalid input, lost association, pinch
+  precedence or reset/shutdown. Consumers must clear prior intent, not infer release.
+
+PINCH has precedence over all static classes for the **resolved intent channel**.
+Its STARTED cancels any active static intent before starting PINCH. HELD suppresses
+static starts even when an earlier STARTED was not admitted. UNKNOWN does not
+override an active valid pinch. When pinch is enabled but UNAVAILABLE, static
+intents are also suppressed/canceled; uncertain high-priority input does not fall
+through to a possibly contradictory static action intent. Raw results are untouched.
+
+The Phase 3.3 detector retains its existing distance hysteresis and rearming.
+The manager observes its OPEN/RELEASED before admitting a fresh STARTED. This
+adds no time delay to normal valid transitions, but an orphan STARTED or HELD
+after unsafe recovery cannot fabricate activation. Reopen to rearm both layers.
+Duplicate STARTED does not restart an active pinch. A missed RELEASED followed
+by OPEN cancels instead of claiming deliberate completion.
+
+Events are returned in `StateFrame.events`; current snapshots follow detection
+slots solely for rendering. Loss cancellations precede current-hand events;
+within each group, side order is fixed. Identical ordered observations and
+timestamps produce identical outputs. No global bus, callbacks, unbounded event
+history, cooldown shared across hands, probability score or action dispatch exists.
+Future desktop controls can consume these immutable records independently;
+future swipe recognition would extend the identifier/input adapter and precedence
+policy rather than coupling this engine to OS APIs. No swipe logic is implemented.
+
+### Association, loss and invalid time
+
+Only unique confident single-category Left/Right predictions (score >=0.8) receive
+state; these are **predicted sides, not persistent identities**. Detection order
+does not transfer history. Shared Phase 3.3 overlap/side helpers retain the same
+gates and do not change pinch lifecycle rules. The manager checks cached landmark
+geometry/continuity, not another MediaPipe inference or feature extraction.
+
+- Missing hand: immediately remove that history and cancel its active intent.
+  The other reliable hand continues independently. Empty frames retain no states.
+- Uncertain/unknown/duplicate labels or overlapping boxes/close wrists: cancel
+  both histories conservatively. No activation/update is emitted for an unsafe hand.
+- Invalid geometry/channel data: cancel the affected history. Unknown identity
+  can invalidate both. Classifications/pinch results must match the current
+  observation's handedness metadata, slot count and timestamp.
+- Wrist jump >0.10 image-width common-axis units: cancel that side and skip
+  the discontinuous observation. Capture dimension changes or >250 ms frame
+  gaps cancel all and skip activation for that observation.
+- Reacquired static poses begin fresh candidates; old timers/events never activate
+  them. Reacquired closed pinches require an observed separation first.
+- Missing/invalid/duplicate/backward timestamps cancel at the **last accepted
+  timestamp** (0 before any valid frame). No wall-clock timestamp is substituted;
+  invalid input does not lower the timestamp watermark. New time must exceed it.
+- Explicit reset/shutdown cancels remaining active intents at the last accepted
+  timestamp. These are cleanup events, not an intentional release.
+
+Loss/ambiguity cancellations reference the **former reliable side** and carry
+`association_current=False`; they do not assert that this hand is still visible.
+The manager retains at most two histories, three static cooldown timers per side
+and one latest event per side. Confident side swaps that escape the simple gates
+remain a limitation. Overlap may interrupt real gestures; conservative cancellation
+is preferred to speculative matching. Underlying backward-rotation static ambiguity
+and projected pinch proximity vs physical contact are unchanged.
+
+### Manual acceptance and benchmarking
+
+1. Use static-only states with event diagnostics. Briefly flash POINTING (<100 ms),
+   then hold it: expect CANDIDATE then one STARTED; prolonged holding must not
+   repeat it. Repeat OPEN_PALM and FIST, including variable movement/lighting.
+2. Change between known poses: expect END after transition stability and a new
+   START after confirmation. Show UNKNOWN/unsupported geometry: expect immediate
+   CANCEL, never UNKNOWN START. Return rapidly to check cooldown/reconfirmation.
+3. With pinch states, open first, approach, hold and separate: one PINCH START,
+   optional bounded distance UPDATE, one END. Holding never repeats START.
+4. Enable both channels. Raw POINTING/FIST/etc. must remain visible while PINCH
+   takes precedence; static CANCEL precedes PINCH START. Release and form a
+   static candidate again; no contradictory active intents should coexist per hand.
+5. Repeat with both hands independently, change detection order, lose one/both,
+   cross/overlap and reacquire closed. Loss must CANCEL rather than END; reopen
+   before a new pinch starts. Static reacquisition requires fresh confirmation.
+6. Verify Q/H, labels/colors, responsiveness and FPS with diagnostics disabled.
+   Test both the original flags without states and the new opt-in combinations.
+
+Run these matched preview benchmarks **sequentially** with the same hand count,
+movement, lighting and capture settings. Existing reports exclude warm-up and
+refuse overwrite; this directory is already ignored:
+
+```powershell
+$stateRun = Get-Date -Format 'yyyyMMdd_HHmmss_fff'
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --benchmark --warmup 3 --duration 30 --report "hand_tracking\benchmarks\raw_${stateRun}.json"
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --benchmark --warmup 3 --duration 30 --report "hand_tracking\benchmarks\states_${stateRun}.json"
+```
+
+`state_management` profiles validation, continuity, transitions and event creation,
+including zero-hand frames. It appears in existing overall/per-hand-count timings.
+Overlay work remains in drawing; optional logs are included in loop FPS but outside
+the state-engine timer. JSON `gesture_states` records settings, measured state/event
+counts and separate shutdown events. State counters count observed hands per frame;
+event counters count emissions by type/identifier. Counters exclude warm-up, while
+state continuity runs during it. Diagnostics log live events including warm-up;
+shutdown cancellations are separately reported and never mixed into measured counts.
+Reports are summaries, not an event journal or proof of physical hand identity.
+
+### Validation and measured synthetic cost
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s gestures/tests -t . -q
+.\.venv\Scripts\python.exe -m unittest discover -s hand_tracking -t . -q
+.\.venv\Scripts\python.exe -m unittest discover -s camera -q
+.\.venv\Scripts\python.exe -m compileall -q gestures hand_tracking camera
+.\.venv\Scripts\python.exe -m pip check
+```
+
+All **214 tests pass**: 105 gesture, 93 tracking and 16 camera tests. All 174
+previous tests remain passing without altered expectations; 40 new tests cover
+confirmation/rejection, known changes/UNKNOWN, cooldown boundaries, variable FPS,
+immutable deterministic events, arbitration, simultaneous pinches, rearming/loss,
+uncertainty, order changes, invalid time/geometry/channel alignment, reset, CLI,
+overlays, native polling/Q/H, shared extraction and benchmark/report behavior.
+The 32 engine tests also pass with `python -S` without third-party packages.
+
+An interleaved synthetic two-hand comparison used the existing venv, five repeated
+approach/release poses, 100 warm-up + 1000 measured observations per configuration,
+alternating configuration order and disabled profile collection. All values are
+ms per two-hand observation; no camera, inference, smoothing, GUI or logs:
+
+| Work | Mean | p50 | p95 | p99 |
+| --- | ---: | ---: | ---: | ---: |
+| Raw static + pinch recognition bridge | 1.268 | 1.065 | 2.372 | 3.834 |
+| Same bridge with state management | 1.351 | 1.111 | 2.471 | 4.283 |
+| State manager portion | 0.044 | 0.036 | 0.085 | 0.174 |
+
+Host scheduling affects these samples; they do not establish camera FPS or physical
+accuracy. Approximately 35+ FPS against the owner's ~36 FPS static baseline is a
+target for local testing, not a verified result. Default static confirmation adds
+intentional time latency even when processing overhead is small. No new dependencies,
+models, threads, frame copies or OS controls are introduced. Stop for owner webcam
+acceptance before the next milestone. Suggested commit after acceptance:
+`feat(gestures): add gesture state management and event arbitration`.
+
 ## Phase 3.3: real-time pinch proximity
 
 Pinch is a **separate opt-in channel**, not a static PINCH class. Static
 OPEN_PALM/FIST/POINTING/UNKNOWN rules and thresholds are unchanged. For example,
-`Left - UNKNOWN | Pinch: HELD` is a valid combination. No desktop controls,
-generalized gesture state machine, arbitration, swipe detection or actions are
-implemented. Physical pinch accuracy and current FPS still require owner testing.
+`Left - UNKNOWN | Pinch: HELD` is a valid combination. This raw channel itself adds
+no generalized state/arbitration; opt-in Phase 3.4 handles those above recognition.
+No desktop controls, swipe detection or actions are implemented. Physical pinch
+accuracy and current FPS still require owner testing.
 
 ### Geometry and starting thresholds
 
@@ -185,7 +438,7 @@ is unknown. Approximately 35+ FPS is a target, not a measured result here.
 .\.venv\Scripts\python.exe -m pip check
 ```
 
-All **174 automated tests pass**: 73 gesture, 85 tracking and 16 camera tests.
+The **Phase 3.3 baseline** was 174 passing tests: 73 gesture, 85 tracking and 16 camera tests.
 All 148 previous tests remain unchanged and passing; 26 new tests cover geometry,
 articulated approach/hold/release, hysteresis/equality, rearming, loss, time and
 identity checks, simultaneous hands/order changes, EMA input, shared extraction,
@@ -378,7 +631,7 @@ classification. If geometry cannot be adapted, its result has no handedness
 metadata; the existing renderer still uses the original frame-local label when
 that hand's x/y coordinates are drawable. No previous classifications are held.
 Labels disappear immediately when observations disappear. Near thresholds labels
-may flicker; temporal debouncing/states/events belong to Phase 3.4. Pinches and
+may flicker; optional Phase 3.4 debounces the resolved intent above these raw labels. Pinches and
 other later gesture algorithms are not implemented in Phase 3.2.
 
 ## Manual webcam validation and performance
@@ -546,7 +799,8 @@ Future classifiers can consume this record's timestamp, raw/smoothed coordinates
 metadata and cached geometry. This supports later static comparisons and later
 temporal consumers retaining consecutive records for movement/transitions. Empty
 frames explicitly represent no observations. Phase 3.2 static rules now consume
-this contract; no matching, temporal state or gesture event system is implemented.
+this contract; it implements no matching or temporal events itself. Phase 3.4's
+opt-in consumer now manages state above these same immutable observations.
 Future temporal code must solve hand association explicitly; tuple order and
 Left/Right predictions are insufficient for persistent identity.
 

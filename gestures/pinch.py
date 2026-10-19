@@ -9,12 +9,11 @@ from enum import StrEnum
 import math
 
 from .features import HandFeatures
+from .association import MIN_SIDE_SCORE, WRIST_CONTINUITY_DISTANCE, reliable_side as _side, hands_overlap
 from .models import MAX_HANDS, HandednessPrediction, HandSide, ImageSize, LandmarkIndex, finite_number
 
 
-MIN_SIDE_SCORE = .8
 MAX_HISTORY_GAP_MS = 250
-WRIST_CONTINUITY_DISTANCE = .10  # Common-axis image-width units, not a pinch threshold.
 
 
 class PinchStatus(StrEnum):
@@ -85,23 +84,6 @@ class _History:
     wrist: tuple[float, float]
 
 
-def _side(features: HandFeatures | None) -> HandSide:
-    predictions = features.observation.handedness if features is not None else ()
-    # Multiple conflicting category labels are ambiguous, even with a top score.
-    if len(predictions) != 1:
-        return HandSide.UNKNOWN
-    prediction = predictions[0]
-    return (prediction.side if prediction.score is not None and prediction.score >= MIN_SIDE_SCORE
-            else HandSide.UNKNOWN)
-
-
-def _bounds(features: HandFeatures) -> tuple[float, float, float, float]:
-    points = features.observation.landmarks
-    aspect = features.image_size.height / features.image_size.width
-    return (min(p.x for p in points), min(p.y * aspect for p in points),
-            max(p.x for p in points), max(p.y * aspect for p in points))
-
-
 class PinchTracker:
     """Rearm only after observed separation; closed reacquisition emits no STARTED.
 
@@ -140,12 +122,7 @@ class PinchTracker:
         ambiguous = (HandSide.UNKNOWN in sides or len(set(sides)) != len(sides) or len(sizes) > 1)
         overlap = False
         if len(features) == 2 and all(item.valid for item in measurements):
-            a, b = (_bounds(item) for item in features)
-            wa, wb = (item.observation[LandmarkIndex.WRIST] for item in features)
-            aspect = features[0].image_size.height / features[0].image_size.width
-            overlap = (math.hypot(wa.x - wb.x, (wa.y - wb.y) * aspect) < WRIST_CONTINUITY_DISTANCE
-                       or (min(a[2], b[2]) > max(a[0], b[0])
-                           and min(a[3], b[3]) > max(a[1], b[1])))
+            overlap = hands_overlap(*features)
         # Unknown/malformed identity cannot safely be assigned to either history.
         if ambiguous or overlap or clock_invalid:
             self._history.clear()
