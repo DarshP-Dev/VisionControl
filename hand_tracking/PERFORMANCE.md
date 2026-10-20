@@ -541,3 +541,27 @@ Phase 2.3; first use the local benchmark evidence.
 
 References: [Google's synchronous VIDEO API and normalized landmarks](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker/python),
 [OpenCV resize documentation](https://docs.opencv.org/4.x/da/d54/group__imgproc__transform.html).
+# Phase 3.6 absolute mapper microbenchmark
+
+The absolute strategy reuses current EMA landmarks, the existing screen EMA,
+and the current preview buffer. It adds no model, frame copy, capture change,
+dependency or thread. Active-region geometry is shared between mapping and
+preview rendering. Mapping stays inside the existing `controller_processing`
+timing; the rectangle is included in preview drawing timing. Existing benchmark
+and native Win32 GUI polling paths are unchanged.
+
+A synthetic steady-point test on the repository's Python environment measured
+five repeats of 20,000 updates per strategy (camera size 1920x1080, screen
+1920x1080, default alpha; initial acquisition outside timing):
+
+| Strategy | Median microseconds/update | Minimum microseconds/update |
+| --- | ---: | ---: |
+| Existing relative | 4.425 | 3.912 |
+| Absolute | 5.856 | 4.232 |
+
+The median difference was about 1.43 microseconds per mapper call in this run.
+These are isolated Python mapper timings, **not actual webcam FPS**, end-to-end
+latency, inference performance or a guarantee under load. Input was never sent.
+Use the existing visible-preview benchmark procedure below to compare relative
+and absolute with otherwise identical gesture/control options and hand workloads.
+Hardware capture and UGREEN cursor-feel testing remain with the owner.

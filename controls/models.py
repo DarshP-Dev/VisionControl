@@ -5,6 +5,7 @@ import math
 from typing import Protocol
 
 from gestures.models import HandSide
+from .region import ActiveRegion
 
 
 @dataclass(frozen=True, slots=True)
@@ -39,12 +40,18 @@ class ControlSettings:
     debug: bool = False
     browsers: tuple[str, ...] = ("chrome.exe", "msedge.exe", "firefox.exe")
     invert_x: bool = False
+    mapping: str = "relative"
+    region_width: float = .80
+    region_height: float = .80
 
     def __post_init__(self):
         if self.mode not in ("simulate", "live") or self.hand not in (HandSide.LEFT, HandSide.RIGHT):
             raise ValueError("Controls require simulate/live mode and left/right hand")
         if not isinstance(self.invert_x, bool):
             raise ValueError("Control invert_x must be a boolean")
+        if self.mapping not in ("relative", "absolute"):
+            raise ValueError("Control mapping must be relative or absolute")
+        ActiveRegion(self.region_width, self.region_height)
         for name, lo, hi in (("sensitivity", .1, 5.), ("alpha", .01, 1.), ("margin", 0., .4)):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not lo <= value <= hi:
@@ -79,8 +86,10 @@ class ControlStatus:
     button_down: bool
     last_action: str
     reason: str
+    mapping: str = "relative"
+    region: ActiveRegion | None = None
 
     def lines(self):
-        return (f"{self.mode.upper()} | {'ARMED' if self.armed else 'DISARMED'} | {self.hand} | "
+        return (f"{self.mode.upper()} | {self.mapping.upper()} | {'ARMED' if self.armed else 'DISARMED'} | {self.hand} | "
                 f"{self.gesture} | LEFT {'DOWN' if self.button_down else 'UP'} | A: Arm D: Disarm",
                 f"Last: {self.last_action} | {self.reason}" + (" | STOP: Ctrl+Alt+Esc" if self.mode == "live" else ""))

@@ -614,3 +614,38 @@ feat(gestures): recognize static hand poses with unknown fallback
 The current milestone stops at Phase 3.2. No automatic commit or push is made.
 Use local hardware results to decide
 the next milestone.
+# Phase 3.6: optional absolute cursor region
+
+Desktop controls now offer `--control-mapping relative|absolute`; **relative
+remains the default**. The existing full-frame capture, EMA landmarks, gesture
+engines and native Windows GUI polling are unchanged. Absolute mode maps the
+smoothed index fingertip's normalized camera position to a selected display;
+this is a 2D camera mapping, not physical touchscreen alignment.
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --controls --control-mode simulate --control-mapping absolute --control-region-width 0.80 --control-region-height 0.80 --control-hand right --control-mouse --control-debug
+```
+
+The centered region defaults to 80% of frame width and 80% of frame height:
+1536x864 at 1920x1080, with margins 192x108 per side. Fractions must be finite,
+greater than zero and at most 1. Try height `.70` to reduce vertical travel.
+The yellow region rectangle is preview-only; inference sees the original image,
+without cropping, mirroring, new inference, or extra frame copying. Status shows
+the selected mapping mode and intended cursor coordinates. `--control-invert-x`
+mirrors absolute horizontal position (or relative horizontal displacement),
+leaving Y and recognition untouched. Existing `--control-alpha` controls screen
+EMA; landmark EMA is reused. Relative sensitivity/margin do not affect absolute.
+
+Simulation is the default and never sends Windows input. Both modes start
+DISARMED: A arms, D disarms, Q quits, H toggles help. Live retains Ctrl+Alt+Esc,
+the stall watchdog, conservative hand association, and forced mouse-up. First
+POINTING acquisition is move-free; subsequent samples blend to absolute targets.
+Pinch STARTED uses a fixed cursor offset to prevent a finger-closure jump; HELD
+can drag without POINTING. Release clears that offset and fresh POINTING blends
+back using the existing EMA. Hand loss disarms and requires manual reacquisition.
+
+See [controls/README.md](../controls/README.md#phase-36-enhancement-absolute-cursor-and-active-region)
+for coordinate formulas, DPI/display limits, exact relative/simulation/live and
+calibration commands, pinch edge-reach limitations, and manual checks. Restart
+after display or DPI changes. Hardware behavior and actual webcam FPS remain
+unmeasured; automated tests use synthetic frames and virtual/fake input only.

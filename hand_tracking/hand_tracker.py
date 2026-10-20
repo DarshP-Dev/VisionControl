@@ -433,7 +433,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                            "event_policy": "one STARTED then ENDED at confirmation; consume STARTED once"},
                 "controls": {"enabled": args.controls, "settings": asdict(control_cli.settings(args)),
                              "final_status": asdict(controller.status()) if controller is not None else None,
-                             "mapping": "relative aspect-correct smoothed index tip; activation anchors cursor",
+                             "mapping": ("absolute centered active region; smoothed physical-pixel targets"
+                                         if args.control_mapping == "absolute" else
+                                         "relative aspect-correct smoothed index tip; activation anchors cursor"),
                              "emergency_stop": "Ctrl+Alt+Esc (live only); 500 ms host-stall watchdog"},
                 "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown.",
             })
@@ -497,6 +499,9 @@ def run(args, report=None):
                         "Timed headless run; Ctrl+C interrupts." if args.headless
                         else "Q: Quit | H: Toggle help.")
             if controller is not None:
+                LOGGER.info("Cursor mapping: %s | centered absolute region: %.0f%% width x %.0f%% height | invert X: %s",
+                            args.control_mapping, args.control_region_width*100, args.control_region_height*100,
+                            args.control_invert_x)
                 LOGGER.info("Controls: %s | starts DISARMED | selected %s | clicks=%s tabs=%s | "
                             "A: Arm, D: Disarm, Q: Quit | live global stop: Ctrl+Alt+Esc",
                             args.control_mode, args.control_hand, args.control_mouse, args.control_tabs)

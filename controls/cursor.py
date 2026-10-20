@@ -1,8 +1,9 @@
-"""Relative, aspect-correct index-tip displacement with screen-space EMA."""
+"""Independent relative and absolute index-tip strategies with screen-space EMA."""
 
 import math
 
 from .models import ControlSettings, Screen
+from .region import ActiveRegion
 
 
 class RelativeCursor:
@@ -36,4 +37,60 @@ class RelativeCursor:
         self.previous = common
         alpha = self.settings.alpha
         self.filtered = tuple(alpha*self.target[i]+(1-alpha)*self.filtered[i] for i in (0, 1))
+        return self.screen.clamp(*self.filtered)
+
+
+class AbsoluteCursor:
+    """Map normalized camera position to physical pixels; no accumulated displacement.
+
+    First acquisition confirms a fresh sample without moving. The next sample
+    applies the existing screen EMA from the current cursor. Pinch anchors use
+    a constant screen offset, cleared on release/reset. Reacquisition blends
+    back to absolute positioning rather than replaying stale drag coordinates.
+    """
+
+    def __init__(self, settings: ControlSettings, screen: Screen):
+        self.settings, self.screen = settings, screen
+        self.region = ActiveRegion(settings.region_width, settings.region_height)
+        self.reset()
+
+    def reset(self):
+        self.previous = self.filtered = self.size = self.drag_offset = None
+        self.drag_pending = False
+
+    def map_point(self, point, size):
+        x, y = self.region.normalize(point, size)
+        if self.settings.invert_x:
+            x = 1-x  # Mirror position once, within the selected display.
+        return (self.screen.left+x*(self.screen.width-1),
+                self.screen.top+y*(self.screen.height-1))
+
+    def begin_drag(self, point, size, current):
+        mapped = self.map_point(point, size)
+        if self.screen.clamp(*current) != tuple(current):
+            raise ValueError("Place the cursor on the selected monitor before activation")
+        self.drag_offset = (current[0]-mapped[0], current[1]-mapped[1])
+        self.filtered, self.previous, self.size = tuple(current), tuple(point), size
+        self.drag_pending = True
+
+    def update(self, point, size, current):
+        target = self.map_point(point, size)
+        if self.drag_pending and self.size == size:
+            self.drag_pending = False
+            return None  # Mouse-down preserves the cursor; HELD remains responsive.
+        if self.previous is None or self.size != size:
+            if self.drag_offset is not None:
+                raise ValueError("Camera geometry changed during drag")
+            if self.screen.clamp(*current) != tuple(current):
+                raise ValueError("Place the cursor on the selected monitor before activation")
+            self.previous, self.size, self.filtered = tuple(point), size, tuple(current)
+            return None
+        if self.drag_offset is not None:
+            target = (target[0]+self.drag_offset[0], target[1]+self.drag_offset[1])
+        # Clamp before EMA to avoid windup; retain fractional EMA state until delivery.
+        target = (max(self.screen.left, min(self.screen.left+self.screen.width-1, target[0])),
+                  max(self.screen.top, min(self.screen.top+self.screen.height-1, target[1])))
+        alpha = self.settings.alpha
+        self.filtered = tuple(alpha*target[i]+(1-alpha)*self.filtered[i] for i in (0, 1))
+        self.previous = tuple(point)
         return self.screen.clamp(*self.filtered)

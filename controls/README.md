@@ -14,7 +14,8 @@ Recognition never imports controls; raw observations/events and thresholds are
 unchanged. The mapper is not another gesture state machine.
 
 - `models.py`: settings, physical screen bounds, backend protocol, status.
-- `cursor.py`: relative index-tip mapping and screen-space EMA.
+- `cursor.py`: independent relative/absolute index-tip mapping and screen-space EMA.
+- `region.py`: validated centered camera region shared by absolute mapping/preview.
 - `controller.py`: selected-hand event mapping, ownership and safety gates.
 - `backends.py`: entirely virtual cursor/buttons/keys and foreground app.
 - `windows.py`: lazy stdlib `ctypes` Win32 adapter, `SendInput`, DPI/monitors,
@@ -78,7 +79,7 @@ EMA current weight **0.6** reduces jitter. Higher alpha reduces lag. These are
 initial interaction settings, not physically calibrated values. Controls reject
 `--no-smoothing`. Distance from camera still affects relative sensitivity.
 
-This is consistently **relative hand-displacement mapping**. Win32 normalized
+This default strategy is **relative hand-displacement mapping**. Win32 normalized
 absolute packets only deliver the computed physical-pixel target without Windows
 relative acceleration; they are not an absolute camera mapping. Right/down in
 the unmirrored image moves right/down. No optical FOV/pointing-angle calibration.
@@ -113,6 +114,129 @@ negative origins. Movement stays on that one monitor. Place the cursor there
 before arming, avoiding a cross-monitor activation jump. Restart after display,
 desktop or DPI reconfiguration. Simulation never queries Windows and uses its
 own virtual monitor (1920x1080 by default).
+
+## Phase 3.6 enhancement: absolute cursor and active region
+
+`--control-mapping relative|absolute` defaults to **relative**. Existing relative
+gain, aspect correction, sensitivity, edge margin, anchoring and inversion are
+unchanged. Select **absolute** to map the position of EMA-smoothed index tip 8 to
+one selected display, rather than accumulate fingertip displacement. This is
+**2D camera-coordinate mapping**, not a physical touchscreen, pointing-ray model,
+or real-world finger-to-screen alignment.
+
+### Region and coordinate calculations
+
+`--control-region-width .80` and `--control-region-height .80` independently set
+fractions of the actual camera **width and height**, each finite and in `(0, 1]`.
+The region is centered. At 1920x1080 the defaults give **1536x864**, with **192 px
+left/right** and **108 px top/bottom** margins. Other resolutions derive their
+geometry from the actual capture dimensions. This is not an 80% image-area setting.
+
+For normalized camera coordinates `(x, y)`, let `left=(1-width)/2` and
+`top=(1-height)/2`. Compute `u=clamp((x-left)/width, 0, 1)` and
+`v=clamp((y-top)/height, 0, 1)`. The physical screen target is
+`(screen.left + u*(screen.width-1), screen.top + v*(screen.height-1))`.
+Corners map to screen corners and the center maps to center. In-frame points
+outside the region clamp to its nearest screen boundary. Invalid/non-finite or
+out-of-frame tips are rejected rather than moved. Unlike relative common-axis
+geometry, absolute mapping uses independent normalized X/Y axes; there is no
+extra camera-aspect multiplier. Aspect-preserving inference downscaling does
+not change these normalized positions.
+
+In absolute mode, **`--control-invert-x` mirrors `u` to `1-u`**, once and before
+screen smoothing. In relative mode it reverses horizontal displacement. Default
+is still **off**. Neither mode inverts Y, flips the preview or changes recognition.
+`--control-sensitivity` and `--control-margin` apply only to relative mode; use
+region width/height to change absolute reach.
+
+A thin yellow rectangle marks the active region in the preview. Status shows
+RELATIVE or ABSOLUTE and the intended screen position in the last Move action,
+including in simulation. The rectangle uses the same normalized pixel convention
+as skeleton drawing, follows capture/preview aspect ratios, and is drawn only on
+the existing preview buffer. Capture, inference image, autofocus, camera settings,
+and full field of view remain unchanged; no crop or additional frame copy occurs.
+
+### Smoothing, activation, pinch and safety
+
+Both modes reuse current EMA landmarks and the existing `--control-alpha .6`
+screen EMA. Higher alpha responds faster; lower alpha suppresses jitter but adds
+lag. Targets clamp before EMA without accumulating displacement. Fractional EMA
+state is retained until integer output. At alpha below 1, reaching an edge takes
+several samples to settle; alpha 1 disables screen EMA, but CLI still requires
+landmark smoothing. No new model, dependency or thread is introduced.
+
+Controls remain opt-in and start DISARMED in simulation and live. **A** arms after
+valid selected-hand association; arming sends no movement. The first actionable
+POINTING sample anchors smoothing at the current cursor without moving. Subsequent
+valid samples blend toward their absolute targets, including a stationary tip.
+After reset, no old fingertip/EMA state is replayed. Selected-hand loss/ambiguity
+still forces UP and disarms; hand reentry never switches control or rearms it.
+
+At a fresh accepted PINCH STARTED, absolute mode captures a **constant screen
+offset** from the newly closed fingertip's mapped position to the current cursor.
+Mouse-down sends no cursor move. HELD samples use mapped positions plus that
+offset and remain responsive even without POINTING classification. This prevents
+finger closure from jerking the cursor or dragged object. The offset is not
+integrated or repeatedly rebased. RELEASED sends one UP and clears the offset;
+the next POINTING acquisition is move-free and the existing EMA blends back
+toward ordinary absolute positioning. Reset, loss, disarm, emergency and shutdown
+also clear drag state and preserve the existing forced-release behavior.
+
+Primary display is the initial target (`--control-monitor 0`). The existing
+backend establishes per-monitor DPI awareness and supplies physical-pixel bounds;
+mapping adds the selected display origin and leaves Win32 virtual-desktop
+normalization to that backend. No logical-pixel/DPI multiplier is added. Existing
+explicit monitor selection, including negative origins, is covered by fake tests,
+but physical multi-monitor/mixed-DPI setups require manual verification. Movement
+stays on one selected display and does not span monitors. Keep the cursor on that
+display before arming. **Restart after monitor, desktop or DPI reconfiguration.**
+
+### Exact PowerShell commands
+
+Run from `C:\Users\Darsh\VisionControl`. All examples start DISARMED. Simulation
+never sends Windows mouse/keyboard input; `--control-mouse` simulates click/drag.
+Tabs remain disabled unless explicitly enabled with the existing swipe flags.
+
+```powershell
+# A. Existing relative behavior; inversion remains off unless you add its flag.
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --controls --control-mode simulate --control-mapping relative --control-hand right --control-mouse
+
+# B. Absolute simulation, 80% width/height, right hand, mouse simulation and diagnostics.
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --controls --control-mode simulate --control-mapping absolute --control-region-width 0.80 --control-region-height 0.80 --control-hand right --control-mouse --control-debug
+
+# C. Same mapping LIVE: focus preview, A to arm, D to disarm, Ctrl+Alt+Esc emergency stop.
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --controls --control-mode live --control-mapping absolute --control-region-width 0.80 --control-region-height 0.80 --control-hand right --control-mouse --control-debug
+
+# D. Vertical calibration in simulation: less vertical hand travel, greater Y gain.
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --controls --control-mode simulate --control-mapping absolute --control-region-width 0.80 --control-region-height 0.70 --control-hand right --control-mouse --control-debug
+```
+
+Add `--control-invert-x` to any example to compare horizontal feel. Remove
+`--control-debug` to disable optional sampled logs. Use Q to quit and H for help.
+Do not start live until simulation is comfortable and the physical emergency
+shortcut has been checked in a safe setting. Existing watchdog, hand-selection,
+click/tab flags and release/error policies are preserved.
+
+### Calibration and limitations
+
+Start with `.80/.80`. If top/bottom are difficult to reach, try `.80/.70` before
+changing smoothing. Try `.90/.80` for a wider usable region, or `1/1` for the full
+frame. Smaller regions amplify camera jitter; these are initial settings, not
+permanent calibration. Test corners, edges, center, quick movement and small
+stationary fluctuations. Pinch grip changes during HELD still move the index tip;
+the constant start offset does not compensate for every later change of grip.
+That offset can also reduce reachable edges during a drag; release and repoint
+to restore normal absolute reach. Release/repoint convergence depends on alpha.
+Webcam accuracy, physical reach, DPI/display behavior and actual FPS require the
+owner's UGREEN/laptop tests. No physical webcam or real input was used in automation.
+
+This enhancement stops at Phase 3.6; no Phase 3.7 reliability redesign is included.
+
+Enhancement validation: **388 tests passed** (16 camera, 124 hand tracking,
+135 gestures, 113 controls), including 47 new tests. The original RelativeCursor
+implementation and all existing test files were retained. No real webcam or
+Windows input was used. The starting working tree was clean at `91a651d`;
+hardware validation remains with the owner.
 
 ## Pinch, drag and tab actions
 

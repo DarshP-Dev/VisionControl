@@ -261,6 +261,9 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
     resized = time.perf_counter()
     if timings is not None:
         timings.add("preview_resize", resized - start)
+    if control_status is not None and control_status.mapping == "absolute" and control_status.region is not None:
+        first, last = control_status.region.preview_bounds(preview.shape[1], preview.shape[0])
+        cv2.rectangle(preview, first, last, (0, 220, 255), 1, cv2.LINE_AA)
     hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results, pinch_results, gesture_states, swipe_results)
     # Screen columns are UI placement only, never tracking identities.
     columns = ({id(hand): i for i,hand in enumerate(sorted(hands,key=lambda h:h.points[0][0]))}

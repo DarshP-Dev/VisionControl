@@ -11,7 +11,7 @@ from gestures.models import HandSide
 from gestures.pinch import PinchStatus
 from gestures.static_gestures import Gesture
 
-from .cursor import RelativeCursor
+from .cursor import AbsoluteCursor, RelativeCursor
 from .models import ControlSettings, ControlStatus
 
 
@@ -23,7 +23,8 @@ class DesktopController:
         if bool(backend.is_live) != (settings.mode == "live"):
             raise ValueError("Control mode and input backend must agree")
         self.backend, self.settings, self.clock = backend, settings, clock
-        self.cursor = RelativeCursor(settings, backend.screen)
+        strategy = AbsoluteCursor if settings.mapping == "absolute" else RelativeCursor
+        self.cursor = strategy(settings, backend.screen)
         self.lock = threading.RLock()  # Only global emergency/watchdog runs outside the camera loop.
         self.safety_ready = settings.mode == "simulate"
         self.armed = self.button_down = self.open_seen = False
@@ -173,7 +174,10 @@ class DesktopController:
             self.button_down = True
             self.backend.left_down()
             self.last_action = "LEFT_BUTTON_DOWN"
-            self.cursor.reset()  # Curling to pinch must not jerk the cursor/object.
+            if self.settings.mapping == "absolute":
+                self.cursor.begin_drag((point.x, point.y), item.image_size, self.backend.cursor_position())
+            else:
+                self.cursor.reset()  # Curling to pinch must not jerk the cursor/object.
         if opened:
             self.open_seen = True
         pinch_active = state.confirmed == PINCH or pinch.status in (PinchStatus.STARTED, PinchStatus.HELD)
@@ -200,7 +204,7 @@ class DesktopController:
             if target is not None:
                 self.backend.move(*target)
                 self.last_action = f"Move ({target[0]}, {target[1]})"
-            self.reason = "Dragging" if self.button_down else "Relative pointing"
+            self.reason = "Dragging" if self.button_down else f"{self.settings.mapping.title()} pointing"
         else:
             self.cursor.reset()
             if not swipes:
@@ -213,7 +217,8 @@ class DesktopController:
     def status(self):
         with self.lock:
             return ControlStatus(self.settings.mode, self.armed, self.settings.hand.value,
-                                 self.gesture, self.button_down, self.last_action, self.reason)
+                                 self.gesture, self.button_down, self.last_action, self.reason,
+                                 self.settings.mapping, getattr(self.cursor, "region", None))
 
     def close(self):
         with self.lock:
