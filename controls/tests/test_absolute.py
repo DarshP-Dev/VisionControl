@@ -83,6 +83,8 @@ class RegionTest(unittest.TestCase):
 
 class AbsoluteCursorTest(unittest.TestCase):
     def cursor(self, **kwargs):
+        # These geometry tests exercise the explicit, unmirrored camera projection.
+        kwargs.setdefault("invert_x", False)
         return AbsoluteCursor(ControlSettings(mapping="absolute", **kwargs), Screen())
 
     def test_all_four_corners(self):
@@ -222,7 +224,7 @@ class AbsoluteControllerTest(unittest.TestCase):
         self.assertEqual(h.backend.position, before)
         self.assertEqual(h.backend.counts["move"], moves)
         h.step(PINCH, P.HELD, dx=-.02)
-        self.assertGreater(h.backend.position[0], before[0])
+        self.assertLess(h.backend.position[0], before[0])  # Absolute defaults to inverted X.
         held = h.backend.position
         self.assertEqual(h.backend.counts["down"], 1)
         h.step(G.POINTING, P.RELEASED, events=((PINCH, E.GESTURE_ENDED, "pinch_released"),))
@@ -314,7 +316,7 @@ class AbsoluteControllerTest(unittest.TestCase):
     def test_negative_monitor_origin_maps_before_win32_normalization(self):
         api = FakeAPI()
         backend = WindowsBackend(1, api=api)
-        cursor = AbsoluteCursor(ControlSettings(mapping="absolute", alpha=1.), backend.screen)
+        cursor = AbsoluteCursor(ControlSettings(mapping="absolute", alpha=1., invert_x=False), backend.screen)
         cursor.update((.5, .5), SIZE, (-100, 200))
         target = cursor.update((.1, .1), SIZE, (0, 0))
         self.assertEqual(target, (-2560, 0))

@@ -501,7 +501,7 @@ def run(args, report=None):
             if controller is not None:
                 LOGGER.info("Cursor mapping: %s | centered absolute region: %.0f%% width x %.0f%% height | invert X: %s",
                             args.control_mapping, args.control_region_width*100, args.control_region_height*100,
-                            args.control_invert_x)
+                            controller.settings.invert_x)
                 LOGGER.info("Controls: %s | starts DISARMED | selected %s | clicks=%s tabs=%s | "
                             "A: Arm, D: Disarm, Q: Quit | live global stop: Ctrl+Alt+Esc",
                             args.control_mode, args.control_hand, args.control_mouse, args.control_tabs)

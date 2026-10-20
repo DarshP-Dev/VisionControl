@@ -89,7 +89,7 @@ the unmirrored image moves right/down. No optical FOV/pointing-angle calibration
 Some users prefer mirrored horizontal cursor motion: a left/right hand movement
 can feel reversed with an unmirrored camera view. Add **`--control-invert-x`** to
 reverse only the relative horizontal cursor delta in simulation or live mode.
-It defaults **off**, preserving existing commands. Vertical motion stays unchanged.
+In relative mode it defaults **off**, preserving existing commands. Vertical motion stays unchanged.
 The sign changes after active-region/aspect correction, before target accumulation,
 clamping and screen-space EMA; acquisition/reacquisition still anchors without a
 jump. The same cursor mapping is used during an already valid drag, without
@@ -136,16 +136,26 @@ For normalized camera coordinates `(x, y)`, let `left=(1-width)/2` and
 `top=(1-height)/2`. Compute `u=clamp((x-left)/width, 0, 1)` and
 `v=clamp((y-top)/height, 0, 1)`. The physical screen target is
 `(screen.left + u*(screen.width-1), screen.top + v*(screen.height-1))`.
-Corners map to screen corners and the center maps to center. In-frame points
+Before inversion, corners map to corresponding screen corners and the center maps
+to center. The absolute default mirrors X as described below. In-frame points
 outside the region clamp to its nearest screen boundary. Invalid/non-finite or
 out-of-frame tips are rejected rather than moved. Unlike relative common-axis
 geometry, absolute mapping uses independent normalized X/Y axes; there is no
 extra camera-aspect multiplier. Aspect-preserving inference downscaling does
 not change these normalized positions.
 
-In absolute mode, **`--control-invert-x` mirrors `u` to `1-u`**, once and before
-screen smoothing. In relative mode it reverses horizontal displacement. Default
-is still **off**. Neither mode inverts Y, flips the preview or changes recognition.
+Absolute mode now **inverts X by default**, using the existing `u` to `1-u`
+mapping exactly once before screen smoothing. This compensates for the horizontal
+direction observed during the UGREEN webcam test: physical finger-left increases
+raw camera X, so the mirrored mapping moves the cursor left; finger-right moves
+it right. Raw camera coordinates and physical hand direction are distinct.
+Relative mode still defaults to **no inversion**, preserving its existing behavior.
+
+Use `--control-invert-x` to explicitly enable inversion in either mode, or
+`--control-no-invert-x` to explicitly disable it. These mutually exclusive flags
+set a boolean; enabling inversion when it is already the default does not invert
+twice. The resolved setting is shared by simulation and live, including dragging.
+Neither mode inverts Y, flips the preview or changes recognition.
 `--control-sensitivity` and `--control-margin` apply only to relative mode; use
 region width/height to change absolute reach.
 
@@ -211,7 +221,10 @@ Tabs remain disabled unless explicitly enabled with the existing swipe flags.
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --controls --control-mode simulate --control-mapping absolute --control-region-width 0.80 --control-region-height 0.70 --control-hand right --control-mouse --control-debug
 ```
 
-Add `--control-invert-x` to any example to compare horizontal feel. Remove
+Absolute examples already enable X inversion by default. Add `--control-no-invert-x`
+to compare the old absolute horizontal direction, or `--control-invert-x` to
+explicitly keep inversion enabled. Relative examples still default to no inversion.
+Remove
 `--control-debug` to disable optional sampled logs. Use Q to quit and H for help.
 Do not start live until simulation is comfortable and the physical emergency
 shortcut has been checked in a safe setting. Existing watchdog, hand-selection,

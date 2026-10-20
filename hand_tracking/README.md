@@ -14,9 +14,10 @@ arming, relative cursor, pinch click/drag and independently enabled browser tabs
 See [controls/README.md](../controls/README.md) for commands, global
 **Ctrl+Alt+Esc** stop, safety gates and staged local testing. Tracking/recognition
 commands alone still send no desktop input. Voice and motor controls are absent.
-For reversed-feeling horizontal pointer movement, add `--control-invert-x` to a
-controls command. This opt-in calibration changes only the cursor's horizontal
-delta; vertical movement, the unmirrored preview and recognition remain unchanged.
+Absolute mapping defaults to X inversion for the tested webcam direction; relative
+mapping keeps inversion off. Use `--control-invert-x` or `--control-no-invert-x`
+to explicitly enable/disable it. Only cursor X changes; vertical movement,
+the unmirrored preview and recognition remain unchanged.
 The existing Phase 1 camera applications are unchanged.
 Inference size is configurable independently of capture; detailed benchmarking
 and host timing reports are available. See [PERFORMANCE.md](PERFORMANCE.md) for
@@ -632,7 +633,8 @@ greater than zero and at most 1. Try height `.70` to reduce vertical travel.
 The yellow region rectangle is preview-only; inference sees the original image,
 without cropping, mirroring, new inference, or extra frame copying. Status shows
 the selected mapping mode and intended cursor coordinates. `--control-invert-x`
-mirrors absolute horizontal position (or relative horizontal displacement),
+mirrors absolute horizontal position (on by default) or relative horizontal
+displacement (off by default); `--control-no-invert-x` explicitly disables it,
 leaving Y and recognition untouched. Existing `--control-alpha` controls screen
 EMA; landmark EMA is reused. Relative sensitivity/margin do not affect absolute.
 

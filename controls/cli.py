@@ -20,8 +20,11 @@ def add_arguments(parser):
     parser.add_argument("--control-sensitivity", type=float, default=1.5)
     parser.add_argument("--control-alpha", type=float, default=.6, help="screen-space EMA current weight [.01,1]")
     parser.add_argument("--control-margin", type=float, default=.10, help="relative mapping: image edge margin [0,.4]")
-    parser.add_argument("--control-invert-x", action="store_true",
-                        help="mirror horizontal delta (relative) or screen position (absolute); default off, Y unchanged")
+    inversion = parser.add_mutually_exclusive_group()
+    inversion.add_argument("--control-invert-x", dest="control_invert_x", action="store_true", default=None,
+                           help="enable X inversion (default: on for absolute, off for relative); Y unchanged")
+    inversion.add_argument("--control-no-invert-x", dest="control_invert_x", action="store_false", default=None,
+                           help="disable X inversion explicitly, including in absolute mode; Y unchanged")
     parser.add_argument("--control-monitor", type=int, default=0, help="live physical monitor index; 0 is primary")
     parser.add_argument("--control-sim-size", default="1920x1080", help="simulated physical screen WIDTHxHEIGHT")
     parser.add_argument("--control-sim-app", default="chrome.exe", help="simulated foreground executable basename")
@@ -53,8 +56,8 @@ def validate(parser, args):
         simulation_screen(args)
     except ValueError as exc:
         parser.error(str(exc))
-    if args.control_invert_x and not args.controls:
-        parser.error("--control-invert-x requires --controls")
+    if args.control_invert_x is not None and not args.controls:
+        parser.error("--control-invert-x/--control-no-invert-x require --controls")
     if not args.controls and (args.control_mapping != "relative" or args.control_region_width != .80
                               or args.control_region_height != .80):
         parser.error("Absolute mapping/region options require --controls")

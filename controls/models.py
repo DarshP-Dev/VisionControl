@@ -39,7 +39,7 @@ class ControlSettings:
     monitor: int = 0
     debug: bool = False
     browsers: tuple[str, ...] = ("chrome.exe", "msedge.exe", "firefox.exe")
-    invert_x: bool = False
+    invert_x: bool | None = None  # None selects the mapping-specific default.
     mapping: str = "relative"
     region_width: float = .80
     region_height: float = .80
@@ -47,10 +47,12 @@ class ControlSettings:
     def __post_init__(self):
         if self.mode not in ("simulate", "live") or self.hand not in (HandSide.LEFT, HandSide.RIGHT):
             raise ValueError("Controls require simulate/live mode and left/right hand")
-        if not isinstance(self.invert_x, bool):
-            raise ValueError("Control invert_x must be a boolean")
         if self.mapping not in ("relative", "absolute"):
             raise ValueError("Control mapping must be relative or absolute")
+        if self.invert_x is None:
+            object.__setattr__(self, "invert_x", self.mapping == "absolute")
+        elif not isinstance(self.invert_x, bool):
+            raise ValueError("Control invert_x must be a boolean or None (mapping default)")
         ActiveRegion(self.region_width, self.region_height)
         for name, lo, hi in (("sensitivity", .1, 5.), ("alpha", .01, 1.), ("margin", 0., .4)):
             value = getattr(self, name)
