@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 
 from gestures.features import extract_features
-from gestures.static_gestures import Gesture, classify_hand
+from gestures.static_gestures import Gesture, StaticThresholds, classify_hand
 from gestures.tests.static_fixtures import SIZE, as_result, pose_hand
 from gestures.tests.test_pointing_calibration import ALL, OTHERS, relaxed_pointing
 from . import hand_tracker as tracker
@@ -19,6 +19,24 @@ from .performance import Profile
 
 
 class GestureDebugTest(unittest.TestCase):
+    def test_assessments_distinguish_index_curl_unsupported_invalid_and_conflict(self):
+        index = extract_features(pose_hand(curled=OTHERS, partial=(ALL[0],)), image_size=SIZE)
+        others = extract_features(pose_hand(curled=(ALL[2], ALL[3])), image_size=SIZE)
+        thumb = extract_features(pose_hand(curled=ALL, thumb="extended"), image_size=SIZE)
+        opened = extract_features(pose_hand(), image_size=SIZE)
+        results = (classify_hand(index, 0, diagnostics=True), classify_hand(others, 0, diagnostics=True),
+                   classify_hand(thumb, 0, diagnostics=True), classify_hand(None, 0, diagnostics=True),
+                   classify_hand(opened, 0, thresholds=StaticThresholds(0, 0, 0, 0, 180, 180, 1, 100),
+                                 diagnostics=True))
+        with self.assertLogs(tracker.LOGGER, level="INFO") as captured:
+            GestureDebug().log(results, 0)
+        text = "\n".join(captured.output)
+        for expected in ("index_not_confidently_extended", "other_fingers_not_confidently_curled",
+                         "unsupported_hand_configuration", "invalid_or_unreliable_measurements",
+                         "conflicting_gesture_rules", "depth/occlusion not assessed", "index extension:",
+                         "middle curl:"):
+            self.assertIn(expected, text)
+
     def test_cli_debug_requires_opt_in_recognition(self):
         self.assertFalse(tracker.parse_args([]).gesture_debug)
         self.assertTrue(tracker.parse_args(["--gestures", "--gesture-debug"]).gesture_debug)

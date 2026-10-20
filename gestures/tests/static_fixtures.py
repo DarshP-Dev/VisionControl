@@ -1,6 +1,7 @@
 """Articulated synthetic chains with distinct palm bases and curled knuckles."""
 
 import math
+from dataclasses import replace
 from types import SimpleNamespace
 
 from gestures.features import FINGER_CHAINS
@@ -60,3 +61,23 @@ def as_result(*hands: HandObservation) -> SimpleNamespace:
         handedness=[[SimpleNamespace(category_name=p.category_name, score=p.score) for p in hand.handedness]
                     for hand in hands],
     )
+
+
+def project_hand(hand: HandObservation, *, yaw: float = 0, pitch: float = 0) -> HandObservation:
+    """Rigid 3D rotation then orthographic projection in aspect-correct space.
+
+    A planar articulated fixture is an ideal observability test, not a simulation
+    of MediaPipe occlusion errors or an anatomical reconstruction of a real hand.
+    yaw=180 exposes the back; in-plane rotation is supplied to pose_hand.
+    """
+    wrist = hand[I.WRIST]
+    cy, sy = math.cos(math.radians(yaw)), math.sin(math.radians(yaw))
+    cp, sp = math.cos(math.radians(pitch)), math.sin(math.radians(pitch))
+    points = []
+    for point in hand.landmarks:
+        x, y, z = point.x - wrist.x, (point.y - wrist.y) * SIZE.height / SIZE.width, point.z - wrist.z
+        x, z = cy * x + sy * z, -sy * x + cy * z
+        y, z = cp * y - sp * z, sp * y + cp * z
+        points.append(replace(point, x=wrist.x + x, y=wrist.y + y * SIZE.width / SIZE.height,
+                              z=wrist.z + z))
+    return HandObservation(tuple(points), hand.handedness)

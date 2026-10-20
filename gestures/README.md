@@ -524,13 +524,18 @@ wrist-label background so OpenCV's font can render every character.
 
 ### Targeted POINTING calibration and diagnostics
 
+**Current follow-up:** see [POINTING reliability and webcam validation](POINTING.md)
+for the targeted pre-Phase-3.7 fix, the reproducible synthetic comparison, exact
+PowerShell commands, rotation limits and the final automated results. Physical
+accuracy of this follow-up still needs owner testing.
+
 The owner physically tested the original Phase 3.2 implementation: OPEN_PALM,
 FIST, UNKNOWN, two-hand independence, recovery and performance passed; POINTING
 was intermittent. Recognition ran at approximately 36 FPS versus the earlier
 38.77 FPS tracking baseline. The bounded calibration below was initially validated
 synthetically; the owner subsequently confirmed the static gestures work well
-after calibration. Occasional backward-rotation POINTING/FIST ambiguity remains
-outside Phase 3.3. New pinch accuracy/performance still need webcam validation.
+after calibration. Later physical testing reported intermittent natural and
+backward-rotation POINTING failures, motivating the focused follow-up linked above.
 
 Inspection showed POINTING reused the strict FIST curl test. Articulated
 synthetic relaxed curls had PIP 90–100°, DIP 110–115° and straightness 0.47–0.56,
@@ -540,12 +545,13 @@ also missed the original 155° extension gate. These demonstrate concrete failur
 paths, **not proof of which gate failed on the owner's real hand**. Debug samples
 are needed to establish the actual camera failure.
 
-The calibration changes only these POINTING gates:
+The current POINTING gates (including that follow-up) are:
 
-- Index PIP minimum: **150°** instead of 155°. Index DIP ≥145°, straightness
+- Index PIP minimum: **145°** (originally 155°, then calibrated to 150°). Index DIP ≥145°, straightness
   ≥0.88 and tip/wrist ≥1.15 remain required; a generally bent index does not qualify.
-- Middle/ring/pinky tip/wrist maximum: **1.65** instead of 1.25. Their PIP ≤110°,
-  DIP ≤160° and straightness ≤0.75 remain required. This allows tips further from
+- Middle/ring/pinky tip/wrist maximum: **1.65** instead of 1.25. Their PIP ≤110°
+  and straightness ≤0.75 remain required. DIP must be valid in [0°, 180°], but
+  no longer vetoes an otherwise clearly curled chain in POINTING. This allows tips further from
   the wrist while preserving clear geometric evidence of curling.
 - Each of those fingers must also lie at least **0.25 palm-scale units closer
   to the wrist than the index tip**. This additional separation guard rejects a
@@ -600,8 +606,9 @@ affect responsiveness. Existing profiling includes calibration work; JSON record
 the additional thresholds and whether debugging was enabled. A sequential
 cached-feature microbenchmark (100 warm-up/2000 measured two-hand iterations,
 no camera, feature extraction or GUI) measured rule means/p95 of 0.021/0.035 ms
-before and 0.053/0.107 ms after calibration with debug off. This is an approximately
+before and 0.053/0.107 ms after that earlier calibration with debug off. This is an approximately
 0.032 ms mean host-rule increase, not a webcam FPS measurement or accuracy gain.
+Those are historical measurements; see POINTING.md for the current comparison.
 The target remains the owner's approximate 36 FPS, pending local re-testing.
 
 The classifier consumes `HandFeatures`; geometry is computed once using the

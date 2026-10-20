@@ -24,7 +24,7 @@ class StaticThresholds:
     curled_distal_max_degrees: float = 160
     curled_straightness_max: float = .75
     curled_tip_to_wrist_max: float = 1.25
-    pointing_index_joint_min_degrees: float = 150
+    pointing_index_joint_min_degrees: float = 145
     pointing_curled_tip_to_wrist_max: float = 1.65
     pointing_tip_separation_min: float = .25
     unsupported_thumb_tip_to_wrist_min: float = 1.35
@@ -112,6 +112,11 @@ def _pointing_evaluation(values: tuple[tuple[float, ...], ...] | None,
             actual = finite_number(value, name)
         except ValueError:
             actual = None
+        if collect and actual is not None:
+            if ("degrees" in name and not 0 <= actual <= 180
+                    or name == "straightness" and not 0 <= actual <= 1
+                    or name == "tip_to_wrist" and actual < 0):
+                actual = None
         passed = actual is not None and (actual >= bound if comparison == ">=" else
                                         actual <= bound if comparison == "<=" else actual > bound)
         matched = matched and passed
@@ -141,7 +146,11 @@ def _pointing_evaluation(values: tuple[tuple[float, ...], ...] | None,
             require(finger, "tip_to_wrist", tip, ">=", thresholds.extended_tip_to_wrist_min)
         else:
             require(finger, "PIP_degrees", joint, "<=", thresholds.curled_joint_max_degrees)
-            require(finger, "DIP_degrees", distal, "<=", thresholds.curled_distal_max_degrees)
+            # A folded PIP and short chord establish curl even with a relaxed,
+            # straight distal segment. DIP validity is still checked above;
+            # the strict FIST definition retains its independent DIP bound.
+            if collect:
+                require(finger, "DIP_degrees_valid", distal, "<=", 180)
             require(finger, "straightness", straight, "<=", thresholds.curled_straightness_max)
             require(finger, "tip_to_wrist", tip, "<=", thresholds.pointing_curled_tip_to_wrist_max)
             try:

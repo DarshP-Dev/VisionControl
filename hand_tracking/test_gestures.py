@@ -11,6 +11,9 @@ import numpy as np
 
 from gestures.models import Finger, HandObservation
 from gestures.static_gestures import Gesture
+from gestures.events import EventType
+from gestures.state_machine import GestureStateManager
+from gestures.tests.test_pointing_reliability import natural_pointing
 from gestures.tests.static_fixtures import SIZE, as_result, pose_hand
 from . import gesture_preview, hand_tracker as tracker
 from .performance import Profile
@@ -22,6 +25,37 @@ OTHERS = (Finger.MIDDLE, Finger.RING, Finger.PINKY)
 
 
 class GestureIntegrationTest(unittest.TestCase):
+    def test_natural_pointing_ema_order_changes_unknown_and_loss_cancel_existing_events(self):
+        smoother, manager, timings = LandmarkSmoother(), GestureStateManager(), Profile()
+        left, right = natural_pointing(bent_index=True), natural_pointing(side="Right")
+        left = HandObservation(tuple(replace(p, x=p.x - .22) for p in left.landmarks), left.handedness)
+        right = HandObservation(tuple(replace(p, x=p.x + .22) for p in right.landmarks), right.handedness)
+
+        def update(hands, stamp):
+            displayed = smoother.apply(as_result(*hands), stamp, (1080, 1920))
+            prepared = []
+            results = gesture_preview.classify_result(displayed, stamp, SIZE, timings, features_out=prepared)
+            return results, manager.update(tuple(prepared), stamp, results)
+
+        results, _ = update((left, right), 0)
+        self.assertEqual([r.gesture for r in results], [Gesture.POINTING, Gesture.POINTING])
+        shifted = HandObservation(tuple(replace(p, x=p.x + .002) for p in right.landmarks), right.handedness)
+        results, confirmed = update((shifted, left), 100)
+        self.assertEqual([r.handedness for r in results], [right.handedness, left.handedness])
+        self.assertEqual([e.event_type for e in confirmed.events], [EventType.GESTURE_STARTED] * 2)
+        peace = pose_hand(curled=(Finger.RING, Finger.PINKY), side="Right")
+        peace = HandObservation(tuple(replace(p, x=p.x + .22) for p in peace.landmarks), peace.handedness)
+        results, changed = update((peace, left), 133)
+        self.assertEqual([r.gesture for r in results], [Gesture.UNKNOWN, Gesture.POINTING])
+        self.assertEqual([e.event_type for e in changed.events], [EventType.GESTURE_CANCELED])
+        self.assertEqual(changed.events[0].side.value, "Right")
+        results, lost = update((), 166)
+        self.assertEqual(results, ())
+        self.assertEqual([e.event_type for e in lost.events], [EventType.GESTURE_CANCELED])
+        self.assertEqual(lost.events[0].side.value, "Left")
+        _, returned = update((right,), 200)
+        self.assertEqual(returned.events, ())  # existing activation/cooldown remain in force
+
     def test_cli_is_opt_in_and_preserves_working_defaults(self):
         for options, expected in (([], False), (["--gestures"], True), (["--no-gestures"], False),
                                    (["--gestures", "--no-gestures"], False)):
