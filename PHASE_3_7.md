@@ -4,6 +4,23 @@
 no Windows input. No gesture, model, desktop action, dependency or thread was added.
 Hardware acceptance remains a separate local testing step.
 
+## Targeted follow-up: Left-hand pinch rearming
+
+At clean commit `28383bc`, the baseline was 473 tests. Opt-in
+`--control-gesture-rearm` now permits a stable Left OPEN/STARTED/HELD/RELEASED
+sequence after routine Right tracking loss, with a default 800 ms hold and
+300 ms stable two-hand association interval. Initial manual A remains mandatory.
+Manual/emergency/watchdog/invariant/fault stops cannot be gesture-rearmed. The
+controller rechecks generation/health through the existing arming path, skips all
+input on completion, resets anchors and requires a fresh Right open/start for clicks.
+
+[Rearming architecture, identity limitations, exact commands and acceptance plan](controls/REARMING.md)
+document this focused addition. Existing recognition/mapping thresholds, safety
+thread and Ctrl+Shift+F10 option are unchanged. No Phase 3.8 identity tracker or new
+Windows action was added. All 531 tests pass (58 added); no physical acceptance
+is claimed. The isolated prepared-input validator timing was mean 0.0222 ms,
+P95 0.0258 ms, excluding inference, controller/backend work and OS delivery.
+
 ## Targeted follow-up: configurable emergency shortcut
 
 The default remains Ctrl+Alt+Esc. The owner selected **Ctrl+Shift+F10** as the

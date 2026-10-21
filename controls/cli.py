@@ -18,6 +18,12 @@ def add_arguments(parser):
     parser.add_argument("--control-region-height", type=float, default=.80,
                         help="absolute mapping: centered frame-height fraction (0,1]")
     parser.add_argument("--control-hand", choices=("left", "right"), default="right")
+    parser.add_argument("--control-gesture-rearm", action="store_true",
+                        help="opt-in Left pinch rearm after routine loss; Right control and initial A required")
+    parser.add_argument("--control-rearm-hold-ms", type=int, default=800, help="Left pinch hold [500,3000] ms")
+    parser.add_argument("--control-rearm-stable-ms", type=int, default=300,
+                        help="stable confident two-hand association [150,2000] ms before fresh Left OPEN")
+    parser.add_argument("--control-rearm-debug", action="store_true", help="sample rearm diagnostics at most every 2 s")
     parser.add_argument("--control-mouse", action="store_true", help="enable pinch click/drag (default: cursor only)")
     parser.add_argument("--control-tabs", action="store_true", help="enable confirmed swipe-to-tab actions (default: off)")
     parser.add_argument("--control-sensitivity", type=float, default=1.5)
@@ -50,7 +56,9 @@ def settings(args):
                            tuple(s.casefold() for s in args.control_browser) if args.control_browser else
                            ("chrome.exe", "msedge.exe", "firefox.exe"), invert_x=args.control_invert_x,
                            mapping=args.control_mapping, region_width=args.control_region_width,
-                           region_height=args.control_region_height, emergency_hotkey=args.control_emergency_hotkey)
+                           region_height=args.control_region_height, emergency_hotkey=args.control_emergency_hotkey,
+                           gesture_rearm=args.control_gesture_rearm, rearm_hold_ms=args.control_rearm_hold_ms,
+                           rearm_stable_ms=args.control_rearm_stable_ms, rearm_debug=args.control_rearm_debug)
 
 
 def validate(parser, args):
@@ -60,6 +68,11 @@ def validate(parser, args):
         simulation_screen(args)
     except ValueError as exc:
         parser.error(str(exc))
+    if args.control_gesture_rearm and not args.controls:
+        parser.error("--control-gesture-rearm requires --controls --gestures --pinch --gesture-states")
+    if not args.control_gesture_rearm and (args.control_rearm_debug or args.control_rearm_hold_ms != 800
+                                         or args.control_rearm_stable_ms != 300):
+        parser.error("--control-rearm-* options require --control-gesture-rearm")
     if args.control_invert_x is not None and not args.controls:
         parser.error("--control-invert-x/--control-no-invert-x require --controls")
     if not args.controls and (args.control_mapping != "relative" or args.control_region_width != .80

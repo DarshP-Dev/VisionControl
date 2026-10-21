@@ -45,9 +45,21 @@ class ControlSettings:
     region_width: float = .80
     region_height: float = .80
     emergency_hotkey: str = DEFAULT_EMERGENCY_HOTKEY
+    gesture_rearm: bool = False
+    rearm_hold_ms: int = 800
+    rearm_stable_ms: int = 300
+    rearm_debug: bool = False
 
     def __post_init__(self):
         object.__setattr__(self, "emergency_hotkey", normalize_hotkey(self.emergency_hotkey))
+        if not isinstance(self.gesture_rearm, bool) or not isinstance(self.rearm_debug, bool):
+            raise ValueError("Gesture rearm/debug settings must be booleans")
+        if self.gesture_rearm and self.hand != HandSide.RIGHT:
+            raise ValueError("--control-gesture-rearm requires --control-hand right; Left is reserved for rearming")
+        for name, lo, hi in (("rearm_hold_ms", 500, 3000), ("rearm_stable_ms", 150, 2000)):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, int) or not lo <= value <= hi:
+                raise ValueError(f"Control {name} must be an integer in [{lo}, {hi}] milliseconds")
         if self.mode not in ("simulate", "live") or self.hand not in (HandSide.LEFT, HandSide.RIGHT):
             raise ValueError("Controls require simulate/live mode and left/right hand")
         if self.mapping not in ("relative", "absolute"):
@@ -95,9 +107,11 @@ class ControlStatus:
     mapping: str = "relative"
     region: ActiveRegion | None = None
     emergency_hotkey: str = DEFAULT_EMERGENCY_HOTKEY
+    rearm_status: str = ""
 
     def lines(self):
         return (f"{self.mode.upper()} | {self.mapping.upper()} | {'ARMED' if self.armed else 'DISARMED'} | {self.hand} | "
                 f"{self.gesture} | LEFT {'DOWN' if self.button_down else 'UP'} | A: Arm D: Disarm",
                 f"Last: {self.last_action} | {self.reason}" +
-                (f" | STOP: {display_hotkey(self.emergency_hotkey)}" if self.mode == "live" else ""))
+                (f" | STOP: {display_hotkey(self.emergency_hotkey)}" if self.mode == "live" else "")) + \
+               ((self.rearm_status,) if self.rearm_status else ())

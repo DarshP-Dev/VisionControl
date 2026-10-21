@@ -1,5 +1,10 @@
 # Phase 3.6: Windows desktop controls
 
+Phase 3.7 adds opt-in [Left-hand pinch rearming](REARMING.md) after routine
+tracking loss. Initial A is required; D/emergency/watchdog/fault stops cannot be
+gesture-rearmed. The Right hand remains the desktop controller. Existing commands
+and the default manual-only recovery behavior remain unchanged.
+
 Phase 3.7 latches pending cancellation before waiting on the frame lock, prepares
 absolute drag before DOWN, retries failed owned-input cleanup at most three times
 (100 ms spacing), and preserves relative subpixel targets. Existing mapping

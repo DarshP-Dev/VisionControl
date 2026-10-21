@@ -13,6 +13,7 @@ from gestures.static_gestures import Gesture
 
 from .cursor import AbsoluteCursor, RelativeCursor
 from .models import ControlSettings, ControlStatus
+from .rearm import INVALID_ASSOCIATION_REASONS, LeftPinchRearm
 
 
 LOGGER = logging.getLogger("controls")
@@ -31,6 +32,10 @@ class DesktopController:
         self._stop_requested.set()
         self._pending_stops = 0
         self._stop_generation = 0
+        self._hard_stopped = True
+        self._manual_armed_once = self._routine_rearm = False
+        self.rearm = LeftPinchRearm(settings) if settings.gesture_rearm else None
+        self.last_rearm_seconds = 0.
         self.safety_ready = settings.mode == "simulate"
         self.armed = self.button_down = self.open_seen = False
         self.closed = self.faulted = False
@@ -45,7 +50,21 @@ class DesktopController:
         self.backend.input_allowed = self._input_allowed
 
     def arm(self):
+        """Explicit keyboard recovery. Gesture requests use the same checked path."""
+        return self._arm()
+
+    def _can_gesture_rearm(self):
+        return (self.settings.gesture_rearm and self._manual_armed_once and self._routine_rearm
+                and not self._hard_stopped and not self.armed and not self._pending_stops
+                and self.safety_ready and not self.closed and not self.faulted
+                and not self.button_down and not self._cleanup_remaining)
+
+    def _arm(self, *, gesture_generation=None):
         with self.lock:
+            if gesture_generation is not None:
+                with self._stop_lock:
+                    if not self._can_gesture_rearm() or gesture_generation != self._stop_generation:
+                        return False
             if self.closed or self.faulted or not self.safety_ready:
                 self.reason = "Safety unavailable; restart required"
                 return False
@@ -67,13 +86,20 @@ class DesktopController:
                 return False
             with self._stop_lock:
                 if (self._pending_stops or self._stop_generation != arming_generation
-                        or self.closed or self.faulted or not self.safety_ready):
+                        or self.closed or self.faulted or not self.safety_ready
+                        or gesture_generation is not None and (gesture_generation != self._stop_generation
+                                                                or not self._can_gesture_rearm())):
                     self.reason = "Disarm pending; arm again after cleanup"
                     return False
                 self._stop_requested.clear()
                 self.armed, self.open_seen = True, False
+                self._hard_stopped = self._routine_rearm = False
+                if gesture_generation is None:
+                    self._manual_armed_once = True
             self.arm_after = self.last_stamp
             self.cursor.reset()
+            if self.rearm is not None:
+                self.rearm.reset()
             self.reason = "Armed; open thumb/index to enable a fresh pinch"
             return True
 
@@ -87,13 +113,20 @@ class DesktopController:
     def disarm(self, reason="Manual disarm"):
         self._disarm(reason, safety_unavailable=False)
 
-    def _disarm(self, reason, safety_unavailable):
+    def _disarm(self, reason, safety_unavailable, *, routine=False):
         # Latch before waiting for a frame's lock. A slow cursor query must not
         # be followed by a new DOWN/MOVE/shortcut after an emergency request.
         with self._stop_lock:
             self._pending_stops += 1
             self._stop_generation += 1
             self._stop_requested.set()
+            # Critical/manual stops latch before waiting, so an older gesture
+            # request cannot become eligible while cleanup is blocked.
+            if not routine:
+                self._hard_stopped, self._routine_rearm = True, False
+            elif (not self._hard_stopped and self._manual_armed_once
+                  and (self.armed or self._routine_rearm)):
+                self._routine_rearm = self.settings.gesture_rearm
         with self.lock:
             try:
                 if safety_unavailable:
@@ -101,6 +134,8 @@ class DesktopController:
                 self.armed = self.open_seen = False
                 self.cursor.reset()
                 self.gesture, self.reason = "--", reason
+                if self.rearm is not None:
+                    self.rearm.reset()
                 errors = []
                 try:
                     self._release()
@@ -150,11 +185,12 @@ class DesktopController:
         return (self.armed and not self._stop_requested.is_set() and self.safety_ready
                 and not self.closed and not self.faulted)
 
-    def _unsafe(self, reason):
+    def _unsafe(self, reason, *, routine=False):
         self.last_good = None
-        self.disarm(reason)
+        self._disarm(reason, safety_unavailable=False, routine=routine)
 
     def update(self, frame, features, pinches):
+        self.last_rearm_seconds = 0.
         self.check_timeout()
         with self.lock:
             if self.closed or self.faulted:
@@ -179,23 +215,33 @@ class DesktopController:
             self._unsafe("Invalid timestamp/tracking gap; rearm manually")
             return
         self.last_stamp = stamp
-        if len(features) != len(frame.hands) or len(pinches) != len(features) or not 1 <= len(features) <= 2:
-            self._unsafe("Selected hand lost or invalid channels; rearm manually")
+        if len(features) != len(frame.hands) or len(pinches) != len(features) or len(features) > 2:
+            self._unsafe("Invalid control channels; rearm manually")
+            return
+        if not features:
+            self._unsafe("Selected hand lost; rearm manually", routine=True)
             return
         sides = tuple(reliable_side(item) for item in features)
         if (HandSide.UNKNOWN in sides or len(set(sides)) != len(sides)
                 or self.settings.hand not in sides or len(features) == 2 and hands_overlap(*features)):
-            self._unsafe("Missing/ambiguous/overlapping hand; rearm manually")
+            self._unsafe("Missing/ambiguous/overlapping hand; rearm manually", routine=True)
             return
         index = sides.index(self.settings.hand)
         item, state, pinch = features[index], frame.hands[index], pinches[index]
-        if (state.side != self.settings.hand or state.reason in (
-                "invalid_time", "ambiguous_handedness", "overlapping_hands", "tracking_gap", "image_size_changed",
-                "invalid_geometry_or_channel", "wrist_jump", "conflicting_image_sizes", "invalid_channel_alignment")
-                or item.image_size is None or not math.isfinite(item.palm_scale) or item.palm_scale <= 1e-9
+        if state.side != self.settings.hand or state.reason in INVALID_ASSOCIATION_REASONS:
+            # A simultaneous side mismatch must not downgrade a known critical
+            # manager error (bad time/geometry/channels) into routine recovery.
+            self._unsafe("Invalid hand association; rearm manually", routine=state.reason in (
+                "ambiguous_handedness", "overlapping_hands", "tracking_gap", "wrist_jump") or
+                state.side != self.settings.hand and state.reason not in INVALID_ASSOCIATION_REASONS)
+            return
+        if (item.image_size is None or not math.isfinite(item.palm_scale) or item.palm_scale <= 1e-9
                 or pinch.timestamp_ms != stamp or pinch.handedness != item.observation.handedness
-                or not pinch.measurement.valid or pinch.status == PinchStatus.UNAVAILABLE):
+                or not pinch.measurement.valid):
             self._unsafe("Invalid hand association/pinch; rearm manually")
+            return
+        if pinch.status == PinchStatus.UNAVAILABLE:
+            self._unsafe("Selected pinch unavailable; rearm manually", routine=True)
             return
         point = item.observation[8]
         if not all(math.isfinite(v) and 0 <= v <= 1 for v in (point.x, point.y)):
@@ -205,11 +251,25 @@ class DesktopController:
         events = tuple(e for e in frame.events if e.side == self.settings.hand)
         if any(not e.metadata.association_current or
                e.event_type == E.GESTURE_CANCELED and e.gesture == PINCH for e in events):
-            self._unsafe("Tracking/gesture cancellation; rearm manually")
+            self._unsafe("Tracking/gesture cancellation; rearm manually", routine=True)
             return
         self.last_good = now
         self.gesture = str(state.confirmed or state.candidate or "--")
         if not self._input_allowed():
+            if self.rearm is not None:
+                before = time.perf_counter()
+                with self._stop_lock:
+                    generation = self._stop_generation if self._can_gesture_rearm() else None
+                if generation is None:
+                    self.rearm.reset("GESTURE REARM BLOCKED - MANUAL ARM REQUIRED")
+                elif self.rearm.update(frame, features, pinches):
+                    if self._arm(gesture_generation=generation):
+                        self.rearm.mark_rearmed(stamp)
+                self.last_rearm_seconds = time.perf_counter() - before
+                if self.settings.rearm_debug and now-self._last_debug >= 2:
+                    LOGGER.info("Gesture rearm: %s | %s", self.rearm.feedback, self.reason)
+                    self._last_debug = now
+            # Includes a successful gesture rearm: never dispatch on its completion frame.
             return
         if self.arm_after is None or stamp <= self.arm_after:
             return
@@ -293,10 +353,19 @@ class DesktopController:
 
     def status(self):
         with self.lock:
+            rearm_status = ""
+            if self.rearm is not None:
+                with self._stop_lock:
+                    available = self._can_gesture_rearm()
+                if not self.armed:
+                    rearm_status = (self.rearm.feedback if available else
+                                    "GESTURE REARM BLOCKED - MANUAL ARM REQUIRED")
+                elif self.rearm.rearmed_until is not None and (self.last_stamp or 0) <= self.rearm.rearmed_until:
+                    rearm_status = "REARMED"
             return ControlStatus(self.settings.mode, self.armed, self.settings.hand.value,
                                  self.gesture, self.button_down, self.last_action, self.reason,
                                  self.settings.mapping, getattr(self.cursor, "region", None),
-                                 self.settings.emergency_hotkey)
+                                 self.settings.emergency_hotkey, rearm_status)
 
     def close(self):
         with self.lock:

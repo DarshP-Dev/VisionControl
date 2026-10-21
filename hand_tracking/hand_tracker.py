@@ -295,6 +295,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                 before_controls = time.perf_counter()
                 controller.update(state_frame, tuple(prepared), pinches)
                 timings.add("controller_processing", time.perf_counter() - before_controls)
+                if args.control_gesture_rearm:
+                    timings.add("gesture_rearm", controller.last_rearm_seconds)
             if not capture_logged:
                 LOGGER.info("Actual capture: %d x %d | actual inference: %d x %d",
                             frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])

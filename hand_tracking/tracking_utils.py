@@ -265,6 +265,7 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
         first, last = control_status.region.preview_bounds(preview.shape[1], preview.shape[0])
         cv2.rectangle(preview, first, last, (0, 220, 255), 1, cv2.LINE_AA)
     hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results, pinch_results, gesture_states, swipe_results)
+    control_lines = control_status.lines() if control_status is not None else ()
     # Screen columns are UI placement only, never tracking identities.
     columns = ({id(hand): i for i,hand in enumerate(sorted(hands,key=lambda h:h.points[0][0]))}
                if swipe_results is not None and len(hands)==2 and preview.shape[1]>=400 else {})
@@ -273,7 +274,7 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
         if columns:
             column = columns[id(hand)]
             bounds = (column*preview.shape[1]//2+4,(column+1)*preview.shape[1]//2-6)
-        draw_hand(preview, hand, top_margin=(54 if show_help else 27)+(54 if control_status else 0), pinch_thresholds=pinch_thresholds,
+        draw_hand(preview, hand, top_margin=(54 if show_help else 27)+27*len(control_lines), pinch_thresholds=pinch_thresholds,
                   swipe_config=swipe_config, capture_aspect=height/width, annotation_bounds=bounds)
     if raw_result is not None:
         for hand in hand_overlays(raw_result, preview.shape[1], preview.shape[0]):
@@ -289,8 +290,7 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
         lines.append("Left: green | Right: blue | Raw: white + | H: Hide help"
                      if raw_result is not None else
                      "Show one or two hands. Left: green | Right: blue | H: Hide help")
-    if control_status is not None:
-        lines.extend(control_status.lines())
+    lines.extend(control_lines)
     for index, text in enumerate(lines):
         font = (min(.5, max(.12, (preview.shape[1]-16) / max(1, cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, .5, 1)[0][0]) * .5))
                 if control_status is not None else .5)

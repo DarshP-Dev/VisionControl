@@ -1,5 +1,13 @@
 # Hand tracking with optional gesture recognition, states and events
 
+Optional [Left-hand pinch rearming](../controls/REARMING.md):
+`--control-gesture-rearm --control-rearm-hold-ms 800` with Right desktop control.
+Both hands must remain confidently associated during a completed held pinch;
+initial/manual/emergency/fault recovery still requires the existing keyboard path.
+`--control-rearm-stable-ms 300` and sampled `--control-rearm-debug` are available.
+The `gesture_rearm` timing stage is nested in controller timing. No extra inference
+or feature extraction is performed. See the linked simulation/live acceptance commands.
+
 Phase 3.7: [reliability audit and hardware acceptance procedure](../PHASE_3_7.md).
 Shared geometry avoids redundant work, relative targets preserve subpixel motion,
 stop requests gate pending input, and per-hand workload timing excludes absent
