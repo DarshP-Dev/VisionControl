@@ -8,6 +8,71 @@ limitations and staged acceptance plan](../PHASE_3_7.md); hardware acceptance is
 Normal input is guarded again after backend preflight; owned-input release remains
 permitted while disarmed or canceled.
 
+## Configurable global emergency shortcut (Phase 3.7 safety fix)
+
+`--control-emergency-hotkey` defaults to **ctrl+alt+esc**, preserving existing
+commands. The complete allowlist is **ctrl+alt+esc**, **ctrl+shift+f9**,
+**ctrl+shift+f10**, and **ctrl+shift+f11**. Names are case-insensitive; modifier
+order and surrounding whitespace normalize, e.g. `SHIFT+CTRL+F10` becomes
+`ctrl+shift+f10`. The main key must come last. No extra modifiers, aliases,
+ordinary typing keys, Win keys or other system shortcuts are accepted.
+These are supported choices, not a guarantee that Windows can register them.
+
+**Ctrl+Shift+F10** is the selected alternative for the owner's Chrome Remote
+Desktop setup. F12 (including Ctrl+Shift+F12) is rejected because Microsoft
+[reserves F12 for debuggers](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerhotkey).
+Ctrl+Shift+Esc, Ctrl+Alt+Del, Alt+Tab, Alt+F4 and Win combinations are also excluded.
+VisionControl does not override another application's registration or alter Chrome
+Remote Desktop settings.
+
+The existing safety thread registers the selected shortcut with `MOD_NOREPEAT`,
+polls its thread-local message queue, and unregisters on that same thread during
+shutdown or failure after successful registration. Reinitialization requires a
+new monitor instance, avoiding duplicate thread registrations. No new input
+mechanism or worker is introduced. Preview status always shows the configured
+**STOP** shortcut in live mode; startup logs and JSON reports record it too.
+
+Live controls still start **DISARMED**. Registration must succeed before camera,
+model or preview setup. Failure reports the configured shortcut, Windows error
+code and system error text when available, and blocks live startup. Error **1409**
+means the shortcut is already registered; choose another allowlisted combination.
+Other failures (for example access denied, invalid parameters, or no supplied
+error code) are reported without assuming another application owns it. No silent
+fallback or emergency-monitor bypass is provided. Simulation validates the option
+but neither registers a global shortcut nor loads the live input backend.
+
+The configured hotkey calls the existing emergency disarm: latch cancellation
+before waiting for in-flight work, block pending normal input, release owned
+buttons/keys, and prevent an in-flight arm request from undoing the stop. The
+500 ms watchdog, bounded release retries, A/D arming, Q/H controls and all gesture,
+cursor and action policies are unchanged.
+
+Run from `C:\Users\Darsh\VisionControl`, first in simulation:
+
+```powershell
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --controls --control-mode simulate --control-mapping absolute --control-region-width 0.80 --control-region-height 0.80 --control-hand right --control-mouse --control-emergency-hotkey ctrl+shift+f10
+
+# Live: starts DISARMED; verify the shortcut before enabling gestures with A.
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --controls --control-mode live --control-mapping absolute --control-region-width 0.80 --control-region-height 0.80 --control-hand right --control-mouse --control-emergency-hotkey ctrl+shift+f10
+```
+
+For cursor-only live verification, omit `--control-mouse`. While still disarmed,
+focus another harmless application and press **Ctrl+Shift+F10**. Return to the
+preview and confirm **DISARMED / GLOBAL EMERGENCY STOP**. Repeat over the actual
+Chrome Remote Desktop connection on the Windows computer receiving gesture input.
+Only after delivery works outside preview focus, arm with A and verify the same
+shortcut stops cursor movement. Then enable mouse controls on a disposable test
+surface, hold a pinch/drag, and verify emergency release without a stuck button.
+Also check D, Q and normal shutdown; restart repeatedly to check registration cleanup.
+
+If registration fails, explicitly select F9 or F11 from the allowlist and repeat
+the full delivery test. A successful registration does **not** prove remote delivery:
+remote software, the client OS, function-key/Fn handling or focus can intercept
+the keys before they reach the receiving machine. Neither Chrome Remote Desktop
+compatibility nor actual global-hotkey delivery has been physically verified by
+automated tests. Existing limitations on revoking an already-running OS call and
+permanently failed input release still apply.
+
 Controls are **off by default**. `--controls` defaults to **simulation**; both
 simulation and live start **DISARMED**. Click/drag and tab shortcuts require
 separate flags. Recognition flags alone never send desktop input. Webcam accuracy,

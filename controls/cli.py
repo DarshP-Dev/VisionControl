@@ -3,12 +3,15 @@
 from .backends import SimulationBackend
 from .controller import DesktopController
 from .models import ControlSettings, Screen
+from .hotkeys import DEFAULT_EMERGENCY_HOTKEY
 from gestures.models import HandSide
 
 
 def add_arguments(parser):
     parser.add_argument("--controls", action="store_true", help="opt-in desktop mapper; starts DISARMED")
     parser.add_argument("--control-mode", choices=("simulate", "live"), default="simulate")
+    parser.add_argument("--control-emergency-hotkey", default=DEFAULT_EMERGENCY_HOTKEY,
+                        help="live global stop: ctrl+alt+esc (default) or ctrl+shift+f9/f10/f11; case-insensitive")
     parser.add_argument("--control-mapping", choices=("relative", "absolute"), default="relative")
     parser.add_argument("--control-region-width", type=float, default=.80,
                         help="absolute mapping: centered frame-width fraction (0,1]")
@@ -47,12 +50,13 @@ def settings(args):
                            tuple(s.casefold() for s in args.control_browser) if args.control_browser else
                            ("chrome.exe", "msedge.exe", "firefox.exe"), invert_x=args.control_invert_x,
                            mapping=args.control_mapping, region_width=args.control_region_width,
-                           region_height=args.control_region_height)
+                           region_height=args.control_region_height, emergency_hotkey=args.control_emergency_hotkey)
 
 
 def validate(parser, args):
     try:
-        settings(args)
+        configured = settings(args)
+        args.control_emergency_hotkey = configured.emergency_hotkey
         simulation_screen(args)
     except ValueError as exc:
         parser.error(str(exc))

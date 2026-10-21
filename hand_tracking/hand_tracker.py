@@ -436,7 +436,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                              "mapping": ("absolute centered active region; smoothed physical-pixel targets"
                                          if args.control_mapping == "absolute" else
                                          "relative aspect-correct smoothed index tip; activation anchors cursor"),
-                             "emergency_stop": "Ctrl+Alt+Esc (live only); 500 ms host-stall watchdog"},
+                             "emergency_stop": f"{args.control_emergency_hotkey} (live only); 500 ms host-stall watchdog"},
                 "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown.",
             })
         LOGGER.info("Application FPS includes capture, preparation, inference, smoothing%s; "
@@ -503,8 +503,9 @@ def run(args, report=None):
                             args.control_mapping, args.control_region_width*100, args.control_region_height*100,
                             controller.settings.invert_x)
                 LOGGER.info("Controls: %s | starts DISARMED | selected %s | clicks=%s tabs=%s | "
-                            "A: Arm, D: Disarm, Q: Quit | live global stop: Ctrl+Alt+Esc",
-                            args.control_mode, args.control_hand, args.control_mouse, args.control_tabs)
+                            "A: Arm, D: Disarm, Q: Quit | live global stop: %s",
+                            args.control_mode, args.control_hand, args.control_mouse, args.control_tabs,
+                            args.control_emergency_hotkey)
             if not args.headless:
                 cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)
                 resources.callback(cv2.destroyAllWindows)

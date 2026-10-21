@@ -6,6 +6,14 @@ stop requests gate pending input, and per-hand workload timing excludes absent
 stages from prior frames. Capture, inference, thresholds, swipe reset, absolute
 defaults and EMA settings are preserved.
 
+`--control-emergency-hotkey ctrl+shift+f10` selects the owner's alternative to
+the default Ctrl+Alt+Esc. Allowed alternatives are Ctrl+Shift+F9/F10/F11; F12 is
+reserved and rejected. The selected shortcut appears in live preview status and
+reports. Simulation validates configuration without registering it. See
+[emergency configuration, launch commands and remote-delivery checks](../controls/README.md#configurable-global-emergency-shortcut-phase-37-safety-fix).
+Live startup still fails closed on registration failure; actual delivery must be
+tested on the receiving Windows computer outside preview focus.
+
 Detect and draw **up to two hands**, each with 21 landmarks and a skeleton, using the
 MediaPipe Tasks Hand Landmarker API in synchronous **VIDEO** mode on the CPU.
 Optional static recognition labels open palm, fist, pointing and unknown poses.

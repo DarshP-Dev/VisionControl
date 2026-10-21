@@ -6,6 +6,7 @@ import os
 from pathlib import PureWindowsPath
 
 from .models import Screen
+from .hotkeys import DEFAULT_EMERGENCY_HOTKEY, EMERGENCY_HOTKEYS, display_hotkey, normalize_hotkey
 
 
 ULONG_PTR = C.c_size_t
@@ -126,10 +127,20 @@ class WindowsAPI:
         if self.user.SendInput(len(batch), batch, C.sizeof(Input)) != len(batch):
             raise OSError("SendInput incomplete/blocked (Windows UIPI may restrict elevated targets)")
 
-    def register_stop(self):
-        # Ctrl+Alt+Esc, MOD_NOREPEAT. Registered on the safety thread's queue.
-        if not self.user.RegisterHotKey(None, 0x5636, 0x4003, 0x1B):
-            raise OSError("Cannot register Ctrl+Alt+Esc emergency stop (shortcut may be occupied)")
+    def register_stop(self, hotkey=DEFAULT_EMERGENCY_HOTKEY):
+        configured = normalize_hotkey(hotkey)
+        modifiers, virtual_key = EMERGENCY_HOTKEYS[configured]
+        # MOD_NOREPEAT; registration and unregistration belong to the safety thread.
+        C.set_last_error(0)
+        if not self.user.RegisterHotKey(None, 0x5636, modifiers | 0x4000, virtual_key):
+            code = C.get_last_error()  # Capture immediately, before formatting/logging.
+            detail = C.FormatError(code).strip() if code else "Windows provided no error code"
+            reason = ("Another application already owns this shortcut." if code == 1409 else
+                      "Registration failed; this does not by itself establish a shortcut conflict.")
+            raise OSError(code, f"Cannot register {display_hotkey(configured)} emergency stop; "
+                          f"Windows error {code}: {detail}. {reason} "
+                          "Choose --control-emergency-hotkey ctrl+shift+f9, ctrl+shift+f10 or ctrl+shift+f11. "
+                          "Live controls remain disabled; no automatic fallback.")
 
     def stop_requested(self):
         message = W.MSG()

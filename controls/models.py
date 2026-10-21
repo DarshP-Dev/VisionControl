@@ -6,6 +6,7 @@ from typing import Callable, Protocol
 
 from gestures.models import HandSide
 from .region import ActiveRegion
+from .hotkeys import DEFAULT_EMERGENCY_HOTKEY, display_hotkey, normalize_hotkey
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,8 +44,10 @@ class ControlSettings:
     mapping: str = "relative"
     region_width: float = .80
     region_height: float = .80
+    emergency_hotkey: str = DEFAULT_EMERGENCY_HOTKEY
 
     def __post_init__(self):
+        object.__setattr__(self, "emergency_hotkey", normalize_hotkey(self.emergency_hotkey))
         if self.mode not in ("simulate", "live") or self.hand not in (HandSide.LEFT, HandSide.RIGHT):
             raise ValueError("Controls require simulate/live mode and left/right hand")
         if self.mapping not in ("relative", "absolute"):
@@ -91,8 +94,10 @@ class ControlStatus:
     reason: str
     mapping: str = "relative"
     region: ActiveRegion | None = None
+    emergency_hotkey: str = DEFAULT_EMERGENCY_HOTKEY
 
     def lines(self):
         return (f"{self.mode.upper()} | {self.mapping.upper()} | {'ARMED' if self.armed else 'DISARMED'} | {self.hand} | "
                 f"{self.gesture} | LEFT {'DOWN' if self.button_down else 'UP'} | A: Arm D: Disarm",
-                f"Last: {self.last_action} | {self.reason}" + (" | STOP: Ctrl+Alt+Esc" if self.mode == "live" else ""))
+                f"Last: {self.last_action} | {self.reason}" +
+                (f" | STOP: {display_hotkey(self.emergency_hotkey)}" if self.mode == "live" else ""))

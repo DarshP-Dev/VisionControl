@@ -4,6 +4,38 @@
 no Windows input. No gesture, model, desktop action, dependency or thread was added.
 Hardware acceptance remains a separate local testing step.
 
+## Targeted follow-up: configurable emergency shortcut
+
+The default remains Ctrl+Alt+Esc. The owner selected **Ctrl+Shift+F10** as the
+alternative for Chrome Remote Desktop. Use
+`--control-emergency-hotkey ctrl+shift+f10`; Ctrl+Shift+F9 and Ctrl+Shift+F11 are
+also allowlisted. F12 is excluded under Microsoft's debugger reservation.
+Case and modifier order normalize. No recognition, mapping or action behavior
+was changed.
+
+The selected value flows through immutable configuration, existing safety-thread
+registration, preview status, startup logs and JSON reports. Registration failures
+include the actual Windows error code, with conflict-specific guidance only for
+1409, and still prevent live startup without fallback. Shutdown and partial startup
+failures unregister on the owning thread. Existing cancellation latches, watchdog,
+button-release recovery and default-disarmed behavior remain in place.
+
+Follow [the exact simulation/live commands and receiving-computer verification
+procedure](controls/README.md#configurable-global-emergency-shortcut-phase-37-safety-fix).
+Successful registration does not establish delivery through remote software.
+No actual registration, webcam or Windows input test was run for this follow-up.
+The pre-change baseline was 445 passing tests; follow-up validation is recorded
+below separately from the original milestone. Do not interpret prior acceptance
+commands' default shortcut as a claim it is available in the owner's remote session.
+
+Follow-up validation: **473 tests passed** (camera 16, gestures 154, hand_tracking
+153, controls 150), up from 445. The 28 added tests cover parsing/rejections,
+Win32 flags/error reporting, owner-thread registration cleanup, startup failure
+and timeout, virtual held-button release, pending-action cancellation, in-flight
+arming, watchdog/runtime failure, simulation isolation, preview/report values and
+Q/H integration. All existing tests were retained. Syntax compilation, dependency
+consistency and diff whitespace checks passed. No new dependency was added.
+
 ## Initial audit and scope
 
 Git was clean at `8bad723` (the targeted POINTING follow-up). The measured baseline

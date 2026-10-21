@@ -295,7 +295,8 @@ class DesktopController:
         with self.lock:
             return ControlStatus(self.settings.mode, self.armed, self.settings.hand.value,
                                  self.gesture, self.button_down, self.last_action, self.reason,
-                                 self.settings.mapping, getattr(self.cursor, "region", None))
+                                 self.settings.mapping, getattr(self.cursor, "region", None),
+                                 self.settings.emergency_hotkey)
 
     def close(self):
         with self.lock:
