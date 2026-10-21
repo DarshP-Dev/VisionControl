@@ -1,5 +1,11 @@
 # Hand tracking with optional gesture recognition, states and events
 
+Phase 3.7: [reliability audit and hardware acceptance procedure](../PHASE_3_7.md).
+Shared geometry avoids redundant work, relative targets preserve subpixel motion,
+stop requests gate pending input, and per-hand workload timing excludes absent
+stages from prior frames. Capture, inference, thresholds, swipe reset, absolute
+defaults and EMA settings are preserved.
+
 Detect and draw **up to two hands**, each with 21 landmarks and a skeleton, using the
 MediaPipe Tasks Hand Landmarker API in synchronous **VIDEO** mode on the CPU.
 Optional static recognition labels open palm, fist, pointing and unknown poses.

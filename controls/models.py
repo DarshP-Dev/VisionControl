@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 import math
-from typing import Protocol
+from typing import Callable, Protocol
 
 from gestures.models import HandSide
 from .region import ActiveRegion
@@ -68,6 +68,7 @@ class ControlSettings:
 class InputBackend(Protocol):
     screen: Screen
     is_live: bool
+    input_allowed: Callable[[], bool]  # Controller-installed guard for normal input; never blocks cleanup UP.
 
     def cursor_position(self) -> tuple[int, int]: ...
     def move(self, x: int, y: int) -> None: ...

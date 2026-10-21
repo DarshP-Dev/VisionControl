@@ -9,6 +9,7 @@ class SimulationBackend:
     is_live = False
 
     def __init__(self, screen=Screen(), foreground="chrome.exe"):
+        self.input_allowed = lambda: True
         self.screen, self.foreground = screen, foreground
         self.position = screen.clamp(screen.left+screen.width/2, screen.top+screen.height/2)
         self.button_down = False
@@ -19,10 +20,14 @@ class SimulationBackend:
         return self.position
 
     def move(self, x, y):
+        if not self.input_allowed():
+            return
         self.position = self.screen.clamp(x, y)
         self.counts["move"] += 1
 
     def left_down(self):
+        if not self.input_allowed():
+            return
         self.button_down = True
         self.counts["down"] += 1
 
@@ -31,7 +36,7 @@ class SimulationBackend:
         self.counts["up"] += 1
 
     def switch_tab(self, previous, allowed):
-        if self.foreground.casefold() not in allowed:
+        if self.foreground.casefold() not in allowed or not self.input_allowed():
             return False
         self.last_keys = ("CTRL", "SHIFT", "TAB") if previous else ("CTRL", "TAB")
         self.counts["tab"] += 1

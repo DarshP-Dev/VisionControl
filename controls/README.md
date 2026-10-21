@@ -1,5 +1,13 @@
 # Phase 3.6: Windows desktop controls
 
+Phase 3.7 latches pending cancellation before waiting on the frame lock, prepares
+absolute drag before DOWN, retries failed owned-input cleanup at most three times
+(100 ms spacing), and preserves relative subpixel targets. Existing mapping
+defaults, pinch/swipe rules and manual arming remain. See the [Phase 3.7 audit,
+limitations and staged acceptance plan](../PHASE_3_7.md); hardware acceptance is pending.
+Normal input is guarded again after backend preflight; owned-input release remains
+permitted while disarmed or canceled.
+
 Controls are **off by default**. `--controls` defaults to **simulation**; both
 simulation and live start **DISARMED**. Click/drag and tab shortcuts require
 separate flags. Recognition flags alone never send desktop input. Webcam accuracy,

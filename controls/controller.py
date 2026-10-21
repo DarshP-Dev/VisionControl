@@ -26,6 +26,11 @@ class DesktopController:
         strategy = AbsoluteCursor if settings.mapping == "absolute" else RelativeCursor
         self.cursor = strategy(settings, backend.screen)
         self.lock = threading.RLock()  # Only global emergency/watchdog runs outside the camera loop.
+        self._stop_lock = threading.Lock()  # Never held while waiting for the controller/backend.
+        self._stop_requested = threading.Event()
+        self._stop_requested.set()
+        self._pending_stops = 0
+        self._stop_generation = 0
         self.safety_ready = settings.mode == "simulate"
         self.armed = self.button_down = self.open_seen = False
         self.closed = self.faulted = False
@@ -35,6 +40,9 @@ class DesktopController:
         self.arm_after = None
         self.gesture, self.last_action, self.reason = "--", "No action", "Press A to arm"
         self._last_debug = -math.inf
+        self._cleanup_remaining = 0
+        self._cleanup_due = 0.
+        self.backend.input_allowed = self._input_allowed
 
     def arm(self):
         with self.lock:
@@ -45,7 +53,9 @@ class DesktopController:
                 self.reason = "Show selected hand with separated thumb/index before arming"
                 return False
             if self.armed:
-                return True
+                return self._input_allowed()
+            with self._stop_lock:
+                arming_generation = self._stop_generation
             try:
                 position = self.backend.cursor_position()
                 if self.backend.screen.clamp(*position) != tuple(position):
@@ -55,7 +65,13 @@ class DesktopController:
                 self.faulted = True
                 self.disarm("Cursor query failed; restart required")
                 return False
-            self.armed, self.open_seen = True, False
+            with self._stop_lock:
+                if (self._pending_stops or self._stop_generation != arming_generation
+                        or self.closed or self.faulted or not self.safety_ready):
+                    self.reason = "Disarm pending; arm again after cleanup"
+                    return False
+                self._stop_requested.clear()
+                self.armed, self.open_seen = True, False
             self.arm_after = self.last_stamp
             self.cursor.reset()
             self.reason = "Armed; open thumb/index to enable a fresh pinch"
@@ -69,37 +85,79 @@ class DesktopController:
             self.last_action = "LEFT_BUTTON_UP"
 
     def disarm(self, reason="Manual disarm"):
+        self._disarm(reason, safety_unavailable=False)
+
+    def _disarm(self, reason, safety_unavailable):
+        # Latch before waiting for a frame's lock. A slow cursor query must not
+        # be followed by a new DOWN/MOVE/shortcut after an emergency request.
+        with self._stop_lock:
+            self._pending_stops += 1
+            self._stop_generation += 1
+            self._stop_requested.set()
         with self.lock:
-            self.armed = self.open_seen = False
-            self.cursor.reset()
-            self.gesture, self.reason = "--", reason
             try:
+                if safety_unavailable:
+                    self.safety_ready = False
+                self.armed = self.open_seen = False
+                self.cursor.reset()
+                self.gesture, self.reason = "--", reason
+                errors = []
                 try:
                     self._release()
-                finally:
+                except Exception as exc:
+                    errors.append(exc)
+                try:
                     self.backend.close()  # Independently retry partial mouse/keyboard deliveries.
-            except Exception:
-                self.faulted = True
-                self.reason = "Input release failed; restart required"
-                LOGGER.exception("Cannot release owned input")
+                except Exception as exc:
+                    errors.append(exc)
+                    self._cleanup_remaining = 3
+                    self._cleanup_due = self.clock()+.1
+                else:
+                    if self.button_down:
+                        self.last_action = "LEFT_BUTTON_UP"
+                    self.button_down = False
+                    self._cleanup_remaining = 0
+                if errors:
+                    self.faulted = True
+                    self.reason = "Input release failed; restart required"
+                    LOGGER.error("Cannot release owned input: %s", errors[-1])
+            finally:
+                with self._stop_lock:
+                    self._pending_stops -= 1
 
     def safety_failure(self, reason):
-        with self.lock:
-            self.safety_ready = False
-            self.disarm(reason)
+        self._disarm(reason, safety_unavailable=True)
 
     def check_timeout(self):
+        # Do not wait for the frame lock before latching an overdue stop.
+        if self.armed and self.clock()-self.last_heartbeat > .5:
+            self.disarm("Capture/processing stalled (>500 ms); rearm manually")
         with self.lock:
-            if self.armed and self.clock()-self.last_heartbeat > .5:
-                self.disarm("Capture/processing stalled (>500 ms); rearm manually")
+            if self._cleanup_remaining and self.clock() >= self._cleanup_due:
+                self._cleanup_remaining -= 1
+                self._cleanup_due = self.clock()+.1
+                try:
+                    self.backend.close()
+                    if self.button_down:
+                        self.last_action = "LEFT_BUTTON_UP"
+                    self.button_down = False
+                    self._cleanup_remaining = 0
+                except Exception:
+                    if not self._cleanup_remaining:
+                        LOGGER.error("Owned input cleanup retries exhausted; physical release may be required")
+
+    def _input_allowed(self):
+        return (self.armed and not self._stop_requested.is_set() and self.safety_ready
+                and not self.closed and not self.faulted)
 
     def _unsafe(self, reason):
         self.last_good = None
         self.disarm(reason)
 
     def update(self, frame, features, pinches):
+        self.check_timeout()
         with self.lock:
-            if self.closed:
+            if self.closed or self.faulted:
                 return
             try:
                 self._update(frame, features, pinches)
@@ -151,7 +209,7 @@ class DesktopController:
             return
         self.last_good = now
         self.gesture = str(state.confirmed or state.candidate or "--")
-        if not self.armed:
+        if not self._input_allowed():
             return
         if self.arm_after is None or stamp <= self.arm_after:
             return
@@ -170,14 +228,22 @@ class DesktopController:
         start = any(e.gesture == PINCH and e.event_type == E.GESTURE_STARTED for e in events)
         if (self.settings.mouse and start and self.open_seen and state.confirmed == PINCH
                 and pinch.status == PinchStatus.STARTED and not self.button_down):
+            # Prepare the fallible position query/anchor while the button is UP.
+            if self.settings.mapping == "absolute":
+                current = self.backend.cursor_position()
+                if not self._input_allowed():
+                    return
+                self.cursor.begin_drag((point.x, point.y), item.image_size, current)
+            else:
+                self.cursor.reset()  # Curling to pinch must not jerk the cursor/object.
+            if not self._input_allowed():
+                return
             # Mark ownership before DOWN: a backend may partially deliver then raise.
             self.button_down = True
             self.backend.left_down()
+            if not self._input_allowed():
+                return
             self.last_action = "LEFT_BUTTON_DOWN"
-            if self.settings.mapping == "absolute":
-                self.cursor.begin_drag((point.x, point.y), item.image_size, self.backend.cursor_position())
-            else:
-                self.cursor.reset()  # Curling to pinch must not jerk the cursor/object.
         if opened:
             self.open_seen = True
         pinch_active = state.confirmed == PINCH or pinch.status in (PinchStatus.STARTED, PinchStatus.HELD)
@@ -188,7 +254,12 @@ class DesktopController:
                 self.reason = "Conflicting swipe events suppressed"
             else:
                 previous = swipes[0].gesture == SWIPE_LEFT
-                if self.backend.switch_tab(previous, self.settings.browsers):
+                if not self._input_allowed():
+                    return
+                sent = self.backend.switch_tab(previous, self.settings.browsers)
+                if not self._input_allowed():
+                    return
+                if sent:
                     self.last_action = "CTRL+SHIFT+TAB" if previous else "CTRL+TAB"
                     self.reason = "Confirmed swipe"
                 else:
@@ -199,10 +270,16 @@ class DesktopController:
         move = self.button_down or (state.confirmed == Gesture.POINTING and state.state == S.ACTIVE
                                   and state.candidate is None and not pinch_active and not swipes)
         if move:
-            target = self.cursor.update((point.x, point.y), item.image_size,
-                                        self.backend.cursor_position() if self.cursor.previous is None else (0, 0))
+            current = self.backend.cursor_position() if self.cursor.previous is None else (0, 0)
+            if not self._input_allowed():
+                return
+            target = self.cursor.update((point.x, point.y), item.image_size, current)
             if target is not None:
+                if not self._input_allowed():
+                    return
                 self.backend.move(*target)
+                if not self._input_allowed():
+                    return
                 self.last_action = f"Move ({target[0]}, {target[1]})"
             self.reason = "Dragging" if self.button_down else f"{self.settings.mapping.title()} pointing"
         else:

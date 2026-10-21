@@ -148,6 +148,7 @@ class WindowsBackend:
     is_live = True
 
     def __init__(self, monitor=0, *, api=None):
+        self.input_allowed = lambda: True
         self.api = api if api is not None else WindowsAPI()
         self.api.prepare_dpi()
         monitors = self.api.monitors()
@@ -168,11 +169,15 @@ class WindowsBackend:
         x, y = self.screen.clamp(x, y)
         dx = round((x-self.desktop.left)*65535/(self.desktop.width-1))
         dy = round((y-self.desktop.top)*65535/(self.desktop.height-1))
+        if not self.input_allowed():
+            return
         self.api.send([mouse(0xC001, dx, dy)])  # MOVE | ABSOLUTE | VIRTUALDESK
 
     def left_down(self):
         if self.api.user.GetAsyncKeyState(1) & 0x8000:
             raise OSError("Left button already held outside VisionControl; disarm before using physical mouse")
+        if not self.input_allowed():
+            return
         self.button_owned = True
         self.api.send([mouse(0x0002)])
 
@@ -190,6 +195,8 @@ class WindowsBackend:
         if any(self.api.user.GetAsyncKeyState(k) & 0x8000 for k in (0x10, 0x11, 0x12, 0x5B, 0x5C, 0x09)):
             return False
         if self.api.user.GetForegroundWindow() != window:
+            return False
+        if not self.input_allowed():
             return False
         self.keys_owned.update(keys)  # A partial batch must still have all possible key-ups attempted.
         try:

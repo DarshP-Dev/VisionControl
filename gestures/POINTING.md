@@ -1,5 +1,11 @@
 # Targeted POINTING reliability follow-up
 
+Phase 3.7 preserves the 145° index PIP calibration and relaxed distal curl
+handling. Complete valid geometry remains mandatory. Variable-timing tests verify
+immediate UNKNOWN cancellation; no UNKNOWN-to-POINTING grace period was added.
+Numerical parity tests cover the geometry optimization. Natural occlusion/flicker
+still needs webcam diagnosis; see [Phase 3.7 acceptance](../PHASE_3_7.md).
+
 This is the bounded recognition fix before Phase 3.7. Physical webcam validation
 is pending. No desktop-control behavior or state
 timing has been changed. Synthetic results below establish specific failure paths

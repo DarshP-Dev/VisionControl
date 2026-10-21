@@ -1,5 +1,11 @@
 # Phase 3.5: directional swipe recognition
 
+Phase 3.7 leaves thresholds, eligibility, cooldown and pose-change/stationary
+reset policy unchanged. Variable-timing tests and 200 complete synthetic swipe
+cycles verify one action per swipe, bounded histories and no opposite action on
+return before a neutral-pose reset. See [Phase 3.7 acceptance](../PHASE_3_7.md) for
+two-hand, loss/recovery and manual extended-use checks. Hardware acceptance is pending.
+
 Supported motions are **SWIPE_LEFT** (decreasing image x) and **SWIPE_RIGHT**
 (increasing image x) in the existing **unmirrored** preview. The direction is
 defined by the camera image, independently of which anatomical hand performs it.

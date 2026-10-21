@@ -1,5 +1,10 @@
 # Phase 3.5: Static, pinch and directional swipe recognition
 
+Phase 3.7 reuses validated arithmetic within geometry operations, with numerical
+and classifier parity tests across poses/aspects/rotations. Event contracts,
+POINTING calibration, pinch thresholds, UNKNOWN cancellation and swipe reset are
+unchanged. See the [reliability report](../PHASE_3_7.md) for timing/stress validation.
+
 Phase 3.6's separate [desktop action mapper](../controls/README.md) can optionally
 consume these existing events. This package remains independent of Windows input;
 recognition flags alone send no actions. Thresholds and event semantics are unchanged.

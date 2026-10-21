@@ -1,5 +1,144 @@
 # Recognition and controls performance
 
+## Phase 3.7: audit, matched synthetic measurements and webcam protocol
+
+Automated result: **445 passed** versus the **410-test baseline**: camera 16,
+gestures 154, hand_tracking 145, controls 130. The 35 new tests add 5000 mixed
+two-hand pinch frames (both mappings), 300 repeated loss/reacquisition cycles,
+200 swipe cycles, 3000 constant-offset drag updates, 10000 bounded profiling
+frames, seeded geometry/classifier parity, variable timing and fake-only failure
+coverage. Syntax compilation, dependency consistency, CLI validation and diff
+whitespace checks passed. Thirty direct documented tracker commands and six
+benchmark-matrix combinations were parsed without launching them; eleven new or
+existing PowerShell code blocks were syntax-parsed without execution.
+
+The clean baseline was commit `8bad723`, with **410 tests**. The
+[milestone report](../PHASE_3_7.md) details confirmed defects, safety invariants,
+staged live commands, stress tests and limitations. No hardware acceptance/FPS is
+claimed. Existing timing already covers camera read, inference resize/RGB, MP
+image preparation, inference, landmark EMA, shared features, static rules, pinch,
+swipes, state management, controller, preview resize/drawing/text, GUI and total
+processing/frame interval. CPU utilization uses process CPU time over monotonic
+wall time. Means, p50/p95/p99/max and bounded sample counts remain available.
+
+Per-hand-count attribution now contains **only stages recorded in that completed
+frame**. Multiple calls for one stage in a frame are summed for its per-frame
+workload sample; overall stage statistics remain per-call. Missing stages no longer
+reuse prior samples. This also retains the actual pollKey/waitKey stage when used.
+Warm-up history runs normally with timing collection disabled. No extra per-frame
+logging, image collection or filesystem writes are introduced.
+
+### Measured CPU optimization
+
+The geometry optimization replaces nested public distance/vector/magnitude calls
+with validated math.dist and reuses each converted vertex/validated angle edge.
+Scaled normalization, invalid inputs, finite/overflow checks and public APIs are
+preserved. Features are still extracted once and shared. Numerical/classifier
+parity tests cover aspect, scale, rotation, both hands and the calibrated rules.
+No inference quality, thresholds, smoothing defaults or safety check was removed.
+
+An initial separate before/after run showed large host-load variation, so the
+reported comparison instead used **interleaved matched pairs**, in one process.
+Original HEAD geometry/cursor/controller/simulation-backend/profile code was loaded in memory with
+`git show` (no checkout or Git writes). The updated code used the same fixture
+harness, same 0/1/2-hand workloads, same 120-frame pointing/open-palm travel/gradual
+return/pinch/release cycle and deterministic 33 ms observation timestamps.
+Each run had **120 warm-up + 180 measured frames**, **three repeats**; pair order
+reversed in repeat two. All timing used perf_counter. No camera, conversion,
+MediaPipe inference, GUI, Windows input or emergency thread was included.
+
+Below are medians of three run means, with min–max run-mean ranges in parentheses,
+**ms per two-hand synthetic iteration**, not physical latency or application FPS:
+
+| Workload | Before | After |
+| --- | ---: | ---: |
+| Static | 3.503 (3.077–4.269) | 2.134 (1.940–2.375) |
+| Static + pinch | 3.428 (3.419–4.407) | 2.629 (1.454–2.713) |
+| Full recognition + swipes | 3.719 (1.507–4.122) | 2.736 (1.020–2.827) |
+| Full + simulated relative | 3.830 (1.472–4.672) | 2.881 (.960–2.921) |
+| Full + simulated absolute | 4.046 (1.481–4.188) | 2.678 (.973–2.926) |
+
+Selected nested stages for two-hand simulated absolute, median of per-run
+statistics (not pooled percentiles), in ms:
+
+| Stage | Before mean / p50 / p95 / p99 | After mean / p50 / p95 / p99 |
+| --- | ---: | ---: |
+| Shared features | 2.9209 / 2.8988 / 3.8075 / 3.9615 | 1.6982 / 1.7890 / 2.1744 / 2.2995 |
+| Static rules | .1543 / .1704 / .1973 / .2800 | .1482 / .1730 / .1992 / .3106 |
+| Pinch | .2260 / .2548 / .2922 / .3677 | .2073 / .2508 / .2790 / .3757 |
+| Swipe portion | .1226 / .1004 / .2480 / .3450 | .1073 / .0955 / .2234 / .2892 |
+| State management (contains swipe) | .2460 / .2340 / .4120 / .5361 | .2161 / .2202 / .3671 / .4289 |
+| Controller | .0731 / .0674 / .1146 / .1590 | .0692 / .0686 / .1166 / .1448 |
+
+These show reduced geometry cost, not a speedup in every unchanged stage or the
+safety layer. Two-hand simulated-relative controller mean rose .0651 → .0680 ms,
+and zero-hand absolute controller mean .0037 → .0095 ms. Zero-hand full-loop
+mean medians were .0511 → .0669 ms (ranges .0148–.0516 / .0244–.0672 ms), where
+there is no geometry work to save. One-hand absolute full-loop medians were
+2.2653 → 1.5365 ms (ranges 2.1960–2.3997 / 1.5073–1.6460 ms).
+Cancellation gates/retry checks add small work; retain them. Host variability
+affects every result. Before/after virtual action counts matched (two-hand runs:
+113 MOVE, 2 tab, 2 DOWN, 2 UP, including warm-up). Reported original comparison
+JSON stays local/ignored at `hand_tracking/benchmarks/phase37_review_timings.json`.
+
+### Repeatable synthetic and real-camera measurements
+
+```powershell
+# OFFLINE only: 15 workload/hand-count combinations, three repetitions
+.\.venv\Scripts\python.exe -m hand_tracking.benchmark_synthetic --frames 400 --warmup 120 --repeats 3 --report hand_tracking/benchmarks/phase37_synthetic.json
+```
+
+The fixture tool always uses SimulationBackend. Virtual arming is only for that
+offline tool, never a live-mode bypass. Its JSON labels synthetic iteration
+throughput explicitly and records warm-up count, settings, stage mean/p50/p95/p99,
+max, CPU usage and virtual action totals (the latter include warm-up).
+
+For real webcam comparisons, use the same capture/inference/GUI settings in every
+run. Use at least three repeats; preserve early/late notes and report median plus
+range, not just the fastest run. Run sequentially, never with multiple camera
+handles. For each workload, perform separate scenes with **0, 1 and 2 visible
+hands**, maintaining the same motion script, lighting and hand distance. The
+recorded detected_hands_frames and timings_by_detected_hands show the actual
+observations; do not label a run purely two-hand if many frames had fewer hands.
+
+This PowerShell block is an **owner-run hardware procedure**, not executed during
+implementation. All control benchmarks below are simulation, start DISARMED and
+require A after a selected hand appears. Do not arm the zero-hand scene. Note
+armed versus disarmed runs. Pick a new $runTag before repeating to protect reports.
+
+```powershell
+$runTag = "phase37-normal-light"
+$scene = "two-hands"  # Repeat separately with "no-hands" and "one-hand" scenes
+$commonArgs = @("--backend", "msmf", "--width", "1920", "--height", "1080", "--fps", "60", "--inference-resolution", "full", "--gui-mode", "auto", "--benchmark", "--warmup", "5", "--duration", "30")
+$cases = @(
+    @{ Name="tracking"; Flags=@() },
+    @{ Name="static"; Flags=@("--gestures") },
+    @{ Name="pinch"; Flags=@("--gestures", "--pinch") },
+    @{ Name="swipes"; Flags=@("--gestures", "--pinch", "--gesture-states", "--swipes") },
+    @{ Name="relative"; Flags=@("--gestures", "--pinch", "--gesture-states", "--swipes", "--controls", "--control-mode", "simulate", "--control-mapping", "relative", "--control-invert-x", "--control-mouse", "--control-tabs") },
+    @{ Name="absolute"; Flags=@("--gestures", "--pinch", "--gesture-states", "--swipes", "--controls", "--control-mode", "simulate", "--control-mapping", "absolute", "--control-region-width", ".80", "--control-region-height", ".80", "--control-mouse", "--control-tabs") }
+)
+foreach ($repeat in 1..3) {
+    foreach ($case in $cases) {
+        $caseArgs = $case.Flags
+        $reportPath = "hand_tracking/benchmarks/$runTag-$scene-$($case.Name)-$repeat.json"
+        .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker @commonArgs @caseArgs --report $reportPath
+        if ($LASTEXITCODE -ne 0) { throw "Benchmark failed: $reportPath" }
+    }
+}
+
+# Separate optional HEADLESS recognition comparison; no GUI or controls
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --gestures --pinch --gesture-states --swipes --headless --benchmark --warmup 5 --duration 30 --report hand_tracking/benchmarks/phase37_headless.json
+```
+
+Do not compare headless FPS directly with preview FPS or synthetic throughput.
+Do not compare mismatched inference sizes, hand counts, lighting or control modes.
+Reports contain CPU-stage timing and host read-to-GUI completion, not exposure,
+buffer age, physical display/input response or a camera-to-cursor latency claim.
+Frame-interval p95/p99/max identify consistency/stalls; actual webcam responsiveness
+and the 35 FPS target remain unverified. See the milestone's 15-minute acceptance
+procedure for jitter, click/drag, safety, tab navigation and late-run deterioration.
+
 ## Phase 3.6 controller overhead
 
 Opt-in controls reuse the current shared features, smoothed landmarks and

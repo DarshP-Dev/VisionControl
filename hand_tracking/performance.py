@@ -87,21 +87,25 @@ class WorkloadProfile(Profile):
     def __init__(self, enabled=True, capacity=8192):
         super().__init__(enabled, capacity)
         self.by_hands = {}
+        self._frame_stages = {}
+
+    def add(self, name, seconds):
+        super().add(name, seconds)
+        if self.enabled:
+            self._frame_stages[name] = self._frame_stages.get(name, 0.) + seconds
 
     def finish_frame(self, hand_count):
         if not self.enabled:
+            self._frame_stages.clear()
             return
+        if isinstance(hand_count, bool) or hand_count not in (0, 1, 2):
+            raise ValueError("Workload hand count must be 0, 1 or 2")
         if hand_count not in self.by_hands:
             self.by_hands[hand_count] = Profile(capacity=self.capacity)
         group = self.by_hands[hand_count]
-        for name in ("camera_read", "inference_resize", "bgr_to_rgb", "mediapipe_image",
-                     "inference", "smoothing", "gesture_features", "gesture_classification",
-                     "gesture_total", "pinch_features", "pinch_processing", "state_management", "swipe_processing", "controller_processing",
-                     "preview_resize", "landmark_drawing",
-                     "text_overlay", "imshow", "gui_events", "gui_total",
-                     "processing", "end_to_end", "frame_interval"):
-            if name in self.stages:
-                group.add(name, self.stages[name]["samples"][-1])
+        for name, seconds in self._frame_stages.items():
+            group.add(name, seconds)
+        self._frame_stages.clear()
 
     def workload_summary(self):
         return {str(count): profile.summary() for count, profile in self.by_hands.items()}

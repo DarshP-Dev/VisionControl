@@ -43,7 +43,11 @@ def magnitude(vector: Sequence[float]) -> float:
 
 def normalize(vector: Sequence[float]) -> Vector:
     """Return a unit vector; zero length has no direction and raises ValueError."""
-    values = _vector(vector)
+    return _normalize_values(_vector(vector))
+
+
+def _normalize_values(values: Vector) -> Vector:
+    """Internal path for already validated finite vectors; keep scaled arithmetic."""
     scale = max(abs(value) for value in values)
     if scale == 0:
         raise ValueError("Cannot normalize a zero-length vector")
@@ -64,7 +68,8 @@ def dot(first: Sequence[float], second: Sequence[float]) -> float:
 
 
 def distance_2d(first: Landmark, second: Landmark, *, image_size: ImageSize | None = None) -> float:
-    return magnitude(vector_between(first, second, image_size=image_size))
+    a, b = _coordinates(first, 2, image_size), _coordinates(second, 2, image_size)
+    return finite_number(math.dist(a, b), "Vector magnitude")
 
 
 def distance_3d(first: Landmark, second: Landmark, *, image_size: ImageSize | None = None) -> float:
@@ -80,11 +85,15 @@ def landmark_distance(hand: HandObservation, first: LandmarkIndex | int, second:
 def angle_degrees(first: Landmark, vertex: Landmark, last: Landmark, *, dimensions: Dimensions = 2,
                   image_size: ImageSize | None = None) -> float | None:
     """Interior angle at vertex in [0, 180]; None if either edge has zero length."""
-    a = vector_between(vertex, first, dimensions=dimensions, image_size=image_size)
-    b = vector_between(vertex, last, dimensions=dimensions, image_size=image_size)
-    if magnitude(a) == 0 or magnitude(b) == 0:
+    # Convert the shared vertex once. Edges are validated once, then reused by
+    # magnitude/normalization/dot arithmetic without repeating public API guards.
+    origin = _coordinates(vertex, dimensions, image_size)
+    ends = (_coordinates(first, dimensions, image_size), _coordinates(last, dimensions, image_size))
+    a, b = (_vector(tuple(value-base for value, base in zip(end, origin))) for end in ends)
+    if (finite_number(math.hypot(*a), "Vector magnitude") == 0
+            or finite_number(math.hypot(*b), "Vector magnitude") == 0):
         return None
-    cosine = dot(normalize(a), normalize(b))
+    cosine = finite_number(math.fsum(x*y for x, y in zip(_normalize_values(a), _normalize_values(b))), "Dot product")
     return math.degrees(math.acos(max(-1.0, min(1.0, cosine))))
 
 
