@@ -10,6 +10,9 @@ from gestures.models import HandSide
 def add_arguments(parser):
     parser.add_argument("--controls", action="store_true", help="opt-in desktop mapper; starts DISARMED")
     parser.add_argument("--control-mode", choices=("simulate", "live"), default="simulate")
+    parser.add_argument("--control-gesture-profile", choices=("legacy", "palm-cursor"), default="legacy")
+    parser.add_argument("--control-cursor-resume", choices=("automatic", "left-pinch"), default="automatic",
+                        help="palm-cursor resume; left-pinch requires --control-gesture-rearm")
     parser.add_argument("--control-emergency-hotkey", default=DEFAULT_EMERGENCY_HOTKEY,
                         help="live global stop: ctrl+alt+esc (default) or ctrl+shift+f9/f10/f11; case-insensitive")
     parser.add_argument("--control-mapping", choices=("relative", "absolute"), default="relative")
@@ -58,7 +61,8 @@ def settings(args):
                            mapping=args.control_mapping, region_width=args.control_region_width,
                            region_height=args.control_region_height, emergency_hotkey=args.control_emergency_hotkey,
                            gesture_rearm=args.control_gesture_rearm, rearm_hold_ms=args.control_rearm_hold_ms,
-                           rearm_stable_ms=args.control_rearm_stable_ms, rearm_debug=args.control_rearm_debug)
+                           rearm_stable_ms=args.control_rearm_stable_ms, rearm_debug=args.control_rearm_debug,
+                           gesture_profile=args.control_gesture_profile, cursor_resume=args.control_cursor_resume)
 
 
 def validate(parser, args):
@@ -68,6 +72,13 @@ def validate(parser, args):
         simulation_screen(args)
     except ValueError as exc:
         parser.error(str(exc))
+    if not args.controls and (args.control_gesture_profile != "legacy" or args.control_cursor_resume != "automatic"):
+        parser.error("Control profile/resume options require --controls")
+    if args.controls:
+        if configured.gesture_profile == "palm-cursor" and args.swipe_pose != "pointing":
+            parser.error("Palm cursor requires POINTING swipe eligibility; omit --swipe-pose or use pointing")
+        if configured.gesture_profile == "legacy" and args.swipe_pose == "pointing":
+            parser.error("POINTING swipes with controls require --control-gesture-profile palm-cursor")
     if args.control_gesture_rearm and not args.controls:
         parser.error("--control-gesture-rearm requires --controls --gestures --pinch --gesture-states")
     if not args.control_gesture_rearm and (args.control_rearm_debug or args.control_rearm_hold_ms != 800

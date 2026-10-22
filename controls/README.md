@@ -1,5 +1,11 @@
 # Phase 3.6: Windows desktop controls
 
+Phase 3.7 also provides an opt-in [palm cursor profile and selectable resume
+modes](PROFILES.md): OPEN_PALM/palm-center cursor, POINTING swipes, automatic or
+deliberate Left pinch cursor resume. Legacy POINTING/index-tip controls remain
+the default. See the linked guide for exact simulation/live commands, safety
+semantics, automated results and the pending hardware acceptance checklist.
+
 Phase 3.7 adds opt-in [Left-hand pinch rearming](REARMING.md) after routine
 tracking loss. Initial A is required; D/emergency/watchdog/fault stops cannot be
 gesture-rearmed. The Right hand remains the desktop controller. Existing commands

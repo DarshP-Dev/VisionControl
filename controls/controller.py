@@ -9,10 +9,11 @@ from gestures.association import reliable_side, hands_overlap
 from gestures.events import PINCH, SWIPES, SWIPE_LEFT, EventType as E, GestureState as S
 from gestures.models import HandSide
 from gestures.pinch import PinchStatus
-from gestures.static_gestures import Gesture
 
 from .cursor import AbsoluteCursor, RelativeCursor
 from .models import ControlSettings, ControlStatus
+from .profiles import PROFILES
+from .interaction import PalmInteraction
 from .rearm import INVALID_ASSOCIATION_REASONS, LeftPinchRearm
 
 
@@ -26,6 +27,8 @@ class DesktopController:
         self.backend, self.settings, self.clock = backend, settings, clock
         strategy = AbsoluteCursor if settings.mapping == "absolute" else RelativeCursor
         self.cursor = strategy(settings, backend.screen)
+        self.profile = PROFILES[settings.gesture_profile]
+        self.interaction = PalmInteraction(settings, backend.screen) if self.profile.palm_anchor else None
         self.lock = threading.RLock()  # Only global emergency/watchdog runs outside the camera loop.
         self._stop_lock = threading.Lock()  # Never held while waiting for the controller/backend.
         self._stop_requested = threading.Event()
@@ -51,7 +54,29 @@ class DesktopController:
 
     def arm(self):
         """Explicit keyboard recovery. Gesture requests use the same checked path."""
+        with self.lock:
+            if self.armed and self.interaction is not None and self.interaction.paused:
+                with self._stop_lock:
+                    generation = self._stop_generation
+                return self._resume_cursor(generation)
         return self._arm()
+
+    def _resume_cursor(self, generation):
+        """Controller-authorized resume only; never change ARMED or dispatch input."""
+        with self._stop_lock:
+            if (not self._input_allowed() or self._hard_stopped or self._pending_stops
+                    or generation != self._stop_generation or self.button_down or self._cleanup_remaining):
+                return False  # Preserve the newer safety-stop reason as well as its latch.
+            if (self.interaction is None or not self.interaction.paused or not self.interaction.ready
+                    or self.last_good is None or self.clock() - self.last_good > .25):
+                self.reason = "Cursor resume blocked; show stable OPEN_PALM with safe association"
+                return False
+            self.interaction.resume()
+            self.cursor.reset()
+            if self.rearm is not None:
+                self.rearm.reset("CURSOR RESUMED")
+            self.reason = "Cursor resumed; awaiting fresh anchor"
+            return True
 
     def _can_gesture_rearm(self):
         return (self.settings.gesture_rearm and self._manual_armed_once and self._routine_rearm
@@ -98,6 +123,8 @@ class DesktopController:
                     self._manual_armed_once = True
             self.arm_after = self.last_stamp
             self.cursor.reset()
+            if self.interaction is not None:
+                self.interaction.reset()
             if self.rearm is not None:
                 self.rearm.reset()
             self.reason = "Armed; open thumb/index to enable a fresh pinch"
@@ -133,6 +160,8 @@ class DesktopController:
                     self.safety_ready = False
                 self.armed = self.open_seen = False
                 self.cursor.reset()
+                if self.interaction is not None:
+                    self.interaction.reset()
                 self.gesture, self.reason = "--", reason
                 if self.rearm is not None:
                     self.rearm.reset()
@@ -243,9 +272,10 @@ class DesktopController:
         if pinch.status == PinchStatus.UNAVAILABLE:
             self._unsafe("Selected pinch unavailable; rearm manually", routine=True)
             return
-        point = item.observation[8]
-        if not all(math.isfinite(v) and 0 <= v <= 1 for v in (point.x, point.y)):
-            self._unsafe("Invalid index fingertip; rearm manually")
+        try:
+            point = self.profile.anchor(item, stamp)
+        except (ValueError, TypeError, AttributeError, IndexError):
+            self._unsafe("Invalid cursor anchor; rearm manually")
             return
         # Cancellations of static poses for pinch/swipe precedence are normal arbitration.
         events = tuple(e for e in frame.events if e.side == self.settings.hand)
@@ -276,6 +306,23 @@ class DesktopController:
         # Only events produced now are actionable. A repeated frame is rejected above.
         events = tuple(e for e in events if e.timestamp_ms == stamp and e.metadata.association_current)
         opened = pinch.status in (PinchStatus.OPEN, PinchStatus.RELEASED)
+        profile_move = False
+        if self.interaction is not None:
+            motion = frame.motion[index] if len(frame.motion) == len(features) else None
+            admitted_pinch = (state.confirmed == PINCH and state.state == S.ACTIVE
+                              and pinch.status in (PinchStatus.STARTED, PinchStatus.HELD))
+            profile_move = self.interaction.observe(state, motion, admitted_pinch, stamp)
+            if self.interaction.paused and self.interaction.manual:
+                # The same validator handles rearm while DISARMED above, or cursor
+                # resume here while ARMED. One frame can never request both.
+                before = time.perf_counter()
+                with self._stop_lock:
+                    generation = self._stop_generation
+                if self.rearm.update(frame, features, pinches):
+                    self._resume_cursor(generation)
+                    self.last_rearm_seconds = time.perf_counter() - before
+                    return  # No input on a command-confirmation frame, even on refusal.
+                self.last_rearm_seconds = time.perf_counter() - before
         was_dragging = self.button_down
         if self.button_down:
             ended = any(e.gesture == PINCH and e.event_type == E.GESTURE_ENDED for e in events)
@@ -287,13 +334,14 @@ class DesktopController:
                 return
         start = any(e.gesture == PINCH and e.event_type == E.GESTURE_STARTED for e in events)
         if (self.settings.mouse and start and self.open_seen and state.confirmed == PINCH
-                and pinch.status == PinchStatus.STARTED and not self.button_down):
+                and pinch.status == PinchStatus.STARTED and not self.button_down
+                and (self.interaction is None or profile_move)):
             # Prepare the fallible position query/anchor while the button is UP.
             if self.settings.mapping == "absolute":
                 current = self.backend.cursor_position()
                 if not self._input_allowed():
                     return
-                self.cursor.begin_drag((point.x, point.y), item.image_size, current)
+                self.cursor.begin_drag(point, item.image_size, current)
             else:
                 self.cursor.reset()  # Curling to pinch must not jerk the cursor/object.
             if not self._input_allowed():
@@ -327,13 +375,25 @@ class DesktopController:
             self.cursor.reset()
         elif swipes:
             self.reason = "Tab actions disabled" if not self.settings.tabs else "Tab suppressed during pinch/drag"
-        move = self.button_down or (state.confirmed == Gesture.POINTING and state.state == S.ACTIVE
-                                  and state.candidate is None and not pinch_active and not swipes)
+        move = self.button_down or (profile_move and not swipes if self.interaction is not None else
+                                   state.confirmed == self.profile.cursor_gesture and state.state == S.ACTIVE
+                                   and state.candidate is None and not pinch_active and not swipes)
         if move:
-            current = self.backend.cursor_position() if self.cursor.previous is None else (0, 0)
+            acquiring = self.cursor.previous is None
+            current = self.backend.cursor_position() if acquiring else (0, 0)
             if not self._input_allowed():
                 return
-            target = self.cursor.update((point.x, point.y), item.image_size, current)
+            target = self.cursor.update(point, item.image_size, current)
+            if self.interaction is not None:
+                if acquiring:
+                    self.interaction.acquired(current, stamp, self.settings.mapping == "absolute")
+                elif self.button_down:
+                    # Drag offset already anchors the current cursor. Never retain
+                    # an unrelated pre-pinch reacquisition blend while dragging.
+                    self.interaction.blend_position = self.interaction.blend_stamp = None
+                    self.interaction.label = "ACTIVE - DRAGGING"
+                elif target is not None:
+                    target = self.interaction.bound_target(target, stamp)
             if target is not None:
                 if not self._input_allowed():
                     return
@@ -341,7 +401,8 @@ class DesktopController:
                 if not self._input_allowed():
                     return
                 self.last_action = f"Move ({target[0]}, {target[1]})"
-            self.reason = "Dragging" if self.button_down else f"{self.settings.mapping.title()} pointing"
+            self.reason = ("Dragging" if self.button_down else
+                           f"{self.settings.mapping.title()} {'palm cursor' if self.interaction is not None else 'pointing'}")
         else:
             self.cursor.reset()
             if not swipes:
@@ -362,10 +423,14 @@ class DesktopController:
                                     "GESTURE REARM BLOCKED - MANUAL ARM REQUIRED")
                 elif self.rearm.rearmed_until is not None and (self.last_stamp or 0) <= self.rearm.rearmed_until:
                     rearm_status = "REARMED"
+                elif self.interaction is not None and self.interaction.paused and self.interaction.manual:
+                    rearm_status = self.rearm.feedback.replace("REARM", "RESUME")
             return ControlStatus(self.settings.mode, self.armed, self.settings.hand.value,
                                  self.gesture, self.button_down, self.last_action, self.reason,
                                  self.settings.mapping, getattr(self.cursor, "region", None),
-                                 self.settings.emergency_hotkey, rearm_status)
+                                 self.settings.emergency_hotkey, rearm_status, self.profile.name,
+                                 ("STOPPED - SYSTEM DISARMED" if not self.armed else self.interaction.label)
+                                 if self.interaction is not None else "")
 
     def close(self):
         with self.lock:

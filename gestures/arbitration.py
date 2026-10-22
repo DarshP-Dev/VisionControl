@@ -5,6 +5,11 @@ from .pinch import PinchResult, PinchStatus
 from .static_gestures import Gesture, GestureResult
 
 
+SWIPE_POSES = {"open-palm": (Gesture.OPEN_PALM,),
+               "open-palm-or-fist": (Gesture.OPEN_PALM, Gesture.FIST),
+               "pointing": (Gesture.POINTING,)}
+
+
 def resolved_input(static: GestureResult | None, pinch: PinchResult | None) -> GestureId | None:
     """UNAVAILABLE/orphan HELD suppress static intents; UNKNOWN never qualifies.
 
@@ -31,7 +36,7 @@ def swipe_eligible(static: GestureResult | None, pinch: PinchResult | None, pose
     selected = resolved_input(static, pinch)
     return (pinch is not None and pinch.measurement.valid
             and pinch.status in (PinchStatus.OPEN, PinchStatus.RELEASED)
-            and selected in ((Gesture.OPEN_PALM,) if pose == "open-palm" else (Gesture.OPEN_PALM, Gesture.FIST)))
+            and selected in SWIPE_POSES.get(pose, ()))
 
 
 def opposing_swipes(observations, recent=()) -> bool:

@@ -1,6 +1,11 @@
 # Phase 3.5: directional swipe recognition
 
-Phase 3.7 leaves thresholds, eligibility, cooldown and pose-change/stationary
+The optional Phase 3.7 [palm cursor profile](../controls/PROFILES.md) selects
+POINTING eligibility through the existing recognizer; trajectories still use
+the palm center. Legacy eligibility remains OPEN_PALM. Raw static classes and
+all motion thresholds are unchanged; UNKNOWN remains ineligible.
+
+The Phase 3.7 reliability audit leaves legacy thresholds, eligibility, cooldown and pose-change/stationary
 reset policy unchanged. Variable-timing tests and 200 complete synthetic swipe
 cycles verify one action per swipe, bounded histories and no opposite action on
 return before a neutral-pose reset. See [Phase 3.7 acceptance](../PHASE_3_7.md) for

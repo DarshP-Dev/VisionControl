@@ -1,5 +1,11 @@
 # Hand tracking with optional gesture recognition, states and events
 
+Optional desktop interaction profiles are documented in
+[controls/PROFILES.md](../controls/PROFILES.md). The default remains legacy
+POINTING/index-tip cursor; `--control-gesture-profile palm-cursor` selects an
+OPEN_PALM/palm-center cursor and POINTING swipes, with automatic or Left pinch
+cursor resume. Raw recognition and tracking defaults are unchanged.
+
 Optional [Left-hand pinch rearming](../controls/REARMING.md):
 `--control-gesture-rearm --control-rearm-hold-ms 800` with Right desktop control.
 Both hands must remain confidently associated during a completed held pinch;

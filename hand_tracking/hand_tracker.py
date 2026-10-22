@@ -14,6 +14,7 @@ import time
 import cv2
 
 from controls import cli as control_cli
+from controls.profiles import PROFILES
 from gestures.models import ImageSize
 from gestures.pinch import PinchThresholds, PinchTracker
 from gestures.state_machine import GestureStateManager, StateSettings
@@ -128,7 +129,7 @@ def parse_args(argv=None):
     parser.add_argument("--swipe-reset-ms", type=nonnegative_int, default=250, help="eligible stationary hold before arming")
     parser.add_argument("--swipe-feedback-ms", type=nonnegative_int, default=350, help="short confirmation feedback duration")
     parser.add_argument("--swipe-max-scale-change", type=positive_float, default=.25)
-    parser.add_argument("--swipe-pose", choices=("open-palm", "open-palm-or-fist"), default="open-palm")
+    parser.add_argument("--swipe-pose", choices=("open-palm", "open-palm-or-fist", "pointing"), default=None)
     control_cli.add_arguments(parser)
     args = parser.parse_args(argv)
     if args.headless and not args.benchmark:
@@ -147,6 +148,8 @@ def parse_args(argv=None):
         parser.error("--gesture-states requires --gestures and/or --pinch")
     if args.gesture_event_debug and not args.gesture_states:
         parser.error("--gesture-event-debug requires --gesture-states")
+    if args.swipe_pose is None:
+        args.swipe_pose = PROFILES[args.control_gesture_profile].swipe_pose
     try:
         state_settings(args)
         swipe_settings(args)

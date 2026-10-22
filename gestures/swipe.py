@@ -41,8 +41,8 @@ class SwipeSettings:
                 raise ValueError(f"{name} must be an integer in [{low}, {high}] ms")
         if self.min_ms >= self.max_ms:
             raise ValueError("Swipe minimum duration must be less than maximum duration")
-        if self.pose not in ("open-palm", "open-palm-or-fist"):
-            raise ValueError("Swipe pose must be open-palm or open-palm-or-fist")
+        if self.pose not in ("open-palm", "open-palm-or-fist", "pointing"):
+            raise ValueError("Swipe pose must be open-palm, open-palm-or-fist or pointing")
 
 
 @dataclass(frozen=True, slots=True)

@@ -7,6 +7,7 @@ from typing import Callable, Protocol
 from gestures.models import HandSide
 from .region import ActiveRegion
 from .hotkeys import DEFAULT_EMERGENCY_HOTKEY, display_hotkey, normalize_hotkey
+from .profiles import PROFILES
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,8 +50,16 @@ class ControlSettings:
     rearm_hold_ms: int = 800
     rearm_stable_ms: int = 300
     rearm_debug: bool = False
+    gesture_profile: str = "legacy"
+    cursor_resume: str = "automatic"
 
     def __post_init__(self):
+        if self.gesture_profile not in PROFILES or self.cursor_resume not in ("automatic", "left-pinch"):
+            raise ValueError("Invalid control gesture profile or cursor resume mode")
+        if self.gesture_profile == "palm-cursor" and self.hand != HandSide.RIGHT:
+            raise ValueError("Palm cursor requires --control-hand right")
+        if self.cursor_resume == "left-pinch" and (self.gesture_profile != "palm-cursor" or not self.gesture_rearm):
+            raise ValueError("Left-pinch cursor resume requires palm-cursor and --control-gesture-rearm")
         object.__setattr__(self, "emergency_hotkey", normalize_hotkey(self.emergency_hotkey))
         if not isinstance(self.gesture_rearm, bool) or not isinstance(self.rearm_debug, bool):
             raise ValueError("Gesture rearm/debug settings must be booleans")
@@ -108,10 +117,13 @@ class ControlStatus:
     region: ActiveRegion | None = None
     emergency_hotkey: str = DEFAULT_EMERGENCY_HOTKEY
     rearm_status: str = ""
+    profile: str = "legacy"
+    cursor_state: str = ""
 
     def lines(self):
         return (f"{self.mode.upper()} | {self.mapping.upper()} | {'ARMED' if self.armed else 'DISARMED'} | {self.hand} | "
                 f"{self.gesture} | LEFT {'DOWN' if self.button_down else 'UP'} | A: Arm D: Disarm",
-                f"Last: {self.last_action} | {self.reason}" +
+                f"Last: {self.last_action} | {self.reason}" + (" | PROFILE: LEGACY" if self.profile == "legacy" else "") +
                 (f" | STOP: {display_hotkey(self.emergency_hotkey)}" if self.mode == "live" else "")) + \
-               ((self.rearm_status,) if self.rearm_status else ())
+               ((f"PROFILE: PALM CURSOR | CURSOR: {self.cursor_state}",) if self.profile == "palm-cursor"
+                else ()) + ((self.rearm_status,) if self.rearm_status else ())
