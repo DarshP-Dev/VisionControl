@@ -244,6 +244,10 @@ class DesktopController:
             self._unsafe("Invalid timestamp/tracking gap; rearm manually")
             return
         self.last_stamp = stamp
+        if (any(state.track_id is not None for state in frame.hands)
+                or any(event.track_id is not None for event in frame.events)):
+            self._unsafe("Track-ID observation is not authorized for desktop controls; rearm manually")
+            return
         if len(features) != len(frame.hands) or len(pinches) != len(features) or len(features) > 2:
             self._unsafe("Invalid control channels; rearm manually")
             return

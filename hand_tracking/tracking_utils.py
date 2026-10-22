@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 MAX_HANDS = 2
 HAND_COLORS = {"Left": (80, 220, 80), "Right": (255, 160, 60), "Unknown": (180, 180, 180)}
 ALTERNATE_COLOR = (200, 80, 220)
+TRACK_COLORS = ((80, 220, 80), (255, 160, 60), (230, 100, 230), (0, 220, 255))
 ONE_HAND_REFERENCE_FPS = 35.81
 PERFORMANCE_DROP_RATIO = 0.75
 PINCH_COLORS = {"OPEN": (180, 180, 180), "STARTED": (0, 255, 255),
@@ -93,6 +94,8 @@ class HandOverlay:
     pinch: "PinchResult | None" = None
     stabilized: "HandState | None" = None
     motion: "SwipeObservation | None" = None
+    association: object | None = None
+    handedness_score: float | None = None
 
 
 def handedness_label(categories):
@@ -111,12 +114,13 @@ def handedness_label(categories):
     return name if name in ("Left", "Right") else "Unknown"
 
 
-def hand_overlays(result, width, height, gesture_results=None, pinch_results=None, gesture_states=None, swipe_results=None):
+def hand_overlays(result, width, height, gesture_results=None, pinch_results=None, gesture_states=None, swipe_results=None,
+                  *, max_hands=2, track_associations=None):
     """Pair landmarks and handedness within this result only; retain no track IDs."""
     overlays = []
     handedness = getattr(result, "handedness", None) or []
     used_colors = set()
-    for index, landmarks in enumerate((getattr(result, "hand_landmarks", None) or [])[:MAX_HANDS]):
+    for index, landmarks in enumerate((getattr(result, "hand_landmarks", None) or [])[:max_hands]):
         if not landmarks or len(landmarks) != 21:
             continue
         try:
@@ -137,7 +141,15 @@ def hand_overlays(result, width, height, gesture_results=None, pinch_results=Non
         pinch = pinch_results[index] if pinch_results is not None and index < len(pinch_results) else None
         stabilized = gesture_states[index] if gesture_states is not None and index < len(gesture_states) else None
         motion = swipe_results[index] if swipe_results is not None and index < len(swipe_results) else None
-        overlays.append(HandOverlay(label, color, points, gesture, pinch, stabilized, motion))
+        association = (track_associations[index] if track_associations is not None
+                       and index < len(track_associations) else None)
+        score = None
+        if association is not None:
+            score = max((p.score for p in (categories or ()) if isinstance(getattr(p, "score", None), (int, float))
+                         and not isinstance(p.score, bool) and math.isfinite(p.score) and 0 <= p.score <= 1), default=None)
+            color = (TRACK_COLORS[(association.track_id - 1) % 4] if association.track_id is not None
+                     else HAND_COLORS["Unknown"])
+        overlays.append(HandOverlay(label, color, points, gesture, pinch, stabilized, motion, association, score))
     return overlays
 
 
@@ -151,7 +163,7 @@ def _label_layout(preview, text, font_scale, anchor, bounds=None):
 
 
 def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None, swipe_config=None, capture_aspect=1.,
-              annotation_bounds=None):
+              annotation_bounds=None, annotation_y_bounds=None):
     """Shared drawing path for either hand, with a label close to its wrist."""
     for start, end in HAND_CONNECTIONS:
         cv2.line(preview, hand.points[start], hand.points[end], hand.color, 2, cv2.LINE_AA)
@@ -159,6 +171,11 @@ def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None, swipe_config=
         cv2.circle(preview, point, 4, (0, 0, 0), -1, cv2.LINE_AA)
         cv2.circle(preview, point, 3, hand.color, -1, cv2.LINE_AA)
     text = f"{hand.label} - {hand.gesture}" if hand.gesture is not None else f"{hand.label} hand"
+    if hand.association is not None:
+        association = hand.association
+        score = f" {hand.handedness_score:.0%}" if hand.handedness_score is not None else ""
+        text = (f"TRACK {association.track_id or '?'} | {hand.label}{score} | {hand.gesture or '--'}"
+                + (" | UNCERTAIN" if not association.certain else " | associated"))
     if hand.pinch is not None:
         status = hand.pinch.status.value
         text += f" | Pinch: {status}"
@@ -173,6 +190,10 @@ def draw_hand(preview, hand, top_margin=27, pinch_thresholds=None, swipe_config=
     motion_rows = 23 * (1 + (2 if swipe_config is not None else 0)) if hand.motion is not None else 0
     y = max(top_margin + height + 4,
             min(hand.points[0][1] + 22, preview.shape[0] - baseline - 5 - diagnostic_row - state_row - motion_rows))
+    if annotation_y_bounds is not None:
+        first, last = annotation_y_bounds
+        y = max(first + height + 4,
+                min(y, last - baseline - 5 - diagnostic_row - state_row - motion_rows))
     cv2.rectangle(preview, (x - 3, y - height - 3), (x + width + 3, y + baseline + 3),
                   (0, 0, 0), -1)
     cv2.putText(preview, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX,
@@ -252,7 +273,8 @@ class PreviewRenderer:
 
 def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw_result=None,
                  gesture_results=None, pinch_results=None, pinch_thresholds=None, gesture_states=None,
-                 swipe_results=None, swipe_config=None, control_status=None):
+                 swipe_results=None, swipe_config=None, control_status=None,
+                 *, max_hands=2, track_associations=None):
     start = time.perf_counter()
     height, width = frame.shape[:2]
     scale = min(1100 / width, 650 / height, 1.0)
@@ -264,20 +286,35 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
     if control_status is not None and control_status.mapping == "absolute" and control_status.region is not None:
         first, last = control_status.region.preview_bounds(preview.shape[1], preview.shape[0])
         cv2.rectangle(preview, first, last, (0, 220, 255), 1, cv2.LINE_AA)
-    hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results, pinch_results, gesture_states, swipe_results)
+    hands = hand_overlays(result, preview.shape[1], preview.shape[0], gesture_results, pinch_results, gesture_states, swipe_results,
+                          max_hands=max_hands, track_associations=track_associations)
     control_lines = control_status.lines() if control_status is not None else ()
     # Screen columns are UI placement only, never tracking identities.
     columns = ({id(hand): i for i,hand in enumerate(sorted(hands,key=lambda h:h.points[0][0]))}
                if swipe_results is not None and len(hands)==2 and preview.shape[1]>=400 else {})
+    track_bands = {}
+    if track_associations is not None:
+        for column in (0, 1):
+            group = sorted((h for h in hands if (h.points[0][0] >= preview.shape[1] // 2) == bool(column)),
+                           key=lambda h: (h.points[0][1], h.points[0][0]))
+            top = 54 if show_help else 27
+            for rank, hand in enumerate(group):
+                track_bands[id(hand)] = ((column * preview.shape[1] // 2 + 4, (column + 1) * preview.shape[1] // 2 - 6),
+                                         (top + rank * (preview.shape[0] - top) // len(group),
+                                          top + (rank + 1) * (preview.shape[0] - top) // len(group)))
     for hand in hands:
         bounds = None
         if columns:
             column = columns[id(hand)]
             bounds = (column*preview.shape[1]//2+4,(column+1)*preview.shape[1]//2-6)
+        extra = {}
+        if id(hand) in track_bands:
+            bounds, vertical = track_bands[id(hand)]
+            extra["annotation_y_bounds"] = vertical
         draw_hand(preview, hand, top_margin=(54 if show_help else 27)+27*len(control_lines), pinch_thresholds=pinch_thresholds,
-                  swipe_config=swipe_config, capture_aspect=height/width, annotation_bounds=bounds)
+                  swipe_config=swipe_config, capture_aspect=height/width, annotation_bounds=bounds, **extra)
     if raw_result is not None:
-        for hand in hand_overlays(raw_result, preview.shape[1], preview.shape[0]):
+        for hand in hand_overlays(raw_result, preview.shape[1], preview.shape[0], max_hands=max_hands):
             for point in hand.points:
                 cv2.drawMarker(preview, point, (255, 255, 255), cv2.MARKER_CROSS,
                                markerSize=7, thickness=1, line_type=cv2.LINE_AA)
@@ -286,6 +323,8 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
         timings.add("landmark_drawing", drawn - resized)
     rate = "--" if fps is None else f"{fps:.1f}"
     lines = [f"App FPS: {rate} | Hands: {len(hands)} | {width} x {height} | Q: Quit | H: Help"]
+    if track_associations is not None or max_hands != 2:
+        lines[0] = f"App FPS: {rate} | HANDS: {len(hands)} / {max_hands} | {width} x {height} | Q: Quit | H: Help"
     if show_help:
         lines.append("Left: green | Right: blue | Raw: white + | H: Hide help"
                      if raw_result is not None else

@@ -6,6 +6,7 @@ import time
 
 from .arbitration import opposing_swipes, resolved_input, swipe_eligible
 from .association import WRIST_CONTINUITY_DISTANCE, hands_overlap, reliable_side
+from .association import valid_track_keys
 from .events import (PINCH, SWIPES, EventMetadata, EventType, GestureEvent, GestureId,
                      GestureState as S, HandState, StateFrame)
 from .features import HandFeatures
@@ -47,6 +48,7 @@ class _Track:
     reason: str = ""
     swipe: SwipeHistory | None = None
     last_swipe: GestureEvent | None = None
+    track_id: int | None = None
 
 
 def _valid_geometry(item: HandFeatures | None) -> bool:
@@ -62,7 +64,7 @@ def _valid_geometry(item: HandFeatures | None) -> bool:
 
 
 class GestureStateManager:
-    """One resolved stream per side, with per-static-gesture cooldown timers.
+    """One stream per legacy side or explicit observation ID, with static cooldowns.
 
     UNKNOWN/invalid input cancels immediately. A known static replacement must
     persist for transition_ms before END; its activation clock starts at the
@@ -74,14 +76,14 @@ class GestureStateManager:
                  swipe_settings: SwipeSettings | None = None, swipe_diagnostics=False):
         self.settings = settings
         self.swipe_settings, self.swipe_diagnostics = swipe_settings, swipe_diagnostics
-        self._tracks: dict[HandSide, _Track] = {}
+        self._tracks: dict[HandSide | int, _Track] = {}
         self._last_timestamp: int | None = None
         self._image_size: ImageSize | None = None
         self.last_swipe_seconds = 0.
 
     def _event(self, track, kind, timestamp, reason="", distance=None, current=True):
         event = GestureEvent(track.confirmed, kind, timestamp, track.side, track.state,
-                             EventMetadata(reason, distance, current))
+                             EventMetadata(reason, distance, current), track.track_id)
         track.last_event = event
         return event
 
@@ -106,8 +108,8 @@ class GestureStateManager:
 
     def _cancel_all(self, timestamp, reason):
         events = []
-        # Fixed side order makes output independent of detection order.
-        for side in sorted(self._tracks, key=lambda value: value.value):
+        # Fixed namespace order makes output independent of detection order.
+        for side in sorted(self._tracks, key=lambda value: str(value)):
             events.extend(self._finish(self._tracks[side], EventType.GESTURE_CANCELED,
                                        timestamp, reason, current=False))
         self._tracks.clear()
@@ -178,7 +180,8 @@ class GestureStateManager:
 
     def update(self, features: tuple[HandFeatures | None, ...], timestamp_ms: int,
                static: tuple[GestureResult, ...] | None = None,
-               pinches: tuple[PinchResult, ...] | None = None) -> StateFrame:
+               pinches: tuple[PinchResult, ...] | None = None,
+               *, identities: tuple[int | None, ...] | None = None) -> StateFrame:
         self.last_swipe_seconds = 0.
         valid_time = isinstance(timestamp_ms, int) and not isinstance(timestamp_ms, bool) and timestamp_ms >= 0
         clock_bad = not valid_time or (self._last_timestamp is not None and timestamp_ms <= self._last_timestamp)
@@ -190,17 +193,20 @@ class GestureStateManager:
         self._last_timestamp = timestamp_ms
         valid = tuple(_valid_geometry(item) for item in features)
         sides = tuple(reliable_side(item) if isinstance(item, HandFeatures) else HandSide.UNKNOWN for item in features)
+        tracked = identities is not None
+        keys = identities if tracked and valid_track_keys(identities, len(features)) else sides
         sizes = {item.image_size for item, ok in zip(features, valid) if ok}
         reason = ""
-        if (len(features) > MAX_HANDS or (static is None and pinches is None)
+        if (len(features) > (4 if tracked else MAX_HANDS) or (static is None and pinches is None)
+                or tracked and not valid_track_keys(identities, len(features))
                 or (static is not None and len(static) != len(features))
                 or (pinches is not None and len(pinches) != len(features))):
             reason = "invalid_channel_alignment"
-        elif HandSide.UNKNOWN in sides or len(set(sides)) != len(sides):
+        elif not tracked and (HandSide.UNKNOWN in sides or len(set(sides)) != len(sides)):
             reason = "ambiguous_handedness"
         elif len(sizes) > 1:
             reason = "conflicting_image_sizes"
-        elif len(features) == 2 and all(valid) and hands_overlap(*features):
+        elif not tracked and len(features) == 2 and all(valid) and hands_overlap(*features):
             reason = "overlapping_hands"
         elif previous_time is not None and timestamp_ms - previous_time > MAX_HISTORY_GAP_MS:
             reason = "tracking_gap"
@@ -212,21 +218,26 @@ class GestureStateManager:
             events = self._cancel_all(timestamp_ms, reason)
             return StateFrame(timestamp_ms, tuple(HandState(side, reason=reason) for side in sides), tuple(events))
         events, displayed, ready = [], {}, []
-        for side in sorted(tuple(self._tracks), key=lambda value: value.value):
-            if side not in sides:
+        for side in sorted(tuple(self._tracks), key=lambda value: str(value)):
+            if side not in keys:
                 events.extend(self._finish(self._tracks.pop(side), EventType.GESTURE_CANCELED,
                                            timestamp_ms, "tracking_lost", current=False))
-        # Resolve in side order; returned snapshots still follow current detection slots.
-        for index in sorted(range(len(sides)), key=lambda i: sides[i].value):
+        # Resolve in namespace order; snapshots still follow current detection slots.
+        for index in sorted(range(len(keys)), key=lambda i: str(keys[i])):
             side, item = sides[index], features[index]
-            track = self._tracks.get(side)
+            key = keys[index]
+            if key is None:
+                displayed[index] = HandState(side, reason="uncertain_track_association")
+                continue
+            track = self._tracks.get(key)
             raw_static = static[index] if static is not None else None
             raw_pinch = pinches[index] if pinches is not None else None
             channel_bad = item is None
             for enabled, result, expected_type in ((static is not None, raw_static, GestureResult),
                                                    (pinches is not None, raw_pinch, PinchResult)):
                 if enabled and (not isinstance(result, expected_type) or result.timestamp_ms != timestamp_ms
-                                or item is None or result.handedness != item.observation.handedness):
+                                or item is None or result.handedness != item.observation.handedness
+                                or tracked and result.track_id != key):
                     channel_bad = True
             if isinstance(raw_pinch, PinchResult):
                 try:
@@ -241,18 +252,19 @@ class GestureStateManager:
                 if track is not None:
                     events.extend(self._finish(track, EventType.GESTURE_CANCELED, timestamp_ms,
                                                "invalid_geometry_or_channel", current=False))
-                    del self._tracks[side]
-                displayed[side] = HandState(side, reason="invalid_geometry_or_channel")
+                    del self._tracks[key]
+                displayed[index] = HandState(side, reason="invalid_geometry_or_channel", track_id=key if tracked else None)
                 continue
             wrist = (item.observation[0].x, item.observation[0].y * item.image_size.height / item.image_size.width)
             if track is not None and math.dist(track.wrist, wrist) > WRIST_CONTINUITY_DISTANCE:
                 events.extend(self._finish(track, EventType.GESTURE_CANCELED, timestamp_ms, "wrist_jump", current=False))
-                del self._tracks[side]
-                displayed[side] = HandState(side, reason="wrist_jump")
+                del self._tracks[key]
+                displayed[index] = HandState(side, reason="wrist_jump", track_id=key if tracked else None)
                 continue
             if track is None:
-                track = self._tracks[side] = _Track(side, wrist)
+                track = self._tracks[key] = _Track(side, wrist, track_id=key if tracked else None)
             track.wrist = wrist
+            track.side = side
             ready.append((index, track, raw_static, raw_pinch))
         motion = [None]*len(features) if self.swipe_settings is not None else []
         if self.swipe_settings is not None:
@@ -288,9 +300,9 @@ class GestureStateManager:
                 events.extend(self._finish(track, EventType.GESTURE_CANCELED, timestamp_ms, "swipe_precedence"))
                 metadata = EventMetadata("swipe_confirmed", motion=result.metrics, direction=result.gesture)
                 events.append(GestureEvent(result.gesture, EventType.GESTURE_STARTED, timestamp_ms,
-                                           track.side, S.ACTIVE, metadata))
+                                           track.side, S.ACTIVE, metadata, track.track_id))
                 terminal = GestureEvent(result.gesture, EventType.GESTURE_ENDED, timestamp_ms,
-                                        track.side, S.COOLDOWN, metadata)
+                                        track.side, S.COOLDOWN, metadata, track.track_id)
                 events.append(terminal)
                 track.last_event, track.state = terminal, S.COOLDOWN
                 track.last_swipe = terminal
@@ -302,6 +314,6 @@ class GestureStateManager:
                 motion[index] = result
             else:
                 events.extend(self._advance(track, raw_static, raw_pinch, timestamp_ms))
-            displayed[side] = HandState(side, track.state, track.confirmed,
-                                        track.candidate or track.pending, track.last_event, track.reason)
-        return StateFrame(timestamp_ms, tuple(displayed[side] for side in sides), tuple(events), tuple(motion))
+            displayed[index] = HandState(side, track.state, track.confirmed,
+                                        track.candidate or track.pending, track.last_event, track.reason, track.track_id)
+        return StateFrame(timestamp_ms, tuple(displayed[index] for index in range(len(features))), tuple(events), tuple(motion))

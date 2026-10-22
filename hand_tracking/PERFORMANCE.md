@@ -704,3 +704,23 @@ latency, inference performance or a guarantee under load. Input was never sent.
 Use the existing visible-preview benchmark procedure below to compare relative
 and absolute with otherwise identical gesture/control options and hand workloads.
 Hardware capture and UGREEN cursor-feel testing remain with the owner.
+
+## Phase 3.8 multi-hand measurement
+
+`--max-hands` selects 1–4 (default 2); see [PHASE_3_8.md](../PHASE_3_8.md) for
+matched 2/3/4 preview commands, safety restrictions and the manual checklist.
+Use `--track-ids` for the two-hand comparison to exercise the same association
+path as 3/4, then measure default two-hand tracking separately. Physical four-hand
+FPS remains unverified. No automatic count/resolution reduction is implemented.
+
+Existing JSON reports now include `max_hands_requested`, `track_ids_enabled`,
+association transition totals and observed 0–4-hand timing strata. New stage
+timings cover observation adaptation and association; smoothing, gesture, GUI,
+total processing, process CPU and actual capture/inference-size fields remain.
+Observed-hand bins matter: max-four with one detection is not four-hand throughput.
+Driver-reported/requested capture FPS is not measured processed application FPS.
+
+The offline `hand_tracking.benchmark_synthetic` also accepts `--max-hands 4
+--track-ids`; it uses matched-scale prefix fixtures for 2/3/4 and excludes camera,
+inference and rendering. Its synthetic iteration rate is not webcam FPS. Choose
+a fresh JSON output path; reports refuse overwrite.

@@ -36,6 +36,15 @@ class HandHistory:
     filtered: np.ndarray
 
 
+def filter_coordinates(raw, previous, alpha):
+    """Shared EMA and rapid-motion bypass for either namespace."""
+    if previous is not None:
+        movement = np.linalg.norm(raw[:, :2] - previous.raw[:, :2], axis=1).max()
+        if movement <= RAPID_MOTION_DISTANCE and not np.array_equal(raw, previous.raw):
+            return alpha * raw + (1.0 - alpha) * previous.filtered
+    return raw
+
+
 def hands_are_close(first, second):
     """A bypass gate only, never a position-based assignment of identity."""
     if np.linalg.norm(first[0, :2] - second[0, :2]) < NEAR_WRIST_DISTANCE:
@@ -111,14 +120,10 @@ class LandmarkSmoother:
         changed = False
         for index, (label, raw) in enumerate(records):
             previous = self._history.get(label)
-            filtered = raw
-            if previous is not None:
-                movement = np.linalg.norm(raw[:, :2] - previous.raw[:, :2], axis=1).max()
-                if movement <= RAPID_MOTION_DISTANCE and not np.array_equal(raw, previous.raw):
-                    filtered = self.alpha * raw + (1.0 - self.alpha) * previous.filtered
-                    displayed[index] = [DisplayLandmark(float(x), float(y), float(z))
-                                        for x, y, z in filtered]
-                    changed = True
+            filtered = filter_coordinates(raw, previous, self.alpha)
+            if filtered is not raw:
+                displayed[index] = [DisplayLandmark(float(x), float(y), float(z)) for x, y, z in filtered]
+                changed = True
             # New, rapidly moved or exactly unchanged measurements bypass the EMA.
             self._history[label] = HandHistory(raw=raw, filtered=filtered)
 
@@ -127,3 +132,32 @@ class LandmarkSmoother:
         displayed_result = copy(result)
         displayed_result.hand_landmarks = displayed
         return displayed_result
+
+
+class TrackLandmarkSmoother:
+    """Same EMA policy, independent histories keyed solely by certain track IDs."""
+
+    def __init__(self, enabled=True, alpha=DEFAULT_ALPHA):
+        self.enabled, self.alpha = enabled, valid_alpha(alpha)
+        self._history = {}
+        self._stamp = self._size = None
+
+    def apply(self, observations, associations, stamp, size):
+        from gestures.models import HandObservation, Landmark
+        if (not self.enabled or self.alpha == 1 or self._size != size
+                or self._stamp is not None and (stamp <= self._stamp or stamp - self._stamp > MAX_HISTORY_GAP_MS)):
+            self._history.clear()
+        self._size, self._stamp = size, stamp
+        current, output = {}, []
+        for hand, association in zip(observations, associations):
+            if hand is None or not association.certain or not self.enabled or self.alpha == 1:
+                output.append(hand)
+                continue
+            key = association.track_id
+            raw = np.asarray([(p.x, p.y, p.z) for p in hand.landmarks], dtype=np.float64)
+            filtered = filter_coordinates(raw, self._history.get(key), self.alpha)
+            current[key] = HandHistory(raw, filtered)
+            output.append(hand if filtered is raw else HandObservation(
+                tuple(Landmark(float(x), float(y), float(z)) for x, y, z in filtered), hand.handedness))
+        self._history = current  # Drop absent/uncertain histories immediately, never phantom hands.
+        return tuple(output)

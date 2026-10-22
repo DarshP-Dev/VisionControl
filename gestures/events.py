@@ -57,11 +57,16 @@ class GestureEvent:
     side: HandSide
     state: GestureState
     metadata: EventMetadata = EventMetadata()
+    track_id: int | None = None
 
     def __post_init__(self):
+        if self.track_id is not None and (isinstance(self.track_id, bool) or not isinstance(self.track_id, int)
+                                          or self.track_id <= 0):
+            raise ValueError("Track ID must be a positive integer or None")
         if (self.gesture not in (Gesture.OPEN_PALM, Gesture.FIST, Gesture.POINTING, PINCH, *SWIPES)
                 or not isinstance(self.event_type, EventType) or not isinstance(self.state, GestureState)
-                or self.side not in (HandSide.LEFT, HandSide.RIGHT)):
+                or self.side not in ((HandSide.LEFT, HandSide.RIGHT, HandSide.UNKNOWN) if self.track_id is not None
+                                     else (HandSide.LEFT, HandSide.RIGHT))):
             raise ValueError("Events require a supported gesture, event/state type and reliable side")
         if isinstance(self.timestamp_ms, bool) or not isinstance(self.timestamp_ms, int) or self.timestamp_ms < 0:
             raise ValueError("Event timestamp must be a nonnegative integer in milliseconds")
@@ -76,6 +81,7 @@ class HandState:
     candidate: GestureId | None = None
     last_event: GestureEvent | None = None
     reason: str = ""
+    track_id: int | None = None
 
 
 @dataclass(frozen=True, slots=True)

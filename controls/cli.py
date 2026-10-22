@@ -107,6 +107,8 @@ def validate(parser, args):
 
 
 def create_controller(args, resources):
+    if getattr(args, "max_hands", 2) > 2 or getattr(args, "track_ids", False):
+        raise ValueError("Track-ID / 3–4 hand observation cannot create a desktop controller")
     configured = settings(args)
     if configured.mode == "simulate":
         backend = SimulationBackend(simulation_screen(args), args.control_sim_app)

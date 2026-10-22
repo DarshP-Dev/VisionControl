@@ -60,8 +60,12 @@ class GestureResult:
     matched_rules: tuple[Gesture, ...] = ()
     reason: str = ""
     pointing_checks: tuple[PointingCheck, ...] = ()
+    track_id: int | None = None  # Optional caller-assigned observation namespace, not recognition evidence.
 
     def __post_init__(self) -> None:
+        if self.track_id is not None and (isinstance(self.track_id, bool) or not isinstance(self.track_id, int)
+                                          or self.track_id <= 0):
+            raise ValueError("Track ID must be a positive integer or None")
         if (not isinstance(self.timestamp_ms, int) or isinstance(self.timestamp_ms, bool)
                 or self.timestamp_ms < 0):
             raise ValueError("Timestamp must be a nonnegative integer number of milliseconds")
@@ -175,11 +179,12 @@ def _clearly_extended_thumb(features: HandFeatures, thresholds: StaticThresholds
 
 def classify_hand(features: HandFeatures | None, timestamp_ms: int,
                   *, thresholds: StaticThresholds = DEFAULT_THRESHOLDS,
-                  diagnostics: bool = False) -> GestureResult:
+                  diagnostics: bool = False, track_id: int | None = None) -> GestureResult:
     """Classify cached 2D features; thumb posture does not gate POINTING.
 
     Supply aspect-correct features for camera inputs. A detected hand with invalid
     required features is UNKNOWN; no observation is represented by no call/result.
+    Optional track_id is caller-assigned metadata and never changes the rules.
     """
     handedness = (features.observation.handedness
                   if isinstance(features, HandFeatures) and isinstance(features.observation, HandObservation)
@@ -188,7 +193,7 @@ def classify_hand(features: HandFeatures | None, timestamp_ms: int,
     pointing, checks = _pointing_evaluation(values, features, thresholds, diagnostics)
     if values is None:
         return GestureResult(Gesture.UNKNOWN, timestamp_ms, handedness,
-                             reason="invalid_or_missing_features", pointing_checks=checks)
+                             reason="invalid_or_missing_features", pointing_checks=checks, track_id=track_id)
     extended, curled = [], []
     for joint, distal, straight, tip in values:
         extended.append(joint >= thresholds.extended_joint_min_degrees
@@ -208,10 +213,10 @@ def classify_hand(features: HandFeatures | None, timestamp_ms: int,
     if pointing:
         matches.append(Gesture.POINTING)
     if len(matches) == 1:
-        return GestureResult(matches[0], timestamp_ms, handedness, tuple(matches), "unique_rule_match", checks)
+        return GestureResult(matches[0], timestamp_ms, handedness, tuple(matches), "unique_rule_match", checks, track_id)
     return GestureResult(Gesture.UNKNOWN, timestamp_ms, handedness, tuple(matches),
                          "conflicting_rules" if matches else "unsupported_thumb_extension" if thumb_veto
-                         else "ambiguous_or_unsupported_pose", checks)
+                         else "ambiguous_or_unsupported_pose", checks, track_id)
 
 
 def classify_frame(features: FrameFeatures,

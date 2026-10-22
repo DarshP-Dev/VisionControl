@@ -1,4 +1,4 @@
-"""Synchronous two-hand tracking with independent opt-in static and pinch recognition."""
+"""Synchronous tracking; default two hands, experimental four-hand observation IDs."""
 
 import argparse
 from collections import Counter
@@ -26,13 +26,14 @@ from camera.camera_diagnostics import (
 from .download_model import MODEL_PATH
 from .gesture_debug import GestureDebug
 from .gesture_preview import classify_result, prepare_features
+from .multi_hand import TrackedPipeline
 from .gui import GuiEvents
 from .performance import (
     InferenceInput, WorkloadProfile, inference_resolution, process_cpu_usage, write_report,
 )
 from .smoothing import DEFAULT_ALPHA, LandmarkSmoother, valid_alpha
 from .tracking_utils import (
-    MAX_HANDS, ONE_HAND_REFERENCE_FPS, PERFORMANCE_DROP_RATIO,
+    ONE_HAND_REFERENCE_FPS, PERFORMANCE_DROP_RATIO,
     ApplicationFPS, FrameTimestamp, PreviewRenderer, make_preview, significant_fps_drop,
 )
 
@@ -94,6 +95,11 @@ def parse_args(argv=None):
                         help="auto uses native Win32 pollKey; waitkey preserves the earlier GUI path")
     parser.add_argument("--headless", action="store_true",
                         help="benchmark capture/inference/smoothing without rendering or GUI")
+    parser.add_argument("--max-hands", type=int, choices=(1, 2, 3, 4), default=2,
+                        help="MediaPipe maximum; 3/4 are experimental observation-only")
+    parser.add_argument("--track-ids", action="store_true",
+                        help="opt into geometric track IDs for 1/2 hands; automatic for 3/4; no desktop controls")
+    parser.add_argument("--multi-hand-debug", action="store_true", help="sample track lifecycle/association diagnostics every 2 s")
     parser.add_argument("--gestures", action=argparse.BooleanOptionalAction, default=False,
                         help="enable static gesture labels; --no-gestures preserves tracking only (default)")
     parser.add_argument("--gesture-debug", action="store_true",
@@ -159,6 +165,12 @@ def parse_args(argv=None):
         parser.error("--swipes requires --gestures --pinch --gesture-states (pose eligibility, pinch safety and events)")
     if args.swipe_debug and not args.swipes:
         parser.error("--swipe-debug requires --swipes")
+    if args.controls and (args.max_hands > 2 or args.track_ids):
+        parser.error("More than two hands / track-ID mode is observation-only; desktop controls (including simulation) require --max-hands 1 or 2 without --track-ids")
+    if args.max_hands == 1 and args.control_gesture_rearm:
+        parser.error("Left-hand rearm/resume requires --max-hands 2")
+    if args.multi_hand_debug and not (args.max_hands > 2 or args.track_ids):
+        parser.error("--multi-hand-debug requires --max-hands 3/4 or --track-ids")
     control_cli.validate(parser, args)
     return args
 
@@ -180,13 +192,16 @@ def log_state_events(events):
         details = (f" | dx={motion.dx:.3f} dy={motion.dy:.3f} vx={motion.velocity_x:.3f} "
                    f"duration={motion.duration_ms}ms cons={motion.consistency:.3f} dom={motion.dominance:.3f}"
                    if motion is not None else "")
-        LOGGER.info("%s | %s | %s | t=%d ms | %s%s%s", event.side.value, event.gesture,
+        label = f"TRACK {event.track_id} ({event.side.value})" if event.track_id is not None else event.side.value
+        LOGGER.info("%s | %s | %s | t=%d ms | %s%s%s", label, event.gesture,
                     event.event_type.value, event.timestamp_ms, event.metadata.reason,
                     " (former association)" if not event.metadata.association_current else "", details)
 
 
-def create_landmarker(model_path):
+def create_landmarker(model_path, max_hands=2):
     # Lazy import lets --help and missing-model diagnostics work without MediaPipe.
+    if isinstance(max_hands, bool) or not isinstance(max_hands, int) or max_hands not in (1, 2, 3, 4):
+        raise ValueError("Maximum hands must be 1, 2, 3 or 4")
     import mediapipe as mp
 
     options = mp.tasks.vision.HandLandmarkerOptions(
@@ -195,13 +210,15 @@ def create_landmarker(model_path):
             delegate=mp.tasks.BaseOptions.Delegate.CPU,
         ),
         running_mode=mp.tasks.vision.RunningMode.VIDEO,
-        num_hands=MAX_HANDS,
+        num_hands=max_hands,
     )
     return mp, mp.tasks.vision.HandLandmarker.create_from_options(options)
 
 
 def process_frames(cap, landmarker, mp, args=None, report=None, controller=None):
     args = args if args is not None else parse_args([])
+    if args.controls and (args.max_hands > 2 or args.track_ids):
+        raise ValueError("Multi-hand track-ID observation cannot dispatch desktop input")
     if args.controls and controller is None:
         # Direct callers get the same cleanup and explicit live safety initialization as run().
         with ExitStack() as resources:
@@ -230,6 +247,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
     state_manager = (GestureStateManager(state_settings(args),
                                        swipe_settings=configured_swipes if args.swipes else None,
                                        swipe_diagnostics=args.swipe_debug) if args.gesture_states else None)
+    tracked = (TrackedPipeline(args, pinch_tracker, state_manager)
+               if args.max_hands > 2 or args.track_ids else None)
     state_counts, event_counts = Counter(), Counter()
     swipe_counts = Counter()
     frames = 0
@@ -260,13 +279,27 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
             after_inference = time.perf_counter()
             timings.add("mediapipe_image", before_inference - before_image)
             timings.add("inference", after_inference - before_inference)
+            if len(getattr(raw_result, "hand_landmarks", None) or []) > args.max_hands:
+                raise ValueError("Detector exceeded requested maximum hand count")
             before_smoothing = time.perf_counter()
-            result = smoother.apply(raw_result, timestamp_ms, frame.shape[:2])
-            timings.add("smoothing", time.perf_counter() - before_smoothing)
+            if tracked is None:
+                result = smoother.apply(raw_result, timestamp_ms, frame.shape[:2])
+                timings.add("smoothing", time.perf_counter() - before_smoothing)
             classifications = None
             pinches = None
             state_frame = None
-            if args.gestures or args.pinch:
+            if tracked is not None:
+                if (gesture_image_size is None or
+                        (gesture_image_size.height, gesture_image_size.width) != frame.shape[:2]):
+                    gesture_image_size = ImageSize(frame.shape[1], frame.shape[0])
+                sampled = gesture_debug is not None and gesture_debug.due(timestamp_ms)
+                result, classifications, pinches, state_frame = tracked.update(
+                    raw_result, timestamp_ms, gesture_image_size, timings, diagnostics=sampled)
+                if sampled:
+                    gesture_debug.log(classifications, timestamp_ms)
+                if args.gesture_event_debug and state_frame is not None:
+                    log_state_events(state_frame.events)
+            elif args.gestures or args.pinch:
                 if (gesture_image_size is None or
                         (gesture_image_size.height, gesture_image_size.width) != frame.shape[:2]):
                     gesture_image_size = ImageSize(frame.shape[1], frame.shape[0])
@@ -314,7 +347,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                                        gesture_states=state_frame.hands if state_frame is not None else None,
                                        swipe_results=state_frame.motion if state_frame is not None and args.swipes else None,
                                        swipe_config=configured_swipes if args.swipe_debug else None,
-                                       control_status=controller.status() if controller is not None else None)
+                                       control_status=controller.status() if controller is not None else None,
+                                       **({"track_associations": tracked.associations if tracked is not None else None,
+                                           "max_hands": args.max_hands}
+                                          if tracked is not None or args.max_hands != 2 else {}))
                 before_display = time.perf_counter()
                 cv2.imshow(WINDOW, preview)
                 before_events = time.perf_counter()
@@ -336,7 +372,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                 measurement_end = end
                 capture_sizes[f"{frame.shape[1]}x{frame.shape[0]}"] += 1
                 inference_sizes[f"{rgb.shape[1]}x{rgb.shape[0]}"] += 1
-                hand_counts[str(min(MAX_HANDS, len(result.hand_landmarks)))] += 1
+                hand_counts[str(len(result.hand_landmarks))] += 1
                 if classifications is not None:
                     gesture_counts.update(item.gesture.value for item in classifications)
                 if pinches is not None:
@@ -346,11 +382,11 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                     event_counts.update(f"{item.event_type.value}:{item.gesture}" for item in state_frame.events)
                     swipe_counts.update(item.gesture for item in state_frame.motion
                                         if item is not None and item.confirmed and item.admitted)
-                timings.finish_frame(min(MAX_HANDS, len(raw_result.hand_landmarks)))
+                timings.finish_frame(len(raw_result.hand_landmarks))
                 rate = fps.record(end)
             if rate is not None and not args.benchmark:
                 LOGGER.info("End-to-end application FPS: %.2f | hands: %d",
-                            rate, min(MAX_HANDS, len(result.hand_landmarks)))
+                            rate, len(result.hand_landmarks))
                 slow = significant_fps_drop(rate)
                 if slow and not warned_slow:
                     LOGGER.warning("Significant application FPS decrease: %.2f FPS is below %.0f%% "
@@ -407,6 +443,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                 "status": status, "benchmark": args.benchmark,
                 "frames": frames, "measurement_seconds": duration,
                 "average_application_fps": average,
+                "max_hands_requested": args.max_hands,
+                "track_ids_enabled": tracked is not None,
+                "association_transitions": dict(tracked.associator.counts) if tracked is not None else {},
                 "capture_resolution_frames": dict(capture_sizes),
                 "inference_resolution_frames": dict(inference_sizes),
                 "detected_hands_frames": dict(hand_counts),
@@ -451,7 +490,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
 
 def run(args, report=None):
     report = report if report is not None else {}
-    report.update({"requested_capture": {"width": args.width, "height": args.height, "fps": args.fps,
+    report.update({"max_hands_requested": args.max_hands,
+                   "track_ids_enabled": args.max_hands > 2 or args.track_ids,
+                   "requested_capture": {"width": args.width, "height": args.height, "fps": args.fps,
                                          "backend": args.backend, "fourcc": args.fourcc,
                                          "camera_index": args.camera_index},
                    "inference_bounds": args.inference_resolution or "full",
@@ -474,7 +515,7 @@ def run(args, report=None):
             return 1
         with ExitStack() as resources:
             controller = control_cli.create_controller(args, resources) if args.controls else None
-            mp, landmarker = create_landmarker(args.model)
+            mp, landmarker = create_landmarker(args.model, max_hands=args.max_hands)
             report["mediapipe"] = getattr(mp, "__version__", "unavailable")
             resources.callback(landmarker.close)
             cap = cv2.VideoCapture(args.camera_index, BACKENDS[args.backend])
@@ -487,7 +528,7 @@ def run(args, report=None):
                 return 1
             configure_capture(cap, args)
             report["driver_readback"] = capture_snapshot(cap, args, "After configuration")
-            LOGGER.info("MediaPipe Hand Landmarker: VIDEO mode | CPU | maximum %d hands", MAX_HANDS)
+            LOGGER.info("MediaPipe Hand Landmarker: VIDEO mode | CPU | maximum %d hands", args.max_hands)
             LOGGER.info("Landmark smoothing: %s | alpha: %.2f | raw comparison markers: %s",
                         args.smoothing, args.smoothing_alpha, args.show_raw_landmarks)
             LOGGER.info("Static gestures: %s (heuristic rules; no confidence probability)", args.gestures)

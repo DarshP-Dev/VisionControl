@@ -1,5 +1,12 @@
 # Hand tracking with optional gesture recognition, states and events
 
+Phase 3.8 adds experimental [3–4 hand observation and geometric track IDs](../PHASE_3_8.md).
+Use `--max-hands 1|2|3|4` (default 2). Maxima 3/4 enable IDs automatically;
+`--track-ids` opts into the same observation path at 1/2. `--multi-hand-debug`
+samples identity diagnostics. More than two hands and experimental ID mode reject
+desktop controls, including simulation. Default two-hand controls are unchanged.
+See the phase guide for exact commands, JSON comparisons and hardware limitations.
+
 Optional desktop interaction profiles are documented in
 [controls/PROFILES.md](../controls/PROFILES.md). The default remains legacy
 POINTING/index-tip cursor; `--control-gesture-profile palm-cursor` selects an

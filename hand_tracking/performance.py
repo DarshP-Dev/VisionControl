@@ -82,7 +82,7 @@ class Profile:
 
 
 class WorkloadProfile(Profile):
-    """Stratify completed-frame timings by observed 0/1/2-hand model results."""
+    """Stratify completed-frame timings by observed 0–4-hand model results."""
 
     def __init__(self, enabled=True, capacity=8192):
         super().__init__(enabled, capacity)
@@ -98,8 +98,8 @@ class WorkloadProfile(Profile):
         if not self.enabled:
             self._frame_stages.clear()
             return
-        if isinstance(hand_count, bool) or hand_count not in (0, 1, 2):
-            raise ValueError("Workload hand count must be 0, 1 or 2")
+        if isinstance(hand_count, bool) or not isinstance(hand_count, int) or hand_count not in (0, 1, 2, 3, 4):
+            raise ValueError("Workload hand count must be between 0 and 4")
         if hand_count not in self.by_hands:
             self.by_hands[hand_count] = Profile(capacity=self.capacity)
         group = self.by_hands[hand_count]

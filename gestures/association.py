@@ -13,6 +13,13 @@ MIN_SIDE_SCORE = .8
 WRIST_CONTINUITY_DISTANCE = .10  # Common-axis image-width units.
 
 
+def valid_track_keys(keys, count):
+    """Explicit observation-only namespace; None marks uncertain associations."""
+    return (isinstance(keys, tuple) and len(keys) == count and count <= 4
+            and all(key is None or isinstance(key, int) and not isinstance(key, bool) and key > 0 for key in keys)
+            and len({key for key in keys if key is not None}) == sum(key is not None for key in keys))
+
+
 def reliable_side(features: HandFeatures | None) -> HandSide:
     try:
         predictions = features.observation.handedness if features is not None else ()
