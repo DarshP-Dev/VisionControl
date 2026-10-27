@@ -680,6 +680,18 @@ Phase 2.3; first use the local benchmark evidence.
 
 References: [Google's synchronous VIDEO API and normalized landmarks](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker/python),
 [OpenCV resize documentation](https://docs.opencv.org/4.x/da/d54/group__imgproc__transform.html).
+## Phase 3.10 experimental camera overlap
+
+`--capture-pipeline sync` remains the default. `latest-thread` overlaps camera
+acquisition with main-thread inference through a single replaceable read-only
+snapshot. See [PHASE_3_10.md](../PHASE_3_10.md) for ownership, timestamps, bounded
+shutdown, capture-health input cancellation, real/synthetic measurements and
+matched PowerShell commands. Independent producer BGR delivery FPS is separate
+from processed application FPS; host ages do not measure sensor exposure age.
+`python -m camera.benchmark_delivery` measures camera-only delivery for either mode.
+`python -m hand_tracking.benchmark_capture` models blocking-call overlap with sleeps
+and synthetic pixels; its iteration rate is not webcam FPS or recognition accuracy.
+
 ## Phase 3.9 background execution and pacing
 
 See [PHASE_3_9.md](../PHASE_3_9.md) for confirmed findings, the complete synchronous

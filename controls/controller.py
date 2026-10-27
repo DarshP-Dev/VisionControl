@@ -53,6 +53,7 @@ class DesktopController:
         self.backend.input_allowed = self._input_allowed
         self.observed_at = None  # Optional host capture-completion clock, never a model timestamp.
         self.move_observer = None  # Opt-in telemetry; synchronous, no input authority.
+        self.pipeline_guard = None  # Experimental capture health fence; never calls camera APIs.
 
     def arm(self):
         """Explicit keyboard recovery. Gesture requests use the same checked path."""
@@ -88,6 +89,9 @@ class DesktopController:
 
     def _arm(self, *, gesture_generation=None):
         with self.lock:
+            if self.pipeline_guard is not None and not self.pipeline_guard():
+                self.reason = "Camera pipeline unavailable; restart required"
+                return False
             if gesture_generation is not None:
                 with self._stop_lock:
                     if not self._can_gesture_rearm() or gesture_generation != self._stop_generation:
@@ -104,6 +108,9 @@ class DesktopController:
                 arming_generation = self._stop_generation
             try:
                 position = self.backend.cursor_position()
+                if self.pipeline_guard is not None and not self.pipeline_guard():
+                    self.reason = "Camera pipeline unavailable; restart required"
+                    return False
                 if self.backend.screen.clamp(*position) != tuple(position):
                     self.reason = "Move cursor onto selected monitor before arming"
                     return False
@@ -196,6 +203,8 @@ class DesktopController:
 
     def check_timeout(self):
         # Do not wait for the frame lock before latching an overdue stop.
+        if self.armed and self.pipeline_guard is not None and not self.pipeline_guard():
+            self.disarm("Camera pipeline failed/stalled; restart required")
         if self.armed and self.clock()-self.last_heartbeat > .5:
             self.disarm("Capture/processing stalled (>500 ms); rearm manually")
         with self.lock:
@@ -215,6 +224,7 @@ class DesktopController:
     def _input_allowed(self):
         return (self.armed and not self._stop_requested.is_set() and self.safety_ready
                 and not self.closed and not self.faulted
+                and (self.pipeline_guard is None or self.pipeline_guard())
                 and (self.observed_at is None or 0 <= self.clock() - self.observed_at <= .25))
 
     def _unsafe(self, reason, *, routine=False):

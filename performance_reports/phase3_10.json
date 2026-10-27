@@ -1,0 +1,3143 @@
+{
+  "baseline_commit": "6dacecd1a784412d7eccc2eae33811c17a68522f",
+  "python": "3.13.16",
+  "scope": "Phase 3.10 optional capture experiment; sync remains default",
+  "hardware_comparison": {
+    "condition": "real camera and MediaPipe, full 1080p CPU VIDEO, headless, no gestures/controls, every measured detection count zero; one pair, not CPU-isolated",
+    "processed_fps_change_percent": 48.77807793536215,
+    "frame_interval_mean_ms_change_percent": -32.785985821667275,
+    "frame_interval_p50_ms_change_percent": -33.881306522434414,
+    "frame_interval_p95_ms_change_percent": -31.96593183510057,
+    "frame_interval_p99_ms_change_percent": -3.3692685693545332,
+    "frame_interval_max_ms_change_percent": -0.17789256357907401
+  },
+  "conditions_not_measured": [
+    "physical two/four hands",
+    "physical gestures",
+    "cursor input or feel",
+    "preview focused/unfocused/minimized performance",
+    "sensor exposure age/unique exposure FPS"
+  ],
+  "excluded_prototypes_from_primary_comparison": {
+    "camera_only_latest_initial_timeout": "5s startup expired before normal 5.94s MSMF configuration; safely released. Final startup budget 15s.",
+    "real_headless_latest_initial_warmup": "Warmup included camera configuration time. Retained as exploratory only; repeated with full model warmup.",
+    "all_hardware_reports": "Some were captured before final counter-field normalization/log wording and join deadline metadata additions; steady-state acquisition/inference path is unchanged."
+  },
+  "reports": {
+    "synthetic_before_sync": {
+      "source_path": "hand_tracking\\benchmarks\\phase3_10_before_sync.json",
+      "sha256": "44981f0ce9dcf66c1e4547cd2de9661fb1b6df27235939331d8b6697402e58da",
+      "data": {
+        "kind": "synthetic_blocking_call_overlap",
+        "python": "3.13.16",
+        "runs": [
+          {
+            "mode": "sync",
+            "frames": 100,
+            "warmup_frames": 20,
+            "read_delay_ms": 15.3,
+            "processing_delay_ms": 23.8,
+            "shape": [
+              1080,
+              1920,
+              3
+            ],
+            "synthetic_completed_iterations_per_second": 25.259613253093654,
+            "timings": {
+              "consumer_wait": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 15.56109600005584,
+                "max_ms": 15.742000003228895,
+                "p50_ms": 15.552150000075926,
+                "p95_ms": 15.698964999501186,
+                "p99_ms": 15.724774001719197
+              },
+              "frame_age_at_processing_start": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 0.0006629998460994102,
+                "max_ms": 0.006300000677583739,
+                "p50_ms": 0.0005999972927384079,
+                "p95_ms": 0.0011999984053545631,
+                "p99_ms": 0.0024390000908170095
+              },
+              "host_age_at_processing_end": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 24.015121999946132,
+                "max_ms": 24.222100000770297,
+                "p50_ms": 24.006250001548324,
+                "p95_ms": 24.075059997630888,
+                "p99_ms": 24.213190001355542
+              },
+              "frame_interval": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 39.58900300000096,
+                "max_ms": 39.81739999653655,
+                "p50_ms": 39.57370000171068,
+                "p95_ms": 39.74532500051282,
+                "p99_ms": 39.79740200273227
+              }
+            },
+            "resources": {
+              "process_cpu_seconds": 0.015625,
+              "process_wall_seconds": 3.9588887999998406,
+              "process_cpu_percent_of_one_core": 0.39468145707958835,
+              "process_cpu_ms_per_frame": 0.15625
+            },
+            "capture": {
+              "mode": "sync",
+              "buffer_capacity": 0
+            },
+            "repeat": 1
+          },
+          {
+            "mode": "sync",
+            "frames": 100,
+            "warmup_frames": 20,
+            "read_delay_ms": 15.3,
+            "processing_delay_ms": 23.8,
+            "shape": [
+              1080,
+              1920,
+              3
+            ],
+            "synthetic_completed_iterations_per_second": 25.248795954355394,
+            "timings": {
+              "consumer_wait": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 15.572563999703561,
+                "max_ms": 15.843799999856856,
+                "p50_ms": 15.55269999880693,
+                "p95_ms": 15.695645000960212,
+                "p99_ms": 15.843602001950785
+              },
+              "frame_age_at_processing_start": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 0.0006589998156414367,
+                "max_ms": 0.00839999847812578,
+                "p50_ms": 0.0005000001692678779,
+                "p95_ms": 0.0012050018995068963,
+                "p99_ms": 0.0020640006550820874
+              },
+              "host_age_at_processing_end": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 24.02143300008902,
+                "max_ms": 24.17020000211778,
+                "p50_ms": 24.00984999985667,
+                "p95_ms": 24.12746499867353,
+                "p99_ms": 24.167329001866165
+              },
+              "frame_interval": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 39.60591300001397,
+                "max_ms": 39.856999999756226,
+                "p50_ms": 39.58885000065493,
+                "p95_ms": 39.770029997271195,
+                "p99_ms": 39.85086199983925
+              }
+            },
+            "resources": {
+              "process_cpu_seconds": 0.015625,
+              "process_wall_seconds": 3.960584899999958,
+              "process_cpu_percent_of_one_core": 0.39451243678680303,
+              "process_cpu_ms_per_frame": 0.15625
+            },
+            "capture": {
+              "mode": "sync",
+              "buffer_capacity": 0
+            },
+            "repeat": 2
+          },
+          {
+            "mode": "sync",
+            "frames": 100,
+            "warmup_frames": 20,
+            "read_delay_ms": 15.3,
+            "processing_delay_ms": 23.8,
+            "shape": [
+              1080,
+              1920,
+              3
+            ],
+            "synthetic_completed_iterations_per_second": 25.27043982467849,
+            "timings": {
+              "consumer_wait": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 15.538390999936382,
+                "max_ms": 15.766499996971106,
+                "p50_ms": 15.539299998636125,
+                "p95_ms": 15.66031499842211,
+                "p99_ms": 15.749273999063007
+              },
+              "frame_age_at_processing_start": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 0.00048800000513438135,
+                "max_ms": 0.0022999993234407157,
+                "p50_ms": 0.0004000012268079445,
+                "p95_ms": 0.000809998891782015,
+                "p99_ms": 0.001705998402030676
+              },
+              "host_age_at_processing_end": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 24.023991000103706,
+                "max_ms": 24.294799997733207,
+                "p50_ms": 24.010849998376216,
+                "p95_ms": 24.118980001003365,
+                "p99_ms": 24.221045001577295
+              },
+              "frame_interval": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 39.57196500003192,
+                "max_ms": 39.95529999883729,
+                "p50_ms": 39.56250000010186,
+                "p95_ms": 39.732740002000355,
+                "p99_ms": 39.89847399832797
+              }
+            },
+            "resources": {
+              "process_cpu_seconds": 0.0,
+              "process_wall_seconds": 3.957192699999723,
+              "process_cpu_percent_of_one_core": 0.0,
+              "process_cpu_ms_per_frame": 0.0
+            },
+            "capture": {
+              "mode": "sync",
+              "buffer_capacity": 0
+            },
+            "repeat": 3
+          }
+        ],
+        "limitations": "Synthetic blocking-call overlap experiment, NOT webcam or MediaPipe FPS.\n\nThe producer sleeps for a chosen read delay; the consumer sleeps for a chosen\nprocessing delay. Sleeps release the GIL. This isolates handoff/overlap and copy\ncost; it does not model sensor timing, CPU contention or recognition accuracy.\n"
+      }
+    },
+    "synthetic_final_sync": {
+      "source_path": "hand_tracking\\benchmarks\\phase3_10_final_sync_synthetic.json",
+      "sha256": "d55ce04634ee3146b9c26161b312d6ea7803bac3dd671b91bae74d2ed4cd19be",
+      "data": {
+        "kind": "synthetic_blocking_call_overlap",
+        "python": "3.13.16",
+        "runs": [
+          {
+            "mode": "sync",
+            "frames": 100,
+            "warmup_frames": 20,
+            "read_delay_ms": 15.3,
+            "processing_delay_ms": 23.8,
+            "shape": [
+              1080,
+              1920,
+              3
+            ],
+            "synthetic_completed_iterations_per_second": 25.25976893778188,
+            "timings": {
+              "consumer_wait": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 15.545982000076037,
+                "max_ms": 15.814400001545437,
+                "p50_ms": 15.520249999099178,
+                "p95_ms": 15.71494999807328,
+                "p99_ms": 15.78578899978311
+              },
+              "frame_age_at_processing_start": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 0.0005490002513397485,
+                "max_ms": 0.0018999999156221747,
+                "p50_ms": 0.00039999940781854093,
+                "p95_ms": 0.00140999982249923,
+                "p99_ms": 0.0018009991617873315
+              },
+              "host_age_at_processing_end": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 24.031397000180732,
+                "max_ms": 24.33990000281483,
+                "p50_ms": 24.01559999816527,
+                "p95_ms": 24.114300001747324,
+                "p99_ms": 24.274461001550662
+              },
+              "frame_interval": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 39.588696000027994,
+                "max_ms": 39.872000001196284,
+                "p50_ms": 39.575150000018766,
+                "p95_ms": 39.7857700008899,
+                "p99_ms": 39.85061600043991
+              }
+            },
+            "resources": {
+              "process_cpu_seconds": 0.0,
+              "process_wall_seconds": 3.958864399999584,
+              "process_cpu_percent_of_one_core": 0.0,
+              "process_cpu_ms_per_frame": 0.0
+            },
+            "capture": {
+              "mode": "sync",
+              "buffer_capacity": 0
+            },
+            "repeat": 1
+          },
+          {
+            "mode": "sync",
+            "frames": 100,
+            "warmup_frames": 20,
+            "read_delay_ms": 15.3,
+            "processing_delay_ms": 23.8,
+            "shape": [
+              1080,
+              1920,
+              3
+            ],
+            "synthetic_completed_iterations_per_second": 25.252630471813674,
+            "timings": {
+              "consumer_wait": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 15.556282999896212,
+                "max_ms": 15.826200000446988,
+                "p50_ms": 15.543150000667083,
+                "p95_ms": 15.733974999966447,
+                "p99_ms": 15.77976899985515
+              },
+              "frame_age_at_processing_start": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 0.0005180001971893944,
+                "max_ms": 0.0018000027921516448,
+                "p50_ms": 0.000450001607532613,
+                "p95_ms": 0.0011049976819776926,
+                "p99_ms": 0.0013050026245764483
+              },
+              "host_age_at_processing_end": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 24.03324800026894,
+                "max_ms": 24.24089999840362,
+                "p50_ms": 24.02645000074699,
+                "p95_ms": 24.12261999979819,
+                "p99_ms": 24.233771998151497
+              },
+              "frame_interval": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 39.5998850000251,
+                "max_ms": 39.90229999908479,
+                "p50_ms": 39.58279999824299,
+                "p95_ms": 39.79177999735839,
+                "p99_ms": 39.839632997318404
+              }
+            },
+            "resources": {
+              "process_cpu_seconds": 0.03125,
+              "process_wall_seconds": 3.959983500000817,
+              "process_cpu_percent_of_one_core": 0.7891447022441773,
+              "process_cpu_ms_per_frame": 0.3125
+            },
+            "capture": {
+              "mode": "sync",
+              "buffer_capacity": 0
+            },
+            "repeat": 2
+          },
+          {
+            "mode": "sync",
+            "frames": 100,
+            "warmup_frames": 20,
+            "read_delay_ms": 15.3,
+            "processing_delay_ms": 23.8,
+            "shape": [
+              1080,
+              1920,
+              3
+            ],
+            "synthetic_completed_iterations_per_second": 25.25682401499556,
+            "timings": {
+              "consumer_wait": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 15.541239000012865,
+                "max_ms": 15.813000001799082,
+                "p50_ms": 15.530650000073365,
+                "p95_ms": 15.648699997291258,
+                "p99_ms": 15.753699000451888
+              },
+              "frame_age_at_processing_start": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 0.0005939998300164007,
+                "max_ms": 0.0021999985619913787,
+                "p50_ms": 0.0005999972927384079,
+                "p95_ms": 0.0011999984053545631,
+                "p99_ms": 0.001507000488345515
+              },
+              "host_age_at_processing_end": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 24.039502999985416,
+                "max_ms": 24.33029999883729,
+                "p50_ms": 24.01934999943478,
+                "p95_ms": 24.170990001039172,
+                "p99_ms": 24.31891500218626
+              },
+              "frame_interval": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 39.59328400000231,
+                "max_ms": 40.08939999766881,
+                "p50_ms": 39.576700000907294,
+                "p95_ms": 39.769249998789746,
+                "p99_ms": 39.87397599965334
+              }
+            },
+            "resources": {
+              "process_cpu_seconds": 0.0,
+              "process_wall_seconds": 3.9593260000001465,
+              "process_cpu_percent_of_one_core": 0.0,
+              "process_cpu_ms_per_frame": 0.0
+            },
+            "capture": {
+              "mode": "sync",
+              "buffer_capacity": 0
+            },
+            "repeat": 3
+          }
+        ],
+        "limitations": "Synthetic blocking-call overlap experiment, NOT webcam or MediaPipe FPS.\n\nThe producer sleeps for a chosen read delay; the consumer sleeps for a chosen\nprocessing delay. Sleeps release the GIL. This isolates handoff/overlap and copy\ncost; it does not model sensor timing, CPU contention or recognition accuracy.\n"
+      }
+    },
+    "synthetic_final_latest": {
+      "source_path": "hand_tracking\\benchmarks\\phase3_10_final_latest_synthetic.json",
+      "sha256": "e9696ceae84c9af001422630a79a9fd588e24218e4ff91526274f0ce6520408c",
+      "data": {
+        "kind": "synthetic_blocking_call_overlap",
+        "python": "3.13.16",
+        "runs": [
+          {
+            "mode": "latest-thread",
+            "frames": 100,
+            "warmup_frames": 20,
+            "read_delay_ms": 15.3,
+            "processing_delay_ms": 23.8,
+            "shape": [
+              1080,
+              1920,
+              3
+            ],
+            "synthetic_completed_iterations_per_second": 40.98944083313232,
+            "timings": {
+              "consumer_wait": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 0.2417180001793895,
+                "max_ms": 0.3639999995357357,
+                "p50_ms": 0.23360000159300398,
+                "p95_ms": 0.30771000147069566,
+                "p99_ms": 0.35627800196380127
+              },
+              "frame_age_at_processing_start": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 9.344101999813574,
+                "max_ms": 17.573900000570575,
+                "p50_ms": 9.241899999324232,
+                "p95_ms": 16.828769998392087,
+                "p99_ms": 17.355803000209566
+              },
+              "host_age_at_processing_end": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 33.488155999802984,
+                "max_ms": 41.805100001511164,
+                "p50_ms": 33.38719999919704,
+                "p95_ms": 41.08585999802017,
+                "p99_ms": 41.627296001825016
+              },
+              "frame_interval": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 24.396588999989035,
+                "max_ms": 24.66629999980796,
+                "p50_ms": 24.478450000970042,
+                "p95_ms": 24.61691000044084,
+                "p99_ms": 24.64491599905159
+              }
+            },
+            "resources": {
+              "process_cpu_seconds": 0.125,
+              "process_wall_seconds": 2.4396526999989874,
+              "process_cpu_percent_of_one_core": 5.12368010414154,
+              "process_cpu_ms_per_frame": 1.25
+            },
+            "capture": {
+              "mode": "latest-thread",
+              "session": "462ddbd69876487b93ca953ecc67c5f2",
+              "buffer_capacity": 1,
+              "max_buffer_occupancy": 1,
+              "buffer_occupancy": 0,
+              "lifetime_counts": {
+                "capture_attempts": 178,
+                "consumed_frames": 120,
+                "consumer_wait_timeouts": 0,
+                "consumer_waits": 1,
+                "delivery_timeouts": 0,
+                "duplicate_packets_suppressed": 0,
+                "millisecond_timestamp_collisions_suppressed": 0,
+                "overwritten_unconsumed_frames": 56,
+                "read_failures": 0,
+                "release_failures": 0,
+                "shutdown_timeouts": 0,
+                "stale_frames_rejected": 0,
+                "stale_results_rejected": 0,
+                "startup_timeouts": 0,
+                "successful_frames": 177,
+                "worker_exceptions": 0
+              },
+              "measurement_counts": {
+                "capture_attempts": 147,
+                "consumed_frames": 100,
+                "consumer_wait_timeouts": 0,
+                "consumer_waits": 0,
+                "delivery_timeouts": 0,
+                "duplicate_packets_suppressed": 0,
+                "millisecond_timestamp_collisions_suppressed": 0,
+                "overwritten_unconsumed_frames": 47,
+                "read_failures": 0,
+                "release_failures": 0,
+                "shutdown_timeouts": 0,
+                "stale_frames_rejected": 0,
+                "stale_results_rejected": 0,
+                "startup_timeouts": 0,
+                "successful_frames": 147,
+                "worker_exceptions": 0
+              },
+              "measurement_seconds": 2.4396425999984785,
+              "capture_worker_delivery_fps": 60.25472747528334,
+              "timings": {
+                "consumer_wait": {
+                  "count": 100,
+                  "percentile_samples": 100,
+                  "mean_ms": 0.007536000011896249,
+                  "max_ms": 0.022199998056748882,
+                  "p50_ms": 0.006349999239319004,
+                  "p95_ms": 0.014704999193781987,
+                  "p99_ms": 0.01715099922876109
+                },
+                "camera_read": {
+                  "count": 147,
+                  "percentile_samples": 147,
+                  "mean_ms": 15.624359863946653,
+                  "max_ms": 16.0704000008991,
+                  "p50_ms": 15.641300000424962,
+                  "p95_ms": 15.837610000016866,
+                  "p99_ms": 16.03137800033437
+                },
+                "snapshot_copy": {
+                  "count": 147,
+                  "percentile_samples": 147,
+                  "mean_ms": 0.8708653060028798,
+                  "max_ms": 1.3213999991421588,
+                  "p50_ms": 0.8533000000170432,
+                  "p95_ms": 1.021589999072603,
+                  "p99_ms": 1.1372539980220608
+                },
+                "publication_interval": {
+                  "count": 146,
+                  "percentile_samples": 146,
+                  "mean_ms": 16.593897945200943,
+                  "max_ms": 17.178999998577638,
+                  "p50_ms": 16.584999999395222,
+                  "p95_ms": 16.955250001046807,
+                  "p99_ms": 17.057284999100375
+                }
+              },
+              "initialization_seconds": 0.0009204000016325153,
+              "first_frame_seconds": 0.01812190000055125,
+              "shutdown_seconds": 0.008203699999285163,
+              "shutdown_error": null,
+              "join_deadline_seconds": 12.0,
+              "worker_alive": false,
+              "release_completed": true,
+              "failed": false,
+              "error": null,
+              "metadata": {},
+              "sensor_fps": null,
+              "sensor_exposure_age_ms": null,
+              "driver_dropped_frames": null,
+              "first_frame_timeout_seconds": 5.0,
+              "max_host_age_seconds": 0.25,
+              "driver_duplicate_images": null,
+              "snapshot_policy": "one owned read-only BGR copy per publication",
+              "timestamp_semantics": "monotonic host read completion, not exposure time"
+            },
+            "repeat": 1
+          },
+          {
+            "mode": "latest-thread",
+            "frames": 100,
+            "warmup_frames": 20,
+            "read_delay_ms": 15.3,
+            "processing_delay_ms": 23.8,
+            "shape": [
+              1080,
+              1920,
+              3
+            ],
+            "synthetic_completed_iterations_per_second": 40.93862943285022,
+            "timings": {
+              "consumer_wait": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 0.23046699971018825,
+                "max_ms": 0.3680000008898787,
+                "p50_ms": 0.2272000001539709,
+                "p95_ms": 0.2859499998521641,
+                "p99_ms": 0.3425569980390721
+              },
+              "frame_age_at_processing_start": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 9.62312599982397,
+                "max_ms": 17.38169999953243,
+                "p50_ms": 9.2338499998732,
+                "p95_ms": 17.027079999024863,
+                "p99_ms": 17.369226001792413
+              },
+              "host_age_at_processing_end": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 33.81141700006992,
+                "max_ms": 41.64350000064587,
+                "p50_ms": 33.52635000010196,
+                "p95_ms": 41.101425000488234,
+                "p99_ms": 41.6048900019814
+              },
+              "frame_interval": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 24.42685399997572,
+                "max_ms": 24.689400001079775,
+                "p50_ms": 24.511749999874155,
+                "p95_ms": 24.574940001548384,
+                "p99_ms": 24.669896996638272
+              }
+            },
+            "resources": {
+              "process_cpu_seconds": 0.171875,
+              "process_wall_seconds": 2.4426806999981636,
+              "process_cpu_percent_of_one_core": 7.036326933771131,
+              "process_cpu_ms_per_frame": 1.71875
+            },
+            "capture": {
+              "mode": "latest-thread",
+              "session": "4da9fa79b74e498c9afcd612458cd73f",
+              "buffer_capacity": 1,
+              "max_buffer_occupancy": 1,
+              "buffer_occupancy": 0,
+              "lifetime_counts": {
+                "capture_attempts": 179,
+                "consumed_frames": 120,
+                "consumer_wait_timeouts": 1,
+                "consumer_waits": 2,
+                "delivery_timeouts": 0,
+                "duplicate_packets_suppressed": 0,
+                "millisecond_timestamp_collisions_suppressed": 0,
+                "overwritten_unconsumed_frames": 57,
+                "read_failures": 0,
+                "release_failures": 0,
+                "shutdown_timeouts": 0,
+                "stale_frames_rejected": 0,
+                "stale_results_rejected": 0,
+                "startup_timeouts": 0,
+                "successful_frames": 178,
+                "worker_exceptions": 0
+              },
+              "measurement_counts": {
+                "capture_attempts": 148,
+                "consumed_frames": 100,
+                "consumer_wait_timeouts": 0,
+                "consumer_waits": 0,
+                "delivery_timeouts": 0,
+                "duplicate_packets_suppressed": 0,
+                "millisecond_timestamp_collisions_suppressed": 0,
+                "overwritten_unconsumed_frames": 48,
+                "read_failures": 0,
+                "release_failures": 0,
+                "shutdown_timeouts": 0,
+                "stale_frames_rejected": 0,
+                "stale_results_rejected": 0,
+                "startup_timeouts": 0,
+                "successful_frames": 148,
+                "worker_exceptions": 0
+              },
+              "measurement_seconds": 2.442676400001801,
+              "capture_worker_delivery_fps": 60.58927821953447,
+              "timings": {
+                "consumer_wait": {
+                  "count": 100,
+                  "percentile_samples": 100,
+                  "mean_ms": 0.004956000084348489,
+                  "max_ms": 0.015000001440057531,
+                  "p50_ms": 0.004100000296602957,
+                  "p95_ms": 0.010200001270277426,
+                  "p99_ms": 0.014801999932387845
+                },
+                "camera_read": {
+                  "count": 148,
+                  "percentile_samples": 148,
+                  "mean_ms": 15.624753378393212,
+                  "max_ms": 16.2979999986419,
+                  "p50_ms": 15.653000000384054,
+                  "p95_ms": 15.806565000093542,
+                  "p99_ms": 15.965972000885815
+                },
+                "snapshot_copy": {
+                  "count": 148,
+                  "percentile_samples": 148,
+                  "mean_ms": 0.8310601349483083,
+                  "max_ms": 1.0753999995358754,
+                  "p50_ms": 0.8247499990829965,
+                  "p95_ms": 0.9368149994770647,
+                  "p99_ms": 1.0204829998474454
+                },
+                "publication_interval": {
+                  "count": 147,
+                  "percentile_samples": 147,
+                  "mean_ms": 16.548219047627153,
+                  "max_ms": 17.162000000098487,
+                  "p50_ms": 16.537999999854947,
+                  "p95_ms": 16.836560000592726,
+                  "p99_ms": 17.01854000115418
+                }
+              },
+              "initialization_seconds": 0.0003299999989394564,
+              "first_frame_seconds": 0.016929699999309378,
+              "shutdown_seconds": 0.014487199998256983,
+              "shutdown_error": null,
+              "join_deadline_seconds": 12.0,
+              "worker_alive": false,
+              "release_completed": true,
+              "failed": false,
+              "error": null,
+              "metadata": {},
+              "sensor_fps": null,
+              "sensor_exposure_age_ms": null,
+              "driver_dropped_frames": null,
+              "first_frame_timeout_seconds": 5.0,
+              "max_host_age_seconds": 0.25,
+              "driver_duplicate_images": null,
+              "snapshot_policy": "one owned read-only BGR copy per publication",
+              "timestamp_semantics": "monotonic host read completion, not exposure time"
+            },
+            "repeat": 2
+          },
+          {
+            "mode": "latest-thread",
+            "frames": 100,
+            "warmup_frames": 20,
+            "read_delay_ms": 15.3,
+            "processing_delay_ms": 23.8,
+            "shape": [
+              1080,
+              1920,
+              3
+            ],
+            "synthetic_completed_iterations_per_second": 40.96376767038659,
+            "timings": {
+              "consumer_wait": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 0.23062699983711354,
+                "max_ms": 0.4954000032739714,
+                "p50_ms": 0.22304999947664328,
+                "p95_ms": 0.2783000023555359,
+                "p99_ms": 0.3881830008322146
+              },
+              "frame_age_at_processing_start": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 9.223618999931205,
+                "max_ms": 17.528400003357092,
+                "p50_ms": 9.032349997141864,
+                "p95_ms": 16.74074500115239,
+                "p99_ms": 17.343764998477127
+              },
+              "host_age_at_processing_end": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 33.397055999994336,
+                "max_ms": 41.58359999928507,
+                "p50_ms": 33.2132499988802,
+                "p95_ms": 41.0001749989533,
+                "p99_ms": 41.561523000455054
+              },
+              "frame_interval": {
+                "count": 100,
+                "percentile_samples": 100,
+                "mean_ms": 24.411834999991697,
+                "max_ms": 24.764000001596287,
+                "p50_ms": 24.511100000381703,
+                "p95_ms": 24.58199500106275,
+                "p99_ms": 24.692125998153642
+              }
+            },
+            "resources": {
+              "process_cpu_seconds": 0.15625,
+              "process_wall_seconds": 2.4411817000000156,
+              "process_cpu_percent_of_one_core": 6.400588698497904,
+              "process_cpu_ms_per_frame": 1.5625
+            },
+            "capture": {
+              "mode": "latest-thread",
+              "session": "2253598ebe7e4efe92a3b11b5c390424",
+              "buffer_capacity": 1,
+              "max_buffer_occupancy": 1,
+              "buffer_occupancy": 0,
+              "lifetime_counts": {
+                "capture_attempts": 178,
+                "consumed_frames": 120,
+                "consumer_wait_timeouts": 0,
+                "consumer_waits": 1,
+                "delivery_timeouts": 0,
+                "duplicate_packets_suppressed": 0,
+                "millisecond_timestamp_collisions_suppressed": 0,
+                "overwritten_unconsumed_frames": 56,
+                "read_failures": 0,
+                "release_failures": 0,
+                "shutdown_timeouts": 0,
+                "stale_frames_rejected": 0,
+                "stale_results_rejected": 0,
+                "startup_timeouts": 0,
+                "successful_frames": 177,
+                "worker_exceptions": 0
+              },
+              "measurement_counts": {
+                "capture_attempts": 147,
+                "consumed_frames": 100,
+                "consumer_wait_timeouts": 0,
+                "consumer_waits": 0,
+                "delivery_timeouts": 0,
+                "duplicate_packets_suppressed": 0,
+                "millisecond_timestamp_collisions_suppressed": 0,
+                "overwritten_unconsumed_frames": 47,
+                "read_failures": 0,
+                "release_failures": 0,
+                "shutdown_timeouts": 0,
+                "stale_frames_rejected": 0,
+                "stale_results_rejected": 0,
+                "startup_timeouts": 0,
+                "successful_frames": 147,
+                "worker_exceptions": 0
+              },
+              "measurement_seconds": 2.441180500001792,
+              "capture_worker_delivery_fps": 60.21676807589282,
+              "timings": {
+                "consumer_wait": {
+                  "count": 100,
+                  "percentile_samples": 100,
+                  "mean_ms": 0.004375999924377538,
+                  "max_ms": 0.012399999832268804,
+                  "p50_ms": 0.0037500012695090845,
+                  "p95_ms": 0.00780500122345984,
+                  "p99_ms": 0.010123000502062508
+                },
+                "camera_read": {
+                  "count": 147,
+                  "percentile_samples": 147,
+                  "mean_ms": 15.627934013623634,
+                  "max_ms": 16.187400000490015,
+                  "p50_ms": 15.651499998057261,
+                  "p95_ms": 15.815119999388116,
+                  "p99_ms": 16.124171999836104
+                },
+                "snapshot_copy": {
+                  "count": 147,
+                  "percentile_samples": 147,
+                  "mean_ms": 0.8254319728206808,
+                  "max_ms": 1.1716000008163974,
+                  "p50_ms": 0.8205999984056689,
+                  "p95_ms": 0.9637400016799798,
+                  "p99_ms": 1.0549000005994458
+                },
+                "publication_interval": {
+                  "count": 146,
+                  "percentile_samples": 146,
+                  "mean_ms": 16.545037671227735,
+                  "max_ms": 17.0207000010123,
+                  "p50_ms": 16.529499998796382,
+                  "p95_ms": 16.839724999044847,
+                  "p99_ms": 16.98263499965833
+                }
+              },
+              "initialization_seconds": 0.0002746999998635147,
+              "first_frame_seconds": 0.01694560000032652,
+              "shutdown_seconds": 0.0010199999996984843,
+              "shutdown_error": null,
+              "join_deadline_seconds": 12.0,
+              "worker_alive": false,
+              "release_completed": true,
+              "failed": false,
+              "error": null,
+              "metadata": {},
+              "sensor_fps": null,
+              "sensor_exposure_age_ms": null,
+              "driver_dropped_frames": null,
+              "first_frame_timeout_seconds": 5.0,
+              "max_host_age_seconds": 0.25,
+              "driver_duplicate_images": null,
+              "snapshot_policy": "one owned read-only BGR copy per publication",
+              "timestamp_semantics": "monotonic host read completion, not exposure time"
+            },
+            "repeat": 3
+          }
+        ],
+        "limitations": "Synthetic blocking-call overlap experiment, NOT webcam or MediaPipe FPS.\n\nThe producer sleeps for a chosen read delay; the consumer sleeps for a chosen\nprocessing delay. Sleeps release the GIL. This isolates handoff/overlap and copy\ncost; it does not model sensor timing, CPU contention or recognition accuracy.\n"
+      }
+    },
+    "camera_only_sync": {
+      "source_path": "hand_tracking\\benchmarks\\phase3_10_camera_only_sync.json",
+      "sha256": "1fce7c01611c618209450d223b3c9abf32a8d8e4e5a4c47aa137517cae37d4fc",
+      "data": {
+        "kind": "camera_only_host_delivery",
+        "capture_pipeline_mode": "sync",
+        "requested_capture": {
+          "camera_index": 0,
+          "backend": "msmf",
+          "width": 1920,
+          "height": 1080,
+          "fps": 60.0,
+          "fourcc": "MJPG"
+        },
+        "sensor_fps": null,
+        "sensor_exposure_age_ms": null,
+        "limitations": "No inference/GUI/controls; BGR read completions are not verified unique sensor frames.",
+        "driver_readback": {
+          "backend": "MSMF",
+          "width": 1920.0,
+          "height": 1080.0,
+          "fps": 60.0,
+          "fourcc": "\u0016\u0000\u0000\u0000"
+        },
+        "configuration_accepted": {
+          "FOURCC": false,
+          "width": true,
+          "height": true,
+          "FPS": true
+        },
+        "actual_dimensions": [
+          1920,
+          1080
+        ],
+        "status": "completed",
+        "frames": 1800,
+        "measurement_seconds": 30.005375599997933,
+        "warmup_seconds_requested": 3.0,
+        "measurement_seconds_requested": 30.0,
+        "capture_only_consumer_fps": 59.989250726130685,
+        "timings": {
+          "camera_read": {
+            "count": 1800,
+            "percentile_samples": 1800,
+            "mean_ms": 16.64595361113849,
+            "max_ms": 39.05180000219843,
+            "p50_ms": 15.995949999705772,
+            "p95_ms": 22.075120000954485,
+            "p99_ms": 33.887821998723666
+          },
+          "host_age_at_consumption": {
+            "count": 1800,
+            "percentile_samples": 1800,
+            "mean_ms": 0.005337333289692954,
+            "max_ms": 0.019499999325489625,
+            "p50_ms": 0.004699999408330768,
+            "p95_ms": 0.008800001523923129,
+            "p99_ms": 0.010602000656945164
+          },
+          "consumer_delivery_interval": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 16.67004085603099,
+            "max_ms": 39.07140000228537,
+            "p50_ms": 16.018700000131503,
+            "p95_ms": 22.104589998343723,
+            "p99_ms": 33.920150001649745
+          }
+        },
+        "memory": {
+          "available": true,
+          "working_set_bytes_at_exit": 140959744,
+          "peak_working_set_bytes_process_lifetime": 165224448
+        },
+        "resources": {
+          "process_cpu_seconds": 35.96875,
+          "process_wall_seconds": 30.005375599997933,
+          "process_cpu_percent_of_one_core": 119.8743534475285,
+          "process_cpu_ms_per_frame": 19.98263888888889
+        }
+      }
+    },
+    "camera_only_latest_initial_timeout": {
+      "source_path": "hand_tracking\\benchmarks\\phase3_10_camera_only_latest.json",
+      "sha256": "4db86ad3e72562cf0fff04cdd8e0043d201e770558430f2ea9e61197d62c4d1b",
+      "data": {
+        "kind": "camera_only_host_delivery",
+        "capture_pipeline_mode": "latest-thread",
+        "requested_capture": {
+          "camera_index": 0,
+          "backend": "msmf",
+          "width": 1920,
+          "height": 1080,
+          "fps": 60.0,
+          "fourcc": "MJPG"
+        },
+        "sensor_fps": null,
+        "sensor_exposure_age_ms": null,
+        "limitations": "No inference/GUI/controls; BGR read completions are not verified unique sensor frames.",
+        "status": "error",
+        "error": "Capture initialization/first-frame timeout",
+        "capture_pipeline": {
+          "mode": "latest-thread",
+          "session": "dc7ee1e49c6e42a698a2c3141fdab073",
+          "buffer_capacity": 1,
+          "max_buffer_occupancy": 0,
+          "buffer_occupancy": 0,
+          "lifetime_counts": {
+            "consumer_waits": 316,
+            "consumer_wait_timeouts": 316
+          },
+          "measurement_counts": {},
+          "measurement_seconds": 0.0,
+          "capture_worker_delivery_fps": null,
+          "timings": {},
+          "initialization_seconds": 5.938504900001135,
+          "first_frame_seconds": null,
+          "shutdown_seconds": 0.9403610000008484,
+          "worker_alive": false,
+          "release_completed": true,
+          "failed": true,
+          "error": "Capture initialization/first-frame timeout",
+          "metadata": {
+            "driver_readback": {
+              "backend": "MSMF",
+              "width": 1920.0,
+              "height": 1080.0,
+              "fps": 60.0,
+              "fourcc": "\u0016\u0000\u0000\u0000"
+            },
+            "configuration_accepted": {
+              "FOURCC": false,
+              "width": true,
+              "height": true,
+              "FPS": true
+            }
+          },
+          "sensor_fps": null,
+          "sensor_exposure_age_ms": null,
+          "driver_dropped_frames": null,
+          "first_frame_timeout_seconds": 5.0,
+          "max_host_age_seconds": 0.25,
+          "driver_duplicate_images": null,
+          "snapshot_policy": "one owned read-only BGR copy per publication",
+          "timestamp_semantics": "monotonic host read completion, not exposure time"
+        },
+        "driver_readback": {
+          "backend": "MSMF",
+          "width": 1920.0,
+          "height": 1080.0,
+          "fps": 60.0,
+          "fourcc": "\u0016\u0000\u0000\u0000"
+        },
+        "configuration_accepted": {
+          "FOURCC": false,
+          "width": true,
+          "height": true,
+          "FPS": true
+        },
+        "frames": 0,
+        "measurement_seconds": 0.0,
+        "warmup_seconds_requested": 3.0,
+        "measurement_seconds_requested": 30.0,
+        "capture_only_consumer_fps": null,
+        "timings": {},
+        "memory": {
+          "available": true,
+          "working_set_bytes_at_exit": 117645312,
+          "peak_working_set_bytes_process_lifetime": 118362112
+        },
+        "resources": {
+          "process_cpu_seconds": 0.0,
+          "process_wall_seconds": 0.0,
+          "process_cpu_percent_of_one_core": null,
+          "process_cpu_ms_per_frame": null
+        }
+      }
+    },
+    "camera_only_latest_retry": {
+      "source_path": "hand_tracking\\benchmarks\\phase3_10_camera_only_latest_retry.json",
+      "sha256": "91c33b166b9442e5599f117419b886b2602e5366f43e1d00c5d2fdc585d6503e",
+      "data": {
+        "kind": "camera_only_host_delivery",
+        "capture_pipeline_mode": "latest-thread",
+        "requested_capture": {
+          "camera_index": 0,
+          "backend": "msmf",
+          "width": 1920,
+          "height": 1080,
+          "fps": 60.0,
+          "fourcc": "MJPG"
+        },
+        "sensor_fps": null,
+        "sensor_exposure_age_ms": null,
+        "limitations": "No inference/GUI/controls; BGR read completions are not verified unique sensor frames.",
+        "actual_dimensions": [
+          1920,
+          1080
+        ],
+        "status": "completed",
+        "capture_pipeline": {
+          "mode": "latest-thread",
+          "session": "783b2bc58bfe4e9d8f8699c264cfbd73",
+          "buffer_capacity": 1,
+          "max_buffer_occupancy": 1,
+          "buffer_occupancy": 0,
+          "lifetime_counts": {
+            "consumer_waits": 3271,
+            "consumer_wait_timeouts": 1288,
+            "capture_attempts": 1984,
+            "successful_frames": 1983,
+            "consumed_frames": 1983
+          },
+          "measurement_counts": {
+            "consumer_waits": 2592,
+            "successful_frames": 1800,
+            "capture_attempts": 1800,
+            "consumed_frames": 1800,
+            "consumer_wait_timeouts": 792
+          },
+          "measurement_seconds": 30.00415090000024,
+          "capture_worker_delivery_fps": 59.99169934850533,
+          "timings": {
+            "camera_read": {
+              "count": 1800,
+              "percentile_samples": 1800,
+              "mean_ms": 15.722367888805215,
+              "max_ms": 37.135099999431986,
+              "p50_ms": 15.104450001672376,
+              "p95_ms": 20.527464997030613,
+              "p99_ms": 32.99281600098765
+            },
+            "snapshot_copy": {
+              "count": 1800,
+              "percentile_samples": 1800,
+              "mean_ms": 0.9022617778221805,
+              "max_ms": 1.8763000007311348,
+              "p50_ms": 0.8492000015394296,
+              "p95_ms": 1.1479649985631113,
+              "p99_ms": 1.4186860007248467
+            },
+            "consumer_wait": {
+              "count": 2592,
+              "percentile_samples": 2592,
+              "mean_ms": 11.463090200614705,
+              "max_ms": 25.1211000031617,
+              "p50_ms": 13.527649998650304,
+              "p95_ms": 17.822290000003704,
+              "p99_ms": 20.35497899949408
+            },
+            "publication_interval": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 16.66940767092775,
+              "max_ms": 38.13889999946696,
+              "p50_ms": 16.006300000299234,
+              "p95_ms": 21.942619999026636,
+              "p99_ms": 34.05580800084863
+            }
+          },
+          "initialization_seconds": 5.983379200002673,
+          "first_frame_seconds": 6.5032750999998825,
+          "shutdown_seconds": 0.28930449999825214,
+          "worker_alive": false,
+          "release_completed": true,
+          "failed": false,
+          "error": null,
+          "metadata": {
+            "driver_readback": {
+              "backend": "MSMF",
+              "width": 1920.0,
+              "height": 1080.0,
+              "fps": 60.0,
+              "fourcc": "\u0016\u0000\u0000\u0000"
+            },
+            "configuration_accepted": {
+              "FOURCC": false,
+              "width": true,
+              "height": true,
+              "FPS": true
+            }
+          },
+          "sensor_fps": null,
+          "sensor_exposure_age_ms": null,
+          "driver_dropped_frames": null,
+          "first_frame_timeout_seconds": 15.0,
+          "max_host_age_seconds": 0.25,
+          "driver_duplicate_images": null,
+          "snapshot_policy": "one owned read-only BGR copy per publication",
+          "timestamp_semantics": "monotonic host read completion, not exposure time"
+        },
+        "driver_readback": {
+          "backend": "MSMF",
+          "width": 1920.0,
+          "height": 1080.0,
+          "fps": 60.0,
+          "fourcc": "\u0016\u0000\u0000\u0000"
+        },
+        "configuration_accepted": {
+          "FOURCC": false,
+          "width": true,
+          "height": true,
+          "FPS": true
+        },
+        "frames": 1800,
+        "measurement_seconds": 30.00413750000007,
+        "warmup_seconds_requested": 3.0,
+        "measurement_seconds_requested": 30.0,
+        "capture_only_consumer_fps": 59.9917261411029,
+        "timings": {
+          "camera_read": {
+            "count": 1800,
+            "percentile_samples": 1800,
+            "mean_ms": 15.722367888805215,
+            "max_ms": 37.135099999431986,
+            "p50_ms": 15.104450001672376,
+            "p95_ms": 20.527464997030613,
+            "p99_ms": 32.99281600098765
+          },
+          "host_age_at_consumption": {
+            "count": 1800,
+            "percentile_samples": 1800,
+            "mean_ms": 1.1002600555912068,
+            "max_ms": 2.182899999752408,
+            "p50_ms": 1.0670499996194849,
+            "p95_ms": 1.2999949991353787,
+            "p99_ms": 1.5993670015450334
+          },
+          "consumer_delivery_interval": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 16.66933418565876,
+            "max_ms": 38.02490000089165,
+            "p50_ms": 16.018599999370053,
+            "p95_ms": 21.838670001670835,
+            "p99_ms": 33.94510599922796
+          }
+        },
+        "memory": {
+          "available": true,
+          "working_set_bytes_at_exit": 138354688,
+          "peak_working_set_bytes_process_lifetime": 167579648
+        },
+        "resources": {
+          "process_cpu_seconds": 38.1875,
+          "process_wall_seconds": 30.00413750000007,
+          "process_cpu_percent_of_one_core": 127.27411344518706,
+          "process_cpu_ms_per_frame": 21.21527777777778
+        }
+      }
+    },
+    "real_headless_sync": {
+      "source_path": "hand_tracking\\benchmarks\\phase3_10_real_headless_sync.json",
+      "sha256": "bdf2d2acaacac06e66129eb5fb2ec6f325f94d0c3829c827a0da6fe4d35921bb",
+      "data": {
+        "max_hands_requested": 2,
+        "capture_pipeline_mode": "sync",
+        "track_ids_enabled": false,
+        "requested_capture": {
+          "width": 1920,
+          "height": 1080,
+          "fps": 60.0,
+          "backend": "msmf",
+          "fourcc": "MJPG",
+          "camera_index": 0
+        },
+        "inference_bounds": "full",
+        "smoothing": {
+          "enabled": true,
+          "alpha": 0.75,
+          "show_raw_landmarks": false
+        },
+        "execution_mode": "headless_tracking",
+        "gui_mode_requested": "auto",
+        "gestures_enabled": false,
+        "gesture_debug_enabled": false,
+        "gesture_states_enabled": false,
+        "swipes_enabled": false,
+        "logical_cpu_count": 16,
+        "python": "3.13.16",
+        "opencv": "5.0.0",
+        "mediapipe": "1.1.1",
+        "driver_readback": {
+          "backend": "MSMF",
+          "width": 1920.0,
+          "height": 1080.0,
+          "fps": 60.0,
+          "fourcc": "\u0016\u0000\u0000\u0000"
+        },
+        "capture_pipeline": {
+          "mode": "sync",
+          "buffer_capacity": 0,
+          "capture_worker_delivery_fps": null
+        },
+        "status": "completed",
+        "benchmark": true,
+        "frames": 1209,
+        "measurement_seconds": 30.00230549999833,
+        "average_application_fps": 40.29690318299263,
+        "capture_consumer": {},
+        "capture_consumer_counter_scope": "whole session including warmup",
+        "association_transitions": {},
+        "capture_resolution_frames": {
+          "1920x1080": 1209
+        },
+        "inference_resolution_frames": {
+          "1920x1080": 1209
+        },
+        "detected_hands_frames": {
+          "0": 1209
+        },
+        "warmup_seconds_requested": 3.0,
+        "measurement_seconds_requested": 30.0,
+        "timings": {
+          "camera_read": {
+            "count": 1209,
+            "percentile_samples": 1209,
+            "mean_ms": 11.682929528554421,
+            "max_ms": 34.68150000117021,
+            "p50_ms": 11.028599998098798,
+            "p95_ms": 17.332520000491055,
+            "p99_ms": 22.402411999792143
+          },
+          "inference_resize": {
+            "count": 1209,
+            "percentile_samples": 1209,
+            "mean_ms": 0.00715674107876584,
+            "max_ms": 0.1426999988325406,
+            "p50_ms": 0.005900001269765198,
+            "p95_ms": 0.012299999070819467,
+            "p99_ms": 0.01635999753489163
+          },
+          "bgr_to_rgb": {
+            "count": 1209,
+            "percentile_samples": 1209,
+            "mean_ms": 0.650378908218335,
+            "max_ms": 1.3292000003275461,
+            "p50_ms": 0.6278000000747852,
+            "p95_ms": 0.8588999990024604,
+            "p99_ms": 1.0005119988636582
+          },
+          "frame_age_at_inference_start": {
+            "count": 1209,
+            "percentile_samples": 1209,
+            "mean_ms": 1.761256823862497,
+            "max_ms": 3.9584000005561393,
+            "p50_ms": 1.658499997574836,
+            "p95_ms": 2.4266600004921193,
+            "p99_ms": 3.208288000605535
+          },
+          "mediapipe_image": {
+            "count": 1209,
+            "percentile_samples": 1209,
+            "mean_ms": 1.0733304384321563,
+            "max_ms": 3.077800000028219,
+            "p50_ms": 0.9825999986787792,
+            "p95_ms": 1.5032800009066691,
+            "p99_ms": 2.5269679998746146
+          },
+          "inference": {
+            "count": 1209,
+            "percentile_samples": 1209,
+            "mean_ms": 11.286619437553437,
+            "max_ms": 20.898800001305062,
+            "p50_ms": 11.279300000751391,
+            "p95_ms": 12.244900000223423,
+            "p99_ms": 13.297952000430087
+          },
+          "smoothing": {
+            "count": 1209,
+            "percentile_samples": 1209,
+            "mean_ms": 0.007097849450754911,
+            "max_ms": 0.022899999748915434,
+            "p50_ms": 0.006599999323952943,
+            "p95_ms": 0.01066000113496556,
+            "p99_ms": 0.014492001209873713
+          },
+          "processing": {
+            "count": 1209,
+            "percentile_samples": 1209,
+            "mean_ms": 13.0802087676903,
+            "max_ms": 22.661700000753626,
+            "p50_ms": 12.998399997741217,
+            "p95_ms": 14.338580000185175,
+            "p99_ms": 15.627380003134027
+          },
+          "end_to_end": {
+            "count": 1209,
+            "percentile_samples": 1209,
+            "mean_ms": 24.763138296244723,
+            "max_ms": 48.35100000127568,
+            "p50_ms": 24.09049999914714,
+            "p95_ms": 30.32984000237774,
+            "p99_ms": 35.36025599809364
+          },
+          "frame_interval": {
+            "count": 1209,
+            "percentile_samples": 1209,
+            "mean_ms": 24.815802729527153,
+            "max_ms": 48.39999999967404,
+            "p50_ms": 24.149599998054327,
+            "p95_ms": 30.37440000261994,
+            "p99_ms": 35.409999998373685
+          }
+        },
+        "timings_by_detected_hands": {
+          "0": {
+            "camera_read": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 11.682929528554421,
+              "max_ms": 34.68150000117021,
+              "p50_ms": 11.028599998098798,
+              "p95_ms": 17.332520000491055,
+              "p99_ms": 22.402411999792143
+            },
+            "inference_resize": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 0.00715674107876584,
+              "max_ms": 0.1426999988325406,
+              "p50_ms": 0.005900001269765198,
+              "p95_ms": 0.012299999070819467,
+              "p99_ms": 0.01635999753489163
+            },
+            "bgr_to_rgb": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 0.650378908218335,
+              "max_ms": 1.3292000003275461,
+              "p50_ms": 0.6278000000747852,
+              "p95_ms": 0.8588999990024604,
+              "p99_ms": 1.0005119988636582
+            },
+            "frame_age_at_inference_start": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 1.761256823862497,
+              "max_ms": 3.9584000005561393,
+              "p50_ms": 1.658499997574836,
+              "p95_ms": 2.4266600004921193,
+              "p99_ms": 3.208288000605535
+            },
+            "mediapipe_image": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 1.0733304384321563,
+              "max_ms": 3.077800000028219,
+              "p50_ms": 0.9825999986787792,
+              "p95_ms": 1.5032800009066691,
+              "p99_ms": 2.5269679998746146
+            },
+            "inference": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 11.286619437553437,
+              "max_ms": 20.898800001305062,
+              "p50_ms": 11.279300000751391,
+              "p95_ms": 12.244900000223423,
+              "p99_ms": 13.297952000430087
+            },
+            "smoothing": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 0.007097849450754911,
+              "max_ms": 0.022899999748915434,
+              "p50_ms": 0.006599999323952943,
+              "p95_ms": 0.01066000113496556,
+              "p99_ms": 0.014492001209873713
+            },
+            "processing": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 13.0802087676903,
+              "max_ms": 22.661700000753626,
+              "p50_ms": 12.998399997741217,
+              "p95_ms": 14.338580000185175,
+              "p99_ms": 15.627380003134027
+            },
+            "end_to_end": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 24.763138296244723,
+              "max_ms": 48.35100000127568,
+              "p50_ms": 24.09049999914714,
+              "p95_ms": 30.32984000237774,
+              "p99_ms": 35.36025599809364
+            },
+            "frame_interval": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 24.815802729527153,
+              "max_ms": 48.39999999967404,
+              "p50_ms": 24.149599998054327,
+              "p95_ms": 30.37440000261994,
+              "p99_ms": 35.409999998373685
+            }
+          }
+        },
+        "timings_by_preview_state": {
+          "headless": {
+            "camera_read": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 11.682929528554421,
+              "max_ms": 34.68150000117021,
+              "p50_ms": 11.028599998098798,
+              "p95_ms": 17.332520000491055,
+              "p99_ms": 22.402411999792143
+            },
+            "inference_resize": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 0.00715674107876584,
+              "max_ms": 0.1426999988325406,
+              "p50_ms": 0.005900001269765198,
+              "p95_ms": 0.012299999070819467,
+              "p99_ms": 0.01635999753489163
+            },
+            "bgr_to_rgb": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 0.650378908218335,
+              "max_ms": 1.3292000003275461,
+              "p50_ms": 0.6278000000747852,
+              "p95_ms": 0.8588999990024604,
+              "p99_ms": 1.0005119988636582
+            },
+            "frame_age_at_inference_start": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 1.761256823862497,
+              "max_ms": 3.9584000005561393,
+              "p50_ms": 1.658499997574836,
+              "p95_ms": 2.4266600004921193,
+              "p99_ms": 3.208288000605535
+            },
+            "mediapipe_image": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 1.0733304384321563,
+              "max_ms": 3.077800000028219,
+              "p50_ms": 0.9825999986787792,
+              "p95_ms": 1.5032800009066691,
+              "p99_ms": 2.5269679998746146
+            },
+            "inference": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 11.286619437553437,
+              "max_ms": 20.898800001305062,
+              "p50_ms": 11.279300000751391,
+              "p95_ms": 12.244900000223423,
+              "p99_ms": 13.297952000430087
+            },
+            "smoothing": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 0.007097849450754911,
+              "max_ms": 0.022899999748915434,
+              "p50_ms": 0.006599999323952943,
+              "p95_ms": 0.01066000113496556,
+              "p99_ms": 0.014492001209873713
+            },
+            "processing": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 13.0802087676903,
+              "max_ms": 22.661700000753626,
+              "p50_ms": 12.998399997741217,
+              "p95_ms": 14.338580000185175,
+              "p99_ms": 15.627380003134027
+            },
+            "end_to_end": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 24.763138296244723,
+              "max_ms": 48.35100000127568,
+              "p50_ms": 24.09049999914714,
+              "p95_ms": 30.32984000237774,
+              "p99_ms": 35.36025599809364
+            },
+            "frame_interval": {
+              "count": 1209,
+              "percentile_samples": 1209,
+              "mean_ms": 24.815802729527153,
+              "max_ms": 48.39999999967404,
+              "p50_ms": 24.149599998054327,
+              "p95_ms": 30.37440000261994,
+              "p99_ms": 35.409999998373685
+            }
+          }
+        },
+        "performance_profile_enabled": true,
+        "pacing": {
+          "enabled": true,
+          "percentile_capacity_per_series": 8192,
+          "stall_threshold_ms": 100.0,
+          "long_frame_stalls": {},
+          "transitions": {},
+          "cursor_gaps_over_threshold_including_intentional_pauses": {},
+          "frames_by_preview_state": {
+            "headless": 1209
+          },
+          "cursor_updates": 0,
+          "capture_delivery_fps": 40.2937358641089,
+          "camera_sensor_fps": null,
+          "camera_driver_frame_age_ms": null,
+          "dropped_camera_frames": null,
+          "application_frame_queue_capacity": 0,
+          "application_queued_frames": 0,
+          "preview_frames_skipped": 0,
+          "timings": {
+            "capture_delivery_interval": {
+              "count": 1208,
+              "percentile_samples": 1208,
+              "mean_ms": 24.81775339403901,
+              "max_ms": 47.432499999558786,
+              "p50_ms": 24.08945000024687,
+              "p95_ms": 30.24701499925867,
+              "p99_ms": 35.0134479989356
+            },
+            "frame_completion_interval": {
+              "count": 1208,
+              "percentile_samples": 1208,
+              "mean_ms": 24.818403725165755,
+              "max_ms": 48.39999999967404,
+              "p50_ms": 24.15099999961967,
+              "p95_ms": 30.38052500269258,
+              "p99_ms": 35.410799998353475
+            }
+          },
+          "by_preview_state": {
+            "headless": {
+              "frames": 1209,
+              "loop_seconds": 30.002087799999572,
+              "application_fps": 40.29719558383591,
+              "timings": {
+                "capture_delivery_interval": {
+                  "count": 1208,
+                  "percentile_samples": 1208,
+                  "mean_ms": 24.81775339403901,
+                  "max_ms": 47.432499999558786,
+                  "p50_ms": 24.08945000024687,
+                  "p95_ms": 30.24701499925867,
+                  "p99_ms": 35.0134479989356
+                },
+                "frame_completion_interval": {
+                  "count": 1208,
+                  "percentile_samples": 1208,
+                  "mean_ms": 24.818403725165755,
+                  "max_ms": 48.39999999967404,
+                  "p50_ms": 24.15099999961967,
+                  "p95_ms": 30.38052500269258,
+                  "p99_ms": 35.410799998353475
+                }
+              }
+            }
+          },
+          "limitations": "Synchronous capture delivery is not independent camera throughput. Host age starts at read completion, not exposure. Cursor intervals include intentional gesture pauses."
+        },
+        "memory": {
+          "available": true,
+          "working_set_bytes_at_exit": 283951104,
+          "peak_working_set_bytes_process_lifetime": 297144320
+        },
+        "gui": {
+          "requested": "auto",
+          "effective": "none",
+          "backend": null,
+          "fallback_reason": null
+        },
+        "resources": {
+          "process_cpu_seconds": 53.0625,
+          "process_wall_seconds": 30.002371899998252,
+          "process_cpu_percent_of_one_core": 176.86101677848708,
+          "process_cpu_ms_per_frame": 43.88957816377171
+        },
+        "gestures": {
+          "enabled": false,
+          "debug_enabled": false,
+          "input": "smoothed",
+          "thresholds": {
+            "extended_joint_min_degrees": 155.0,
+            "extended_distal_min_degrees": 145.0,
+            "extended_straightness_min": 0.88,
+            "extended_tip_to_wrist_min": 1.15,
+            "curled_joint_max_degrees": 110.0,
+            "curled_distal_max_degrees": 160.0,
+            "curled_straightness_max": 0.75,
+            "curled_tip_to_wrist_max": 1.25,
+            "pointing_index_joint_min_degrees": 145.0,
+            "pointing_curled_tip_to_wrist_max": 1.65,
+            "pointing_tip_separation_min": 0.25,
+            "unsupported_thumb_tip_to_wrist_min": 1.35
+          },
+          "classification_counts": {}
+        },
+        "pinch": {
+          "enabled": false,
+          "debug_enabled": false,
+          "thresholds": {
+            "activation": 0.25,
+            "release": 0.4
+          },
+          "status_counts": {},
+          "input": "smoothed",
+          "recovery": "open beyond release threshold to rearm; no release on loss"
+        },
+        "gesture_states": {
+          "enabled": false,
+          "debug_enabled": false,
+          "settings": {
+            "activation_ms": 100,
+            "transition_ms": 60,
+            "cooldown_ms": 150,
+            "update_ms": 250
+          },
+          "state_counts": {},
+          "event_counts": {},
+          "shutdown_events": [],
+          "policy": "PINCH takes precedence; UNKNOWN/unavailable cancels; no OS actions"
+        },
+        "swipes": {
+          "enabled": false,
+          "debug_enabled": false,
+          "settings": {
+            "min_distance": 1.5,
+            "min_velocity": 3.0,
+            "dominance": 3.0,
+            "consistency": 0.85,
+            "min_ms": 120,
+            "max_ms": 600,
+            "cooldown_ms": 800,
+            "reset_ms": 250,
+            "feedback_ms": 350,
+            "max_scale_change": 0.25,
+            "pose": "open-palm"
+          },
+          "confirmation_counts": {},
+          "coordinates": "unmirrored image: right increases x, left decreases x",
+          "event_policy": "one STARTED then ENDED at confirmation; consume STARTED once"
+        },
+        "controls": {
+          "enabled": false,
+          "settings": {
+            "mode": "simulate",
+            "hand": "Right",
+            "mouse": false,
+            "tabs": false,
+            "sensitivity": 1.5,
+            "alpha": 0.6,
+            "margin": 0.1,
+            "monitor": 0,
+            "debug": false,
+            "browsers": [
+              "chrome.exe",
+              "msedge.exe",
+              "firefox.exe"
+            ],
+            "invert_x": false,
+            "mapping": "relative",
+            "region_width": 0.8,
+            "region_height": 0.8,
+            "emergency_hotkey": "ctrl+alt+esc",
+            "gesture_rearm": false,
+            "rearm_hold_ms": 800,
+            "rearm_stable_ms": 300,
+            "rearm_debug": false,
+            "gesture_profile": "legacy",
+            "cursor_resume": "automatic"
+          },
+          "final_status": null,
+          "mapping": "relative aspect-correct smoothed index tip; activation anchors cursor",
+          "emergency_stop": "ctrl+alt+esc (live only); 500 ms host-stall watchdog"
+        },
+        "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown."
+      }
+    },
+    "real_headless_latest_initial_warmup": {
+      "source_path": "hand_tracking\\benchmarks\\phase3_10_real_headless_latest.json",
+      "sha256": "8f4288ae98de13a68a48320981df508ba81a858d9479e08fd8a271f2dc5010f1",
+      "data": {
+        "max_hands_requested": 2,
+        "capture_pipeline_mode": "latest-thread",
+        "track_ids_enabled": false,
+        "requested_capture": {
+          "width": 1920,
+          "height": 1080,
+          "fps": 60.0,
+          "backend": "msmf",
+          "fourcc": "MJPG",
+          "camera_index": 0
+        },
+        "inference_bounds": "full",
+        "smoothing": {
+          "enabled": true,
+          "alpha": 0.75,
+          "show_raw_landmarks": false
+        },
+        "execution_mode": "headless_tracking",
+        "gui_mode_requested": "auto",
+        "gestures_enabled": false,
+        "gesture_debug_enabled": false,
+        "gesture_states_enabled": false,
+        "swipes_enabled": false,
+        "logical_cpu_count": 16,
+        "python": "3.13.16",
+        "opencv": "5.0.0",
+        "mediapipe": "1.1.1",
+        "status": "completed",
+        "benchmark": true,
+        "frames": 1792,
+        "measurement_seconds": 30.01723910000146,
+        "average_application_fps": 59.69902808282967,
+        "capture_consumer": {
+          "skipped_sequences": 3,
+          "last_sequence": 1796
+        },
+        "capture_consumer_counter_scope": "whole session including warmup",
+        "association_transitions": {},
+        "capture_resolution_frames": {
+          "1920x1080": 1792
+        },
+        "inference_resolution_frames": {
+          "1920x1080": 1792
+        },
+        "detected_hands_frames": {
+          "0": 1792
+        },
+        "warmup_seconds_requested": 3.0,
+        "measurement_seconds_requested": 30.0,
+        "timings": {
+          "capture_wait": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 2.5293672991283853,
+            "max_ms": 34.65430000142078,
+            "p50_ms": 1.731649999783258,
+            "p95_ms": 6.629079999038365,
+            "p99_ms": 19.694865001802096
+          },
+          "camera_read": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 15.781342243296795,
+            "max_ms": 46.94500000186963,
+            "p50_ms": 15.11939999909373,
+            "p95_ms": 21.962940001321773,
+            "p99_ms": 32.26356300168845
+          },
+          "inference_resize": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 0.005926283472084444,
+            "max_ms": 0.026999998226528987,
+            "p50_ms": 0.005699999746866524,
+            "p95_ms": 0.008999999408842996,
+            "p99_ms": 0.012235998583491859
+          },
+          "bgr_to_rgb": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 0.8334958705680557,
+            "max_ms": 1.6947000003710855,
+            "p50_ms": 0.7990499998413725,
+            "p95_ms": 1.1161999987962183,
+            "p99_ms": 1.2944069993318406
+          },
+          "frame_age_at_inference_start": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 3.967139955355898,
+            "max_ms": 18.853900000976864,
+            "p50_ms": 3.138450001642923,
+            "p95_ms": 8.879320000960423,
+            "p99_ms": 13.997241000724882
+          },
+          "mediapipe_image": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 1.2124773995359257,
+            "max_ms": 4.450500000530155,
+            "p50_ms": 1.121249999414431,
+            "p95_ms": 1.7136100012066888,
+            "p99_ms": 2.137208000094688
+          },
+          "inference": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 11.833945870514688,
+            "max_ms": 18.851400000130525,
+            "p50_ms": 11.711400000422145,
+            "p95_ms": 13.475260000450362,
+            "p99_ms": 14.474413999778328
+          },
+          "processed_observation_interval": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 16.752990345982052,
+            "max_ms": 48.035099996923236,
+            "p50_ms": 16.02149999962421,
+            "p95_ms": 23.76931499929921,
+            "p99_ms": 33.08657899920943
+          },
+          "smoothing": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 0.0065377232435334266,
+            "max_ms": 0.027599999157246202,
+            "p50_ms": 0.005900001269765198,
+            "p95_ms": 0.01080000220099464,
+            "p99_ms": 0.013908996770624063
+          },
+          "processing": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 15.83817187497516,
+            "max_ms": 33.21190000133356,
+            "p50_ms": 15.098449999641161,
+            "p95_ms": 21.606104999773372,
+            "p99_ms": 26.456121000519467
+          },
+          "end_to_end": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 16.689567410758904,
+            "max_ms": 49.57350000040606,
+            "p50_ms": 15.941300000122283,
+            "p95_ms": 21.880405000047165,
+            "p99_ms": 33.7600550011848
+          },
+          "frame_interval": {
+            "count": 1792,
+            "percentile_samples": 1792,
+            "mean_ms": 16.75065033482172,
+            "max_ms": 49.620000001596054,
+            "p50_ms": 16.00949999919976,
+            "p95_ms": 21.976205000282786,
+            "p99_ms": 33.80836899868882
+          }
+        },
+        "timings_by_detected_hands": {
+          "0": {
+            "capture_wait": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 2.5293672991283853,
+              "max_ms": 34.65430000142078,
+              "p50_ms": 1.731649999783258,
+              "p95_ms": 6.629079999038365,
+              "p99_ms": 19.694865001802096
+            },
+            "camera_read": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 15.781342243296795,
+              "max_ms": 46.94500000186963,
+              "p50_ms": 15.11939999909373,
+              "p95_ms": 21.962940001321773,
+              "p99_ms": 32.26356300168845
+            },
+            "inference_resize": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 0.005926283472084444,
+              "max_ms": 0.026999998226528987,
+              "p50_ms": 0.005699999746866524,
+              "p95_ms": 0.008999999408842996,
+              "p99_ms": 0.012235998583491859
+            },
+            "bgr_to_rgb": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 0.8334958705680557,
+              "max_ms": 1.6947000003710855,
+              "p50_ms": 0.7990499998413725,
+              "p95_ms": 1.1161999987962183,
+              "p99_ms": 1.2944069993318406
+            },
+            "frame_age_at_inference_start": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 3.967139955355898,
+              "max_ms": 18.853900000976864,
+              "p50_ms": 3.138450001642923,
+              "p95_ms": 8.879320000960423,
+              "p99_ms": 13.997241000724882
+            },
+            "mediapipe_image": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 1.2124773995359257,
+              "max_ms": 4.450500000530155,
+              "p50_ms": 1.121249999414431,
+              "p95_ms": 1.7136100012066888,
+              "p99_ms": 2.137208000094688
+            },
+            "inference": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 11.833945870514688,
+              "max_ms": 18.851400000130525,
+              "p50_ms": 11.711400000422145,
+              "p95_ms": 13.475260000450362,
+              "p99_ms": 14.474413999778328
+            },
+            "processed_observation_interval": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 16.752990345982052,
+              "max_ms": 48.035099996923236,
+              "p50_ms": 16.02149999962421,
+              "p95_ms": 23.76931499929921,
+              "p99_ms": 33.08657899920943
+            },
+            "smoothing": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 0.0065377232435334266,
+              "max_ms": 0.027599999157246202,
+              "p50_ms": 0.005900001269765198,
+              "p95_ms": 0.01080000220099464,
+              "p99_ms": 0.013908996770624063
+            },
+            "processing": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 15.83817187497516,
+              "max_ms": 33.21190000133356,
+              "p50_ms": 15.098449999641161,
+              "p95_ms": 21.606104999773372,
+              "p99_ms": 26.456121000519467
+            },
+            "end_to_end": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 16.689567410758904,
+              "max_ms": 49.57350000040606,
+              "p50_ms": 15.941300000122283,
+              "p95_ms": 21.880405000047165,
+              "p99_ms": 33.7600550011848
+            },
+            "frame_interval": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 16.75065033482172,
+              "max_ms": 49.620000001596054,
+              "p50_ms": 16.00949999919976,
+              "p95_ms": 21.976205000282786,
+              "p99_ms": 33.80836899868882
+            }
+          }
+        },
+        "timings_by_preview_state": {
+          "headless": {
+            "capture_wait": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 2.5293672991283853,
+              "max_ms": 34.65430000142078,
+              "p50_ms": 1.731649999783258,
+              "p95_ms": 6.629079999038365,
+              "p99_ms": 19.694865001802096
+            },
+            "camera_read": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 15.781342243296795,
+              "max_ms": 46.94500000186963,
+              "p50_ms": 15.11939999909373,
+              "p95_ms": 21.962940001321773,
+              "p99_ms": 32.26356300168845
+            },
+            "inference_resize": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 0.005926283472084444,
+              "max_ms": 0.026999998226528987,
+              "p50_ms": 0.005699999746866524,
+              "p95_ms": 0.008999999408842996,
+              "p99_ms": 0.012235998583491859
+            },
+            "bgr_to_rgb": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 0.8334958705680557,
+              "max_ms": 1.6947000003710855,
+              "p50_ms": 0.7990499998413725,
+              "p95_ms": 1.1161999987962183,
+              "p99_ms": 1.2944069993318406
+            },
+            "frame_age_at_inference_start": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 3.967139955355898,
+              "max_ms": 18.853900000976864,
+              "p50_ms": 3.138450001642923,
+              "p95_ms": 8.879320000960423,
+              "p99_ms": 13.997241000724882
+            },
+            "mediapipe_image": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 1.2124773995359257,
+              "max_ms": 4.450500000530155,
+              "p50_ms": 1.121249999414431,
+              "p95_ms": 1.7136100012066888,
+              "p99_ms": 2.137208000094688
+            },
+            "inference": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 11.833945870514688,
+              "max_ms": 18.851400000130525,
+              "p50_ms": 11.711400000422145,
+              "p95_ms": 13.475260000450362,
+              "p99_ms": 14.474413999778328
+            },
+            "processed_observation_interval": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 16.752990345982052,
+              "max_ms": 48.035099996923236,
+              "p50_ms": 16.02149999962421,
+              "p95_ms": 23.76931499929921,
+              "p99_ms": 33.08657899920943
+            },
+            "smoothing": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 0.0065377232435334266,
+              "max_ms": 0.027599999157246202,
+              "p50_ms": 0.005900001269765198,
+              "p95_ms": 0.01080000220099464,
+              "p99_ms": 0.013908996770624063
+            },
+            "processing": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 15.83817187497516,
+              "max_ms": 33.21190000133356,
+              "p50_ms": 15.098449999641161,
+              "p95_ms": 21.606104999773372,
+              "p99_ms": 26.456121000519467
+            },
+            "end_to_end": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 16.689567410758904,
+              "max_ms": 49.57350000040606,
+              "p50_ms": 15.941300000122283,
+              "p95_ms": 21.880405000047165,
+              "p99_ms": 33.7600550011848
+            },
+            "frame_interval": {
+              "count": 1792,
+              "percentile_samples": 1792,
+              "mean_ms": 16.75065033482172,
+              "max_ms": 49.620000001596054,
+              "p50_ms": 16.00949999919976,
+              "p95_ms": 21.976205000282786,
+              "p99_ms": 33.80836899868882
+            }
+          }
+        },
+        "performance_profile_enabled": true,
+        "pacing": {
+          "enabled": true,
+          "percentile_capacity_per_series": 8192,
+          "stall_threshold_ms": 100.0,
+          "long_frame_stalls": {},
+          "transitions": {},
+          "cursor_gaps_over_threshold_including_intentional_pauses": {},
+          "frames_by_preview_state": {
+            "headless": 1792
+          },
+          "cursor_updates": 0,
+          "camera_sensor_fps": null,
+          "camera_driver_frame_age_ms": null,
+          "dropped_camera_frames": null,
+          "application_frame_queue_capacity": 1,
+          "application_queued_frames": 0,
+          "preview_frames_skipped": 0,
+          "timings": {
+            "capture_delivery_interval": {
+              "count": 1791,
+              "percentile_samples": 1791,
+              "mean_ms": 16.7560870463418,
+              "max_ms": 48.035099996923236,
+              "p50_ms": 16.02149999962421,
+              "p95_ms": 23.778049999236828,
+              "p99_ms": 33.08940999922922
+            },
+            "frame_completion_interval": {
+              "count": 1791,
+              "percentile_samples": 1791,
+              "mean_ms": 16.74992082635483,
+              "max_ms": 49.620000001596054,
+              "p50_ms": 16.00709999911487,
+              "p95_ms": 21.976750000249012,
+              "p99_ms": 33.80890999869734
+            }
+          },
+          "by_preview_state": {
+            "headless": {
+              "frames": 1792,
+              "loop_seconds": 30.016988900002616,
+              "application_fps": 59.69952569092777,
+              "timings": {
+                "capture_delivery_interval": {
+                  "count": 1791,
+                  "percentile_samples": 1791,
+                  "mean_ms": 16.7560870463418,
+                  "max_ms": 48.035099996923236,
+                  "p50_ms": 16.02149999962421,
+                  "p95_ms": 23.778049999236828,
+                  "p99_ms": 33.08940999922922
+                },
+                "frame_completion_interval": {
+                  "count": 1791,
+                  "percentile_samples": 1791,
+                  "mean_ms": 16.74992082635483,
+                  "max_ms": 49.620000001596054,
+                  "p50_ms": 16.00709999911487,
+                  "p95_ms": 21.976750000249012,
+                  "p99_ms": 33.80890999869734
+                }
+              }
+            }
+          },
+          "limitations": "Read-completion intervals cover consumed snapshots; producer delivery FPS is in capture_pipeline. Host age includes slot waiting, not sensor exposure age. Cursor gaps include intentional poses/pauses.",
+          "consumed_capture_delivery_fps": 59.67980455307557
+        },
+        "memory": {
+          "available": true,
+          "working_set_bytes_at_exit": 283734016,
+          "peak_working_set_bytes_process_lifetime": 301977600
+        },
+        "gui": {
+          "requested": "auto",
+          "effective": "none",
+          "backend": null,
+          "fallback_reason": null
+        },
+        "resources": {
+          "process_cpu_seconds": 84.078125,
+          "process_wall_seconds": 30.017236399999092,
+          "process_cpu_percent_of_one_core": 280.09948644040577,
+          "process_cpu_ms_per_frame": 46.91859654017857
+        },
+        "gestures": {
+          "enabled": false,
+          "debug_enabled": false,
+          "input": "smoothed",
+          "thresholds": {
+            "extended_joint_min_degrees": 155.0,
+            "extended_distal_min_degrees": 145.0,
+            "extended_straightness_min": 0.88,
+            "extended_tip_to_wrist_min": 1.15,
+            "curled_joint_max_degrees": 110.0,
+            "curled_distal_max_degrees": 160.0,
+            "curled_straightness_max": 0.75,
+            "curled_tip_to_wrist_max": 1.25,
+            "pointing_index_joint_min_degrees": 145.0,
+            "pointing_curled_tip_to_wrist_max": 1.65,
+            "pointing_tip_separation_min": 0.25,
+            "unsupported_thumb_tip_to_wrist_min": 1.35
+          },
+          "classification_counts": {}
+        },
+        "pinch": {
+          "enabled": false,
+          "debug_enabled": false,
+          "thresholds": {
+            "activation": 0.25,
+            "release": 0.4
+          },
+          "status_counts": {},
+          "input": "smoothed",
+          "recovery": "open beyond release threshold to rearm; no release on loss"
+        },
+        "gesture_states": {
+          "enabled": false,
+          "debug_enabled": false,
+          "settings": {
+            "activation_ms": 100,
+            "transition_ms": 60,
+            "cooldown_ms": 150,
+            "update_ms": 250
+          },
+          "state_counts": {},
+          "event_counts": {},
+          "shutdown_events": [],
+          "policy": "PINCH takes precedence; UNKNOWN/unavailable cancels; no OS actions"
+        },
+        "swipes": {
+          "enabled": false,
+          "debug_enabled": false,
+          "settings": {
+            "min_distance": 1.5,
+            "min_velocity": 3.0,
+            "dominance": 3.0,
+            "consistency": 0.85,
+            "min_ms": 120,
+            "max_ms": 600,
+            "cooldown_ms": 800,
+            "reset_ms": 250,
+            "feedback_ms": 350,
+            "max_scale_change": 0.25,
+            "pose": "open-palm"
+          },
+          "confirmation_counts": {},
+          "coordinates": "unmirrored image: right increases x, left decreases x",
+          "event_policy": "one STARTED then ENDED at confirmation; consume STARTED once"
+        },
+        "controls": {
+          "enabled": false,
+          "settings": {
+            "mode": "simulate",
+            "hand": "Right",
+            "mouse": false,
+            "tabs": false,
+            "sensitivity": 1.5,
+            "alpha": 0.6,
+            "margin": 0.1,
+            "monitor": 0,
+            "debug": false,
+            "browsers": [
+              "chrome.exe",
+              "msedge.exe",
+              "firefox.exe"
+            ],
+            "invert_x": false,
+            "mapping": "relative",
+            "region_width": 0.8,
+            "region_height": 0.8,
+            "emergency_hotkey": "ctrl+alt+esc",
+            "gesture_rearm": false,
+            "rearm_hold_ms": 800,
+            "rearm_stable_ms": 300,
+            "rearm_debug": false,
+            "gesture_profile": "legacy",
+            "cursor_resume": "automatic"
+          },
+          "final_status": null,
+          "mapping": "relative aspect-correct smoothed index tip; activation anchors cursor",
+          "emergency_stop": "ctrl+alt+esc (live only); 500 ms host-stall watchdog"
+        },
+        "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown.",
+        "capture_pipeline": {
+          "mode": "latest-thread",
+          "session": "9b74c453bb9b4a12923a4929913ba326",
+          "buffer_capacity": 1,
+          "max_buffer_occupancy": 1,
+          "buffer_occupancy": 0,
+          "lifetime_counts": {
+            "consumer_waits": 1796,
+            "consumer_wait_timeouts": 448,
+            "capture_attempts": 1797,
+            "successful_frames": 1796,
+            "consumed_frames": 1793,
+            "overwritten_unconsumed_frames": 3
+          },
+          "measurement_counts": {
+            "consumed_frames": 1792,
+            "successful_frames": 1794,
+            "capture_attempts": 1794,
+            "overwritten_unconsumed_frames": 3,
+            "consumer_waits": 1393,
+            "consumer_wait_timeouts": 46
+          },
+          "measurement_seconds": 30.017170400002215,
+          "capture_worker_delivery_fps": 59.76579324744972,
+          "timings": {
+            "consumer_wait": {
+              "count": 1838,
+              "percentile_samples": 1838,
+              "mean_ms": 2.452335690956495,
+              "max_ms": 23.90929999819491,
+              "p50_ms": 1.8367499997111736,
+              "p95_ms": 8.156400000734715,
+              "p99_ms": 18.683979001762026
+            },
+            "camera_read": {
+              "count": 1794,
+              "percentile_samples": 1794,
+              "mean_ms": 15.780284894080959,
+              "max_ms": 46.94500000186963,
+              "p50_ms": 15.11920000120881,
+              "p95_ms": 21.925020001435733,
+              "p99_ms": 32.26334900165966
+            },
+            "snapshot_copy": {
+              "count": 1794,
+              "percentile_samples": 1794,
+              "mean_ms": 0.9132229096756412,
+              "max_ms": 6.165300001157448,
+              "p50_ms": 0.8331999997608364,
+              "p95_ms": 1.28947000066546,
+              "p99_ms": 1.681212000657977
+            },
+            "publication_interval": {
+              "count": 1793,
+              "percentile_samples": 1793,
+              "mean_ms": 16.73002163970959,
+              "max_ms": 48.279700000421144,
+              "p50_ms": 16.019900001992937,
+              "p95_ms": 23.156679999374212,
+              "p99_ms": 33.073335997905815
+            }
+          },
+          "initialization_seconds": 5.896748200000729,
+          "first_frame_seconds": 6.376756699999532,
+          "shutdown_seconds": 0.2573812000009639,
+          "shutdown_error": null,
+          "join_deadline_seconds": 12.0,
+          "worker_alive": false,
+          "release_completed": true,
+          "failed": false,
+          "error": null,
+          "metadata": {
+            "driver_readback": {
+              "backend": "MSMF",
+              "width": 1920.0,
+              "height": 1080.0,
+              "fps": 60.0,
+              "fourcc": "\u0016\u0000\u0000\u0000"
+            }
+          },
+          "sensor_fps": null,
+          "sensor_exposure_age_ms": null,
+          "driver_dropped_frames": null,
+          "first_frame_timeout_seconds": 15.0,
+          "max_host_age_seconds": 0.25,
+          "driver_duplicate_images": null,
+          "snapshot_policy": "one owned read-only BGR copy per publication",
+          "timestamp_semantics": "monotonic host read completion, not exposure time"
+        },
+        "driver_readback": {
+          "backend": "MSMF",
+          "width": 1920.0,
+          "height": 1080.0,
+          "fps": 60.0,
+          "fourcc": "\u0016\u0000\u0000\u0000"
+        }
+      }
+    },
+    "real_headless_latest_warmed": {
+      "source_path": "hand_tracking\\benchmarks\\phase3_10_real_headless_latest_warmed.json",
+      "sha256": "a48b925b1322d074e6669a253a269a3496c9e0554ef95b95ad363eab221047be",
+      "data": {
+        "max_hands_requested": 2,
+        "capture_pipeline_mode": "latest-thread",
+        "track_ids_enabled": false,
+        "requested_capture": {
+          "width": 1920,
+          "height": 1080,
+          "fps": 60.0,
+          "backend": "msmf",
+          "fourcc": "MJPG",
+          "camera_index": 0
+        },
+        "inference_bounds": "full",
+        "smoothing": {
+          "enabled": true,
+          "alpha": 0.75,
+          "show_raw_landmarks": false
+        },
+        "execution_mode": "headless_tracking",
+        "gui_mode_requested": "auto",
+        "gestures_enabled": false,
+        "gesture_debug_enabled": false,
+        "gesture_states_enabled": false,
+        "swipes_enabled": false,
+        "logical_cpu_count": 16,
+        "python": "3.13.16",
+        "opencv": "5.0.0",
+        "mediapipe": "1.1.1",
+        "status": "completed",
+        "benchmark": true,
+        "frames": 1799,
+        "measurement_seconds": 30.00685969999904,
+        "average_application_fps": 59.95295802313021,
+        "capture_consumer": {
+          "skipped_sequences": 0,
+          "last_sequence": 1980
+        },
+        "capture_consumer_counter_scope": "whole session including warmup",
+        "association_transitions": {},
+        "capture_resolution_frames": {
+          "1920x1080": 1799
+        },
+        "inference_resolution_frames": {
+          "1920x1080": 1799
+        },
+        "detected_hands_frames": {
+          "0": 1799
+        },
+        "warmup_seconds_requested": 3.0,
+        "measurement_seconds_requested": 30.0,
+        "timings": {
+          "capture_wait": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 2.7539758199300333,
+            "max_ms": 35.649599998578196,
+            "p50_ms": 2.2451000004366506,
+            "p95_ms": 5.778479998480176,
+            "p99_ms": 20.048705998706282
+          },
+          "camera_read": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 15.793699610896603,
+            "max_ms": 47.39089999930002,
+            "p50_ms": 15.185699998255586,
+            "p95_ms": 19.205780001357194,
+            "p99_ms": 32.94004599942127
+          },
+          "inference_resize": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 0.005746470246703574,
+            "max_ms": 0.16490000052726828,
+            "p50_ms": 0.00549999822396785,
+            "p95_ms": 0.00799999907030724,
+            "p99_ms": 0.01049999991664663
+          },
+          "bgr_to_rgb": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 0.7985849360936005,
+            "max_ms": 1.4629999968747143,
+            "p50_ms": 0.779799996962538,
+            "p95_ms": 0.990350002393825,
+            "p99_ms": 1.177123999077594
+          },
+          "frame_age_at_inference_start": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 3.298009560874712,
+            "max_ms": 13.540400002966635,
+            "p50_ms": 2.9918000000179745,
+            "p95_ms": 4.980960000830236,
+            "p99_ms": 8.340866002399705
+          },
+          "mediapipe_image": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 1.0935921623435314,
+            "max_ms": 2.1770000021206215,
+            "p50_ms": 1.044799999363022,
+            "p95_ms": 1.4680399981443768,
+            "p99_ms": 1.745307999299257
+          },
+          "inference": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 11.709478154509508,
+            "max_ms": 17.348900000797585,
+            "p50_ms": 11.640600001555867,
+            "p95_ms": 13.132930001302155,
+            "p99_ms": 13.841541999427136
+          },
+          "processed_observation_interval": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 16.67828538076695,
+            "max_ms": 48.151000002690125,
+            "p50_ms": 16.021599996747682,
+            "p95_ms": 20.05081000061182,
+            "p99_ms": 33.89471600014076
+          },
+          "smoothing": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 0.006734797130247605,
+            "max_ms": 0.04930000068270601,
+            "p50_ms": 0.006099999154685065,
+            "p95_ms": 0.011100000847363845,
+            "p99_ms": 0.013904000370530408
+          },
+          "processing": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 15.045054419080115,
+            "max_ms": 25.737300002219854,
+            "p50_ms": 14.783699996769428,
+            "p95_ms": 17.25976000125229,
+            "p99_ms": 20.70264599919028
+          },
+          "end_to_end": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 16.61706459141076,
+            "max_ms": 48.269999999320135,
+            "p50_ms": 15.906000000541098,
+            "p95_ms": 20.599430002766894,
+            "p99_ms": 34.16190999967512
+          },
+          "frame_interval": {
+            "count": 1799,
+            "percentile_samples": 1799,
+            "mean_ms": 16.67969716509146,
+            "max_ms": 48.31389999890234,
+            "p50_ms": 15.967399998771725,
+            "p95_ms": 20.664940002461663,
+            "p99_ms": 34.21694199802004
+          }
+        },
+        "timings_by_detected_hands": {
+          "0": {
+            "capture_wait": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 2.7539758199300333,
+              "max_ms": 35.649599998578196,
+              "p50_ms": 2.2451000004366506,
+              "p95_ms": 5.778479998480176,
+              "p99_ms": 20.048705998706282
+            },
+            "camera_read": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 15.793699610896603,
+              "max_ms": 47.39089999930002,
+              "p50_ms": 15.185699998255586,
+              "p95_ms": 19.205780001357194,
+              "p99_ms": 32.94004599942127
+            },
+            "inference_resize": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 0.005746470246703574,
+              "max_ms": 0.16490000052726828,
+              "p50_ms": 0.00549999822396785,
+              "p95_ms": 0.00799999907030724,
+              "p99_ms": 0.01049999991664663
+            },
+            "bgr_to_rgb": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 0.7985849360936005,
+              "max_ms": 1.4629999968747143,
+              "p50_ms": 0.779799996962538,
+              "p95_ms": 0.990350002393825,
+              "p99_ms": 1.177123999077594
+            },
+            "frame_age_at_inference_start": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 3.298009560874712,
+              "max_ms": 13.540400002966635,
+              "p50_ms": 2.9918000000179745,
+              "p95_ms": 4.980960000830236,
+              "p99_ms": 8.340866002399705
+            },
+            "mediapipe_image": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 1.0935921623435314,
+              "max_ms": 2.1770000021206215,
+              "p50_ms": 1.044799999363022,
+              "p95_ms": 1.4680399981443768,
+              "p99_ms": 1.745307999299257
+            },
+            "inference": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 11.709478154509508,
+              "max_ms": 17.348900000797585,
+              "p50_ms": 11.640600001555867,
+              "p95_ms": 13.132930001302155,
+              "p99_ms": 13.841541999427136
+            },
+            "processed_observation_interval": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 16.67828538076695,
+              "max_ms": 48.151000002690125,
+              "p50_ms": 16.021599996747682,
+              "p95_ms": 20.05081000061182,
+              "p99_ms": 33.89471600014076
+            },
+            "smoothing": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 0.006734797130247605,
+              "max_ms": 0.04930000068270601,
+              "p50_ms": 0.006099999154685065,
+              "p95_ms": 0.011100000847363845,
+              "p99_ms": 0.013904000370530408
+            },
+            "processing": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 15.045054419080115,
+              "max_ms": 25.737300002219854,
+              "p50_ms": 14.783699996769428,
+              "p95_ms": 17.25976000125229,
+              "p99_ms": 20.70264599919028
+            },
+            "end_to_end": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 16.61706459141076,
+              "max_ms": 48.269999999320135,
+              "p50_ms": 15.906000000541098,
+              "p95_ms": 20.599430002766894,
+              "p99_ms": 34.16190999967512
+            },
+            "frame_interval": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 16.67969716509146,
+              "max_ms": 48.31389999890234,
+              "p50_ms": 15.967399998771725,
+              "p95_ms": 20.664940002461663,
+              "p99_ms": 34.21694199802004
+            }
+          }
+        },
+        "timings_by_preview_state": {
+          "headless": {
+            "capture_wait": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 2.7539758199300333,
+              "max_ms": 35.649599998578196,
+              "p50_ms": 2.2451000004366506,
+              "p95_ms": 5.778479998480176,
+              "p99_ms": 20.048705998706282
+            },
+            "camera_read": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 15.793699610896603,
+              "max_ms": 47.39089999930002,
+              "p50_ms": 15.185699998255586,
+              "p95_ms": 19.205780001357194,
+              "p99_ms": 32.94004599942127
+            },
+            "inference_resize": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 0.005746470246703574,
+              "max_ms": 0.16490000052726828,
+              "p50_ms": 0.00549999822396785,
+              "p95_ms": 0.00799999907030724,
+              "p99_ms": 0.01049999991664663
+            },
+            "bgr_to_rgb": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 0.7985849360936005,
+              "max_ms": 1.4629999968747143,
+              "p50_ms": 0.779799996962538,
+              "p95_ms": 0.990350002393825,
+              "p99_ms": 1.177123999077594
+            },
+            "frame_age_at_inference_start": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 3.298009560874712,
+              "max_ms": 13.540400002966635,
+              "p50_ms": 2.9918000000179745,
+              "p95_ms": 4.980960000830236,
+              "p99_ms": 8.340866002399705
+            },
+            "mediapipe_image": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 1.0935921623435314,
+              "max_ms": 2.1770000021206215,
+              "p50_ms": 1.044799999363022,
+              "p95_ms": 1.4680399981443768,
+              "p99_ms": 1.745307999299257
+            },
+            "inference": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 11.709478154509508,
+              "max_ms": 17.348900000797585,
+              "p50_ms": 11.640600001555867,
+              "p95_ms": 13.132930001302155,
+              "p99_ms": 13.841541999427136
+            },
+            "processed_observation_interval": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 16.67828538076695,
+              "max_ms": 48.151000002690125,
+              "p50_ms": 16.021599996747682,
+              "p95_ms": 20.05081000061182,
+              "p99_ms": 33.89471600014076
+            },
+            "smoothing": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 0.006734797130247605,
+              "max_ms": 0.04930000068270601,
+              "p50_ms": 0.006099999154685065,
+              "p95_ms": 0.011100000847363845,
+              "p99_ms": 0.013904000370530408
+            },
+            "processing": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 15.045054419080115,
+              "max_ms": 25.737300002219854,
+              "p50_ms": 14.783699996769428,
+              "p95_ms": 17.25976000125229,
+              "p99_ms": 20.70264599919028
+            },
+            "end_to_end": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 16.61706459141076,
+              "max_ms": 48.269999999320135,
+              "p50_ms": 15.906000000541098,
+              "p95_ms": 20.599430002766894,
+              "p99_ms": 34.16190999967512
+            },
+            "frame_interval": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 16.67969716509146,
+              "max_ms": 48.31389999890234,
+              "p50_ms": 15.967399998771725,
+              "p95_ms": 20.664940002461663,
+              "p99_ms": 34.21694199802004
+            }
+          }
+        },
+        "performance_profile_enabled": true,
+        "pacing": {
+          "enabled": true,
+          "percentile_capacity_per_series": 8192,
+          "stall_threshold_ms": 100.0,
+          "long_frame_stalls": {},
+          "transitions": {},
+          "cursor_gaps_over_threshold_including_intentional_pauses": {},
+          "frames_by_preview_state": {
+            "headless": 1799
+          },
+          "cursor_updates": 0,
+          "camera_sensor_fps": null,
+          "camera_driver_frame_age_ms": null,
+          "dropped_camera_frames": null,
+          "application_frame_queue_capacity": 1,
+          "application_queued_frames": 0,
+          "preview_frames_skipped": 0,
+          "timings": {
+            "capture_delivery_interval": {
+              "count": 1798,
+              "percentile_samples": 1798,
+              "mean_ms": 16.678448387096346,
+              "max_ms": 48.151000002690125,
+              "p50_ms": 16.020999999454943,
+              "p95_ms": 20.051365000654187,
+              "p99_ms": 33.89507400013826
+            },
+            "frame_completion_interval": {
+              "count": 1798,
+              "percentile_samples": 1798,
+              "mean_ms": 16.67917436040015,
+              "max_ms": 48.31389999890234,
+              "p50_ms": 15.966599999956088,
+              "p95_ms": 20.665460002419422,
+              "p99_ms": 34.21826299803797
+            }
+          },
+          "by_preview_state": {
+            "headless": {
+              "frames": 1799,
+              "loop_seconds": 30.006612599998334,
+              "application_fps": 59.95345172684036,
+              "timings": {
+                "capture_delivery_interval": {
+                  "count": 1798,
+                  "percentile_samples": 1798,
+                  "mean_ms": 16.678448387096346,
+                  "max_ms": 48.151000002690125,
+                  "p50_ms": 16.020999999454943,
+                  "p95_ms": 20.051365000654187,
+                  "p99_ms": 33.89507400013826
+                },
+                "frame_completion_interval": {
+                  "count": 1798,
+                  "percentile_samples": 1798,
+                  "mean_ms": 16.67917436040015,
+                  "max_ms": 48.31389999890234,
+                  "p50_ms": 15.966599999956088,
+                  "p95_ms": 20.665460002419422,
+                  "p99_ms": 34.21826299803797
+                }
+              }
+            }
+          },
+          "limitations": "Read-completion intervals cover consumed snapshots; producer delivery FPS is in capture_pipeline. Host age includes slot waiting, not sensor exposure age. Cursor gaps include intentional poses/pauses.",
+          "consumed_capture_delivery_fps": 59.95761576800348
+        },
+        "memory": {
+          "available": true,
+          "working_set_bytes_at_exit": 269660160,
+          "peak_working_set_bytes_process_lifetime": 291274752
+        },
+        "gui": {
+          "requested": "auto",
+          "effective": "none",
+          "backend": null,
+          "fallback_reason": null
+        },
+        "resources": {
+          "process_cpu_seconds": 75.484375,
+          "process_wall_seconds": 30.0068566000009,
+          "process_cpu_percent_of_one_core": 251.55708912208328,
+          "process_cpu_ms_per_frame": 41.95907448582546
+        },
+        "gestures": {
+          "enabled": false,
+          "debug_enabled": false,
+          "input": "smoothed",
+          "thresholds": {
+            "extended_joint_min_degrees": 155.0,
+            "extended_distal_min_degrees": 145.0,
+            "extended_straightness_min": 0.88,
+            "extended_tip_to_wrist_min": 1.15,
+            "curled_joint_max_degrees": 110.0,
+            "curled_distal_max_degrees": 160.0,
+            "curled_straightness_max": 0.75,
+            "curled_tip_to_wrist_max": 1.25,
+            "pointing_index_joint_min_degrees": 145.0,
+            "pointing_curled_tip_to_wrist_max": 1.65,
+            "pointing_tip_separation_min": 0.25,
+            "unsupported_thumb_tip_to_wrist_min": 1.35
+          },
+          "classification_counts": {}
+        },
+        "pinch": {
+          "enabled": false,
+          "debug_enabled": false,
+          "thresholds": {
+            "activation": 0.25,
+            "release": 0.4
+          },
+          "status_counts": {},
+          "input": "smoothed",
+          "recovery": "open beyond release threshold to rearm; no release on loss"
+        },
+        "gesture_states": {
+          "enabled": false,
+          "debug_enabled": false,
+          "settings": {
+            "activation_ms": 100,
+            "transition_ms": 60,
+            "cooldown_ms": 150,
+            "update_ms": 250
+          },
+          "state_counts": {},
+          "event_counts": {},
+          "shutdown_events": [],
+          "policy": "PINCH takes precedence; UNKNOWN/unavailable cancels; no OS actions"
+        },
+        "swipes": {
+          "enabled": false,
+          "debug_enabled": false,
+          "settings": {
+            "min_distance": 1.5,
+            "min_velocity": 3.0,
+            "dominance": 3.0,
+            "consistency": 0.85,
+            "min_ms": 120,
+            "max_ms": 600,
+            "cooldown_ms": 800,
+            "reset_ms": 250,
+            "feedback_ms": 350,
+            "max_scale_change": 0.25,
+            "pose": "open-palm"
+          },
+          "confirmation_counts": {},
+          "coordinates": "unmirrored image: right increases x, left decreases x",
+          "event_policy": "one STARTED then ENDED at confirmation; consume STARTED once"
+        },
+        "controls": {
+          "enabled": false,
+          "settings": {
+            "mode": "simulate",
+            "hand": "Right",
+            "mouse": false,
+            "tabs": false,
+            "sensitivity": 1.5,
+            "alpha": 0.6,
+            "margin": 0.1,
+            "monitor": 0,
+            "debug": false,
+            "browsers": [
+              "chrome.exe",
+              "msedge.exe",
+              "firefox.exe"
+            ],
+            "invert_x": false,
+            "mapping": "relative",
+            "region_width": 0.8,
+            "region_height": 0.8,
+            "emergency_hotkey": "ctrl+alt+esc",
+            "gesture_rearm": false,
+            "rearm_hold_ms": 800,
+            "rearm_stable_ms": 300,
+            "rearm_debug": false,
+            "gesture_profile": "legacy",
+            "cursor_resume": "automatic"
+          },
+          "final_status": null,
+          "mapping": "relative aspect-correct smoothed index tip; activation anchors cursor",
+          "emergency_stop": "ctrl+alt+esc (live only); 500 ms host-stall watchdog"
+        },
+        "latency_note": "Host read-to-processing/GUI completion only; camera/driver frame age is unknown.",
+        "capture_pipeline": {
+          "mode": "latest-thread",
+          "session": "4c0c1fb33ba6433e8ab5ed20d80d9bf5",
+          "buffer_capacity": 1,
+          "max_buffer_occupancy": 1,
+          "buffer_occupancy": 0,
+          "lifetime_counts": {
+            "consumer_waits": 2088,
+            "consumer_wait_timeouts": 455,
+            "capture_attempts": 1981,
+            "successful_frames": 1980,
+            "consumed_frames": 1980
+          },
+          "measurement_counts": {
+            "consumer_waits": 1514,
+            "successful_frames": 1799,
+            "capture_attempts": 1799,
+            "consumed_frames": 1799,
+            "consumer_wait_timeouts": 43
+          },
+          "measurement_seconds": 30.006799399998272,
+          "capture_worker_delivery_fps": 59.9530785012714,
+          "timings": {
+            "camera_read": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 15.793699610896603,
+              "max_ms": 47.39089999930002,
+              "p50_ms": 15.185699998255586,
+              "p95_ms": 19.205780001357194,
+              "p99_ms": 32.94004599942127
+            },
+            "snapshot_copy": {
+              "count": 1799,
+              "percentile_samples": 1799,
+              "mean_ms": 0.8528455808769607,
+              "max_ms": 2.1639999977196567,
+              "p50_ms": 0.799699999333825,
+              "p95_ms": 1.118189997578156,
+              "p99_ms": 1.288602000422543
+            },
+            "consumer_wait": {
+              "count": 1842,
+              "percentile_samples": 1842,
+              "mean_ms": 2.6754800759715005,
+              "max_ms": 21.47569999942789,
+              "p50_ms": 2.254650000395486,
+              "p95_ms": 6.948869998814148,
+              "p99_ms": 19.01156400028412
+            },
+            "publication_interval": {
+              "count": 1798,
+              "percentile_samples": 1798,
+              "mean_ms": 16.67844505005406,
+              "max_ms": 48.187999997026054,
+              "p50_ms": 16.01660000233096,
+              "p95_ms": 20.14137000260233,
+              "p99_ms": 33.75170499904925
+            }
+          },
+          "initialization_seconds": 5.937031299999944,
+          "first_frame_seconds": 6.416554999999789,
+          "shutdown_seconds": 0.2583043999984511,
+          "shutdown_error": null,
+          "join_deadline_seconds": 12.0,
+          "worker_alive": false,
+          "release_completed": true,
+          "failed": false,
+          "error": null,
+          "metadata": {
+            "driver_readback": {
+              "backend": "MSMF",
+              "width": 1920.0,
+              "height": 1080.0,
+              "fps": 60.0,
+              "fourcc": "\u0016\u0000\u0000\u0000"
+            }
+          },
+          "sensor_fps": null,
+          "sensor_exposure_age_ms": null,
+          "driver_dropped_frames": null,
+          "first_frame_timeout_seconds": 15.0,
+          "max_host_age_seconds": 0.25,
+          "driver_duplicate_images": null,
+          "snapshot_policy": "one owned read-only BGR copy per publication",
+          "timestamp_semantics": "monotonic host read completion, not exposure time"
+        },
+        "driver_readback": {
+          "backend": "MSMF",
+          "width": 1920.0,
+          "height": 1080.0,
+          "fps": 60.0,
+          "fourcc": "\u0016\u0000\u0000\u0000"
+        }
+      }
+    }
+  },
+  "automated_validation": {
+    "initial": {
+      "camera": 16,
+      "gestures": 165,
+      "hand_tracking": 230,
+      "controls": 259,
+      "total": 670
+    },
+    "final": {
+      "camera": 36,
+      "gestures": 165,
+      "hand_tracking": 253,
+      "controls": 266,
+      "total": 720
+    },
+    "new_tests": 50,
+    "real_Windows_input_sent_by_tests": false
+  }
+}

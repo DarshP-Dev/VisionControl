@@ -119,6 +119,10 @@ class WorkloadProfile(Profile):
     def workload_summary(self):
         return {str(count): profile.summary() for count, profile in self.by_hands.items()}
 
+    def discard_frame(self):
+        """Exclude a rejected iteration from workload/state bins; keep all-run costs."""
+        self._frame_stages.clear()
+
     def preview_summary(self):
         return {state: profile.summary() for state, profile in self.by_preview_state.items()}
 

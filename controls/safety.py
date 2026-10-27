@@ -1,4 +1,4 @@
-"""One live-only emergency/watchdog thread; capture and inference stay synchronous."""
+"""Live-only emergency/watchdog thread, independent of camera/model progress."""
 
 import logging
 import threading

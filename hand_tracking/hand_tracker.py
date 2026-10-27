@@ -1,4 +1,4 @@
-"""Synchronous tracking; default two hands, experimental four-hand observation IDs."""
+"""Main-thread tracking; default synchronous capture, optional latest-frame worker."""
 
 import argparse
 from collections import Counter
@@ -23,6 +23,7 @@ from gestures.static_gestures import DEFAULT_THRESHOLDS
 from camera.camera_diagnostics import (
     BACKENDS, capture_snapshot, configure_capture, read_frame,
 )
+from camera.latest_capture import LatestCapture, CaptureError, CaptureTimestamp, ensure_camera_available
 from .download_model import MODEL_PATH
 from .gesture_debug import GestureDebug
 from .gesture_preview import classify_result, prepare_features
@@ -89,6 +90,8 @@ def parse_args(argv=None):
     parser.add_argument("--report", type=Path, help="write JSON profile; refuses existing files")
     parser.add_argument("--performance-profile", action="store_true",
                         help="opt-in bounded stage, preview-state and cursor pacing diagnostics; also enabled by --benchmark/--report")
+    parser.add_argument("--capture-pipeline", choices=("sync", "latest-thread"), default="sync",
+                        help="sync (default) or experimental one-slot camera worker; model/GUI/controllers stay on main")
     parser.add_argument("--smoothing", action=argparse.BooleanOptionalAction, default=True,
                         help="enable conservative landmark EMA (default); --no-smoothing uses raw results")
     parser.add_argument("--smoothing-alpha", type=valid_alpha, default=DEFAULT_ALPHA,
@@ -220,18 +223,26 @@ def create_landmarker(model_path, max_hands=2):
 
 
 def process_frames(cap, landmarker, mp, args=None, report=None, controller=None, *,
-                   preview_window=None, profile_enabled=None):
+                   preview_window=None, profile_enabled=None, capture_source=None):
     args = args if args is not None else parse_args([])
     if args.controls and (args.max_hands > 2 or args.track_ids):
         raise ValueError("Multi-hand track-ID observation cannot dispatch desktop input")
+    if (args.capture_pipeline == "latest-thread") != (capture_source is not None):
+        raise ValueError("Experimental capture requires its owning capture source; sync cannot share one")
     if args.controls and controller is None:
         # Direct callers get the same cleanup and explicit live safety initialization as run().
         with ExitStack() as resources:
             configured_controller = control_cli.create_controller(args, resources)
             return process_frames(cap, landmarker, mp, args, report, configured_controller,
-                                  preview_window=preview_window, profile_enabled=profile_enabled)
+                                  preview_window=preview_window, profile_enabled=profile_enabled, capture_source=capture_source)
     start = time.perf_counter()
     timestamps = FrameTimestamp(start)
+    captured_timestamps = CaptureTimestamp(capture_source.origin) if capture_source is not None else None
+    last_capture_sequence = 0
+    last_processed_capture = None
+    delivery_counts = Counter()
+    if controller is not None and capture_source is not None:
+        controller.pipeline_guard = capture_source.input_allowed
     fps = ApplicationFPS(start)
     measuring = not args.benchmark
     measurement_start = start if measuring else None
@@ -272,6 +283,28 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
     status = "stopped"
     show_help = False
     previous_frame_end = start
+    warmup_origin = start if capture_source is None else None
+    def poll_capture_wait():
+        nonlocal show_help, status
+        if window is None:
+            return False
+        before = time.perf_counter()
+        waiting_key = gui.read_key()
+        state = window.state()
+        timings.add("capture_wait_gui", time.perf_counter()-before)
+        if state == "closed":
+            status = "preview_closed"
+            return True
+        if waiting_key in (ord("q"), ord("Q")):
+            return True
+        if waiting_key in (ord("h"), ord("H")):
+            show_help = not show_help
+        if controller is not None:
+            if waiting_key in (ord("d"), ord("D")):
+                controller.disarm()
+            elif waiting_key in (ord("a"), ord("A")):
+                controller.arm()
+        return False
     LOGGER.info("Execution: %s | GUI: %s", "headless tracking" if args.headless else "preview",
                 gui.metadata() if gui else "disabled (no GUI work)")
     if args.benchmark:
@@ -280,21 +313,95 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                     "headless tracking" if args.headless else "preview pipeline")
     try:
         while True:
+            if capture_source is not None:
+                timings.discard_frame()
+                # Deadlines and GUI still progress when every model result is
+                # rejected as stale or capture timestamps collide within a ms.
+                now = time.perf_counter()
+                if (args.benchmark and not measuring and warmup_origin is not None
+                        and now-warmup_origin >= args.warmup):
+                    measuring, measurement_start, cpu_start = True, now, time.process_time()
+                    fps = ApplicationFPS(now)
+                    timings.enabled = pacing.enabled = pacing.profile.enabled = profiling
+                    capture_source.begin_measurement()
+                if args.benchmark and measuring and now-measurement_start >= args.duration:
+                    status = "completed"
+                    return 0
+                if poll_capture_wait():
+                    return 0
             before_read = time.perf_counter()
-            frame = read_frame(cap)
-            after_read = time.perf_counter()
-            observed_at = controller.clock() if controller is not None else None
-            timings.add("camera_read", after_read - before_read)
-            # Never derive VIDEO timestamps from the requested or reported camera FPS.
-            timestamp_ms = timestamps.next(after_read)
+            if capture_source is None:
+                frame = read_frame(cap)
+                after_read = time.perf_counter()
+                observed_at = (controller.clock() - (time.perf_counter()-after_read)
+                               if controller is not None else None)
+                timings.add("camera_read", after_read - before_read)
+                # Preserve the synchronous timestamp conversion exactly.
+                timestamp_ms = timestamps.next(after_read)
+            else:
+                packet = None
+                while packet is None:
+                    packet = capture_source.take(.01)
+                    capture_source.check_deadline()
+                    if packet is None:
+                        # Bounded condition waits release the GIL. Keep GUI close,
+                        # D/Q and help responsive even with no camera deliveries.
+                        if poll_capture_wait():
+                            return 0
+                    if controller is not None:
+                        controller.check_timeout()
+                acquired = time.perf_counter()
+                if warmup_origin is None:
+                    warmup_origin = acquired  # Camera opening/configuration is not model warmup.
+                timings.add("capture_wait", acquired-before_read)
+                after_read = packet.read_completed_at
+                age = acquired-after_read
+                if (packet.session != capture_source.session or packet.sequence <= last_capture_sequence
+                        or not math.isfinite(age) or age < 0):
+                    capture_source.fail("Invalid/reordered capture packet; restart required")
+                    capture_source.raise_if_failed()
+                last_capture_sequence = packet.sequence
+                if age > .25:
+                    capture_source.record_rejection("stale_frames_rejected")
+                    if controller is not None:
+                        controller.disarm("Stale capture frame; rearm manually")
+                    continue
+                timestamp_ms = captured_timestamps.next(after_read)
+                if timestamp_ms is None:
+                    capture_source.record_rejection("millisecond_timestamp_collisions_suppressed")
+                    continue
+                frame = packet.image
+                # Preserve the controller's own monotonic clock domain while
+                # retaining the entire read-completion age, including slot wait.
+                # Recompute age at clock translation, not at earlier acquisition.
+                # Read the controller clock first: inter-call scheduling delay
+                # errs toward an older observation, never extends freshness.
+                observed_at = (controller.clock() - (time.perf_counter()-after_read)
+                               if controller is not None else None)
+                timings.add("camera_read", packet.read_seconds)
+                delivery_counts["skipped_sequences"] += max(0, packet.sequence - delivery_counts.get("last_sequence", 0) - 1)
+                delivery_counts["last_sequence"] = packet.sequence
             rgb = inference_input.prepare(frame, timings)
             before_image = time.perf_counter()
             image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
             before_inference = time.perf_counter()
+            timings.add("frame_age_at_inference_start", before_inference-after_read)
             raw_result = landmarker.detect_for_video(image, timestamp_ms)
             after_inference = time.perf_counter()
             timings.add("mediapipe_image", before_inference - before_image)
             timings.add("inference", after_inference - before_inference)
+            if capture_source is not None:
+                capture_source.raise_if_failed()  # Faults during native inference must cancel its result.
+                if after_inference-after_read > .25:
+                    capture_source.record_rejection("stale_results_rejected")
+                    if controller is not None:
+                        controller.disarm("Inference result expired; rearm manually")
+                    continue
+                if last_processed_capture is not None:
+                    timings.add("processed_observation_interval", after_read-last_processed_capture)
+                    if after_read-last_processed_capture > .25:
+                        delivery_counts["tracking_gaps_over_250_ms"] += 1
+                last_processed_capture = after_read
             if len(getattr(raw_result, "hand_landmarks", None) or []) > args.max_hands:
                 raise ValueError("Detector exceeded requested maximum hand count")
             before_smoothing = time.perf_counter()
@@ -361,8 +468,12 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 if controller is not None and key in (ord("d"), ord("D"), ord("q"), ord("Q")):
                     controller.disarm("Preview quit" if key in (ord("q"), ord("Q")) else "Manual disarm")
             pacing.begin(after_read, preview_state)
+            if capture_source is not None and state_frame is not None:
+                delivery_counts["tracking_gap_cancellations"] += sum(
+                    event.metadata.reason == "tracking_gap" for event in state_frame.events)
             if controller is not None:
                 before_controls = time.perf_counter()
+                timings.add("frame_age_at_controller_update", before_controls-after_read)
                 controller.update(state_frame, tuple(prepared), pinches, observed_at=observed_at)
                 timings.add("controller_processing", time.perf_counter() - before_controls)
                 if args.control_gesture_rearm:
@@ -439,17 +550,21 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                     controller.arm()
                 elif key in (ord("d"), ord("D")):
                     controller.disarm()
-            if not measuring and end - start >= args.warmup:
+            if not measuring and warmup_origin is not None and end - warmup_origin >= args.warmup:
                 measuring = True
                 measurement_start = end
                 cpu_start = time.process_time()
                 fps = ApplicationFPS(end)
                 timings.enabled = pacing.enabled = pacing.profile.enabled = profiling
+                if capture_source is not None:
+                    capture_source.begin_measurement()
                 LOGGER.info("Warm-up complete; starting steady-state measurement.")
             elif args.benchmark and measuring and end - measurement_start >= args.duration:
                 status = "completed"
                 return 0
     finally:
+        if capture_source is not None:
+            capture_source.request_stop()  # Fence before any blocking cleanup.
         if controller is not None:
             controller.move_observer = None
             controller.disarm("Tracking shutdown")
@@ -464,6 +579,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             log_state_events(shutdown_events)
         duration = (measurement_end - measurement_start
                     if measurement_start is not None and measurement_end is not None else 0.0)
+        if capture_source is not None and measurement_start is not None:
+            duration = max(0., time.perf_counter()-measurement_start)
         average = frames / duration if duration > 0 else None
         resources = process_cpu_usage(max(0.0, cpu_end - cpu_start) if cpu_start is not None else 0.0,
                                       cpu_wall_seconds, frames)
@@ -471,24 +588,34 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                     frames, duration, average or 0.0)
         timings.report()
         LOGGER.info("Process CPU: %s", resources)
+        pacing_report = pacing.summary()
+        pacing_report["preview_frames_skipped"] = skipped_previews
+        if capture_source is not None:
+            pacing_report["application_frame_queue_capacity"] = 1
+            pacing_report["consumed_capture_delivery_fps"] = pacing_report.pop("capture_delivery_fps")
+            pacing_report["limitations"] = ("Read-completion intervals cover consumed snapshots; producer delivery FPS is in capture_pipeline. "
+                                             "Host age includes slot waiting, not sensor exposure age. Cursor gaps include intentional poses/pauses.")
         if profiling:
-            LOGGER.info("Cursor/preview pacing (host times only): %s", pacing.summary())
+            LOGGER.info("Cursor/preview pacing (host times only): %s", pacing_report)
         if not frames:
             LOGGER.info("No completed measured frames; FPS and percentiles are unavailable.")
         if report is not None:
-            pacing_report = pacing.summary()
-            pacing_report["preview_frames_skipped"] = skipped_previews
             report.update({
                 "status": status, "benchmark": args.benchmark,
                 "frames": frames, "measurement_seconds": duration,
                 "average_application_fps": average,
                 "max_hands_requested": args.max_hands,
+                "capture_pipeline_mode": args.capture_pipeline,
+                "capture_consumer": dict(delivery_counts),
+                "capture_consumer_counter_scope": "whole session including warmup",
                 "track_ids_enabled": tracked is not None,
                 "association_transitions": dict(tracked.associator.counts) if tracked is not None else {},
                 "capture_resolution_frames": dict(capture_sizes),
                 "inference_resolution_frames": dict(inference_sizes),
                 "detected_hands_frames": dict(hand_counts),
                 "warmup_seconds_requested": args.warmup if args.benchmark else 0,
+                "warmup_seconds_actual": (max(0., measurement_start-warmup_origin)
+                                          if args.benchmark and measurement_start is not None and warmup_origin is not None else None),
                 "measurement_seconds_requested": args.duration if args.benchmark else None,
                 "timings": timings.summary(),
                 "timings_by_detected_hands": timings.workload_summary(),
@@ -534,6 +661,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
 def run(args, report=None):
     report = report if report is not None else {}
     report.update({"max_hands_requested": args.max_hands,
+                   "capture_pipeline_mode": args.capture_pipeline,
                    "track_ids_enabled": args.max_hands > 2 or args.track_ids,
                    "requested_capture": {"width": args.width, "height": args.height, "fps": args.fps,
                                          "backend": args.backend, "fourcc": args.fourcc,
@@ -561,16 +689,44 @@ def run(args, report=None):
             mp, landmarker = create_landmarker(args.model, max_hands=args.max_hands)
             report["mediapipe"] = getattr(mp, "__version__", "unavailable")
             resources.callback(landmarker.close)
-            cap = cv2.VideoCapture(args.camera_index, BACKENDS[args.backend])
-            resources.callback(cap.release)
-            if not cap.isOpened():
-                report.update(status="error", error="Cannot open camera")
-                LOGGER.error("Cannot open camera %d using %s. Check USB connection, camera "
-                             "permissions and other apps, or try another --camera-index.",
-                             args.camera_index, args.backend)
-                return 1
-            configure_capture(cap, args)
-            report["driver_readback"] = capture_snapshot(cap, args, "After configuration")
+            capture_source = None
+            if args.capture_pipeline == "latest-thread":
+                def configure_owned(cap):
+                    if not cap.isOpened():
+                        raise CaptureError(f"Cannot open camera {args.camera_index} using {args.backend}")
+                    configure_capture(cap, args)
+                    return {"driver_readback": capture_snapshot(cap, args, "After worker configuration")}
+                capture_source = LatestCapture(
+                    lambda: cv2.VideoCapture(args.camera_index, BACKENDS[args.backend]), configure_owned,
+                    device_key=(args.backend, args.camera_index),
+                    profile=bool(args.benchmark or args.report or args.performance_profile),
+                    measuring=not args.benchmark)
+                def close_capture_source():
+                    try:
+                        capture_source.close()
+                    finally:
+                        report["capture_pipeline"] = capture_source.snapshot()
+                        report.update(report["capture_pipeline"]["metadata"])
+                resources.callback(close_capture_source)
+                capture_source.start()
+                cap = None
+                LOGGER.warning("Experimental latest-thread capture: one-slot snapshots; synchronous mode remains default")
+            else:
+                before_camera_init = time.perf_counter()
+                ensure_camera_available((args.backend, args.camera_index))
+                cap = cv2.VideoCapture(args.camera_index, BACKENDS[args.backend])
+                resources.callback(cap.release)
+                if not cap.isOpened():
+                    report.update(status="error", error="Cannot open camera")
+                    LOGGER.error("Cannot open camera %d using %s. Check USB connection, camera "
+                                 "permissions and other apps, or try another --camera-index.",
+                                 args.camera_index, args.backend)
+                    return 1
+                configure_capture(cap, args)
+                report["driver_readback"] = capture_snapshot(cap, args, "After configuration")
+                report["capture_pipeline"] = {"mode": "sync", "buffer_capacity": 0,
+                                               "capture_worker_delivery_fps": None,
+                                               "initialization_seconds": time.perf_counter()-before_camera_init}
             LOGGER.info("MediaPipe Hand Landmarker: VIDEO mode | CPU | maximum %d hands", args.max_hands)
             LOGGER.info("Landmark smoothing: %s | alpha: %.2f | raw comparison markers: %s",
                         args.smoothing, args.smoothing_alpha, args.show_raw_landmarks)
@@ -604,7 +760,12 @@ def run(args, report=None):
             options = {"controller": controller} if controller is not None else {}
             return process_frames(cap, landmarker, mp, args=args, report=report,
                                   preview_window=options_window,
-                                  profile_enabled=bool(args.benchmark or args.report or args.performance_profile), **options)
+                                  profile_enabled=bool(args.benchmark or args.report or args.performance_profile),
+                                  capture_source=capture_source, **options)
+    except CaptureError as exc:
+        report.update(status="error", error=str(exc))
+        LOGGER.error("Camera pipeline failed closed: %s. Inspect capture_pipeline cleanup status; restart after an unreleased native call.", exc)
+        return 1
     except (ImportError, OSError, ValueError, RuntimeError, cv2.error) as exc:
         report.update(status="error", error=str(exc))
         LOGGER.error("Hand tracking failed: %s. Check the model and install dependencies with "

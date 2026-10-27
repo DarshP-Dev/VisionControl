@@ -1,5 +1,12 @@
 # Hand tracking with optional gesture recognition, states and events
 
+Phase 3.10 adds an opt-in [latest-frame capture experiment](../PHASE_3_10.md):
+`--capture-pipeline latest-thread`. Default `sync` is preserved. One owning camera
+thread replaces a single pending snapshot; inference, gestures, controllers and
+HighGUI stay on main. Reports distinguish producer throughput, processed FPS,
+overwrites and host frame age. Physical multi-hand/cursor acceptance is required
+before relying on it for live use; see the guide for commands and shutdown limits.
+
 Phase 3.9 adds [background/minimized preview handling and opt-in pacing diagnostics](../PHASE_3_9.md).
 Use `--performance-profile` or existing `--benchmark --report <new-path>` for
 bounded stage, preview-state, cursor-interval and host frame-age statistics.
