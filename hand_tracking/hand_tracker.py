@@ -28,6 +28,8 @@ from .gesture_debug import GestureDebug
 from .gesture_preview import classify_result, prepare_features
 from .multi_hand import TrackedPipeline
 from .gui import GuiEvents
+from .preview_window import PreviewWindow, create_preview_window
+from .diagnostics import PacingDiagnostics, process_memory
 from .performance import (
     InferenceInput, WorkloadProfile, inference_resolution, process_cpu_usage, write_report,
 )
@@ -85,6 +87,8 @@ def parse_args(argv=None):
     parser.add_argument("--duration", type=positive_float, default=30.0,
                         help="measurement seconds for --benchmark (default: 30)")
     parser.add_argument("--report", type=Path, help="write JSON profile; refuses existing files")
+    parser.add_argument("--performance-profile", action="store_true",
+                        help="opt-in bounded stage, preview-state and cursor pacing diagnostics; also enabled by --benchmark/--report")
     parser.add_argument("--smoothing", action=argparse.BooleanOptionalAction, default=True,
                         help="enable conservative landmark EMA (default); --no-smoothing uses raw results")
     parser.add_argument("--smoothing-alpha", type=valid_alpha, default=DEFAULT_ALPHA,
@@ -215,7 +219,8 @@ def create_landmarker(model_path, max_hands=2):
     return mp, mp.tasks.vision.HandLandmarker.create_from_options(options)
 
 
-def process_frames(cap, landmarker, mp, args=None, report=None, controller=None):
+def process_frames(cap, landmarker, mp, args=None, report=None, controller=None, *,
+                   preview_window=None, profile_enabled=None):
     args = args if args is not None else parse_args([])
     if args.controls and (args.max_hands > 2 or args.track_ids):
         raise ValueError("Multi-hand track-ID observation cannot dispatch desktop input")
@@ -223,7 +228,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
         # Direct callers get the same cleanup and explicit live safety initialization as run().
         with ExitStack() as resources:
             configured_controller = control_cli.create_controller(args, resources)
-            return process_frames(cap, landmarker, mp, args, report, configured_controller)
+            return process_frames(cap, landmarker, mp, args, report, configured_controller,
+                                  preview_window=preview_window, profile_enabled=profile_enabled)
     start = time.perf_counter()
     timestamps = FrameTimestamp(start)
     fps = ApplicationFPS(start)
@@ -231,10 +237,19 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
     measurement_start = start if measuring else None
     measurement_end = None
     cpu_start = time.process_time() if measuring else None
-    timings = WorkloadProfile(enabled=measuring)
+    # Passing a report explicitly is an opt-in for programmatic callers. run()
+    # supplies an explicit flag so ordinary interactive execution stores nothing.
+    profiling = (bool(args.benchmark or args.report or args.performance_profile or report is not None)
+                 if profile_enabled is None else profile_enabled)
+    timings = WorkloadProfile(enabled=measuring and profiling)
+    pacing = PacingDiagnostics(enabled=measuring and profiling)
+    skipped_previews = 0
+    if controller is not None and profiling:
+        controller.move_observer = pacing.moved
     inference_input = InferenceInput(args.inference_resolution)
     renderer = PreviewRenderer() if not args.headless else None
     gui = GuiEvents(args.gui_mode) if not args.headless else None
+    window = (preview_window or PreviewWindow(WINDOW)) if not args.headless else None
     smoother = LandmarkSmoother(enabled=args.smoothing, alpha=args.smoothing_alpha)
     capture_sizes, inference_sizes, hand_counts = Counter(), Counter(), Counter()
     gesture_counts = Counter()
@@ -268,6 +283,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
             before_read = time.perf_counter()
             frame = read_frame(cap)
             after_read = time.perf_counter()
+            observed_at = controller.clock() if controller is not None else None
             timings.add("camera_read", after_read - before_read)
             # Never derive VIDEO timestamps from the requested or reported camera FPS.
             timestamp_ms = timestamps.next(after_read)
@@ -327,9 +343,27 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                         timings.add("swipe_processing", state_manager.last_swipe_seconds)
                     if args.gesture_event_debug:
                         log_state_events(state_frame.events)
+            # Pump even when minimized. Consume close / D before the next input
+            # dispatch, including a close queued while inference was running.
+            key = -1
+            preview_state = "headless"
+            if window is not None:
+                before_events = time.perf_counter()
+                key = gui.read_key()
+                after_events = time.perf_counter()
+                timings.add(gui.api, after_events - before_events)
+                timings.add("gui_events", after_events - before_events)
+                preview_state = window.state()
+                timings.add("preview_state", time.perf_counter() - after_events)
+                if preview_state == "closed":
+                    status = "preview_closed"
+                    return 0
+                if controller is not None and key in (ord("d"), ord("D"), ord("q"), ord("Q")):
+                    controller.disarm("Preview quit" if key in (ord("q"), ord("Q")) else "Manual disarm")
+            pacing.begin(after_read, preview_state)
             if controller is not None:
                 before_controls = time.perf_counter()
-                controller.update(state_frame, tuple(prepared), pinches)
+                controller.update(state_frame, tuple(prepared), pinches, observed_at=observed_at)
                 timings.add("controller_processing", time.perf_counter() - before_controls)
                 if args.control_gesture_rearm:
                     timings.add("gesture_rearm", controller.last_rearm_seconds)
@@ -337,8 +371,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                 LOGGER.info("Actual capture: %d x %d | actual inference: %d x %d",
                             frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])
                 capture_logged = True
-            key = -1
-            if not args.headless:
+            if window is not None and window.should_render(preview_state):
+                before_preview = time.perf_counter()
                 preview = make_preview(frame, result, fps.current, show_help,
                                        renderer=renderer, timings=timings,
                                        raw_result=raw_result if args.show_raw_landmarks else None,
@@ -352,20 +386,22 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                                            "max_hands": args.max_hands}
                                           if tracked is not None or args.max_hands != 2 else {}))
                 before_display = time.perf_counter()
+                timings.add("preview_rendering", before_display - before_preview)
                 cv2.imshow(WINDOW, preview)
-                before_events = time.perf_counter()
-                key = gui.read_key()
                 end = time.perf_counter()
-                timings.add("imshow", before_events - before_display)
-                timings.add(gui.api, end - before_events)
-                timings.add("gui_events", end - before_events)
-                timings.add("gui_total", end - before_display)
+                timings.add("imshow", end - before_display)
+                timings.add("gui_total", end - before_display + after_events - before_events)
             else:
                 end = time.perf_counter()
+                if window is not None:
+                    if measuring:
+                        skipped_previews += 1
+                    timings.add("gui_total", after_events - before_events)
             timings.add("processing", end - after_read)
             timings.add("end_to_end", end - before_read)
             timings.add("frame_interval", end - previous_frame_end)
             previous_frame_end = end
+            pacing.finish(before_read, end)
             rate = None
             if measuring:
                 frames += 1
@@ -382,7 +418,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                     event_counts.update(f"{item.event_type.value}:{item.gesture}" for item in state_frame.events)
                     swipe_counts.update(item.gesture for item in state_frame.motion
                                         if item is not None and item.confirmed and item.admitted)
-                timings.finish_frame(len(raw_result.hand_landmarks))
+                timings.finish_frame(len(raw_result.hand_landmarks), preview_state)
                 rate = fps.record(end)
             if rate is not None and not args.benchmark:
                 LOGGER.info("End-to-end application FPS: %.2f | hands: %d",
@@ -403,20 +439,19 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                     controller.arm()
                 elif key in (ord("d"), ord("D")):
                     controller.disarm()
-            if not args.headless and cv2.getWindowProperty(WINDOW, cv2.WND_PROP_VISIBLE) < 1:
-                return 0
             if not measuring and end - start >= args.warmup:
                 measuring = True
                 measurement_start = end
                 cpu_start = time.process_time()
                 fps = ApplicationFPS(end)
-                timings.enabled = True
+                timings.enabled = pacing.enabled = pacing.profile.enabled = profiling
                 LOGGER.info("Warm-up complete; starting steady-state measurement.")
             elif args.benchmark and measuring and end - measurement_start >= args.duration:
                 status = "completed"
                 return 0
     finally:
         if controller is not None:
+            controller.move_observer = None
             controller.disarm("Tracking shutdown")
         cpu_end = time.process_time()
         cpu_wall_seconds = (max(0.0, time.perf_counter() - measurement_start)
@@ -436,9 +471,13 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                     frames, duration, average or 0.0)
         timings.report()
         LOGGER.info("Process CPU: %s", resources)
+        if profiling:
+            LOGGER.info("Cursor/preview pacing (host times only): %s", pacing.summary())
         if not frames:
             LOGGER.info("No completed measured frames; FPS and percentiles are unavailable.")
         if report is not None:
+            pacing_report = pacing.summary()
+            pacing_report["preview_frames_skipped"] = skipped_previews
             report.update({
                 "status": status, "benchmark": args.benchmark,
                 "frames": frames, "measurement_seconds": duration,
@@ -453,6 +492,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None)
                 "measurement_seconds_requested": args.duration if args.benchmark else None,
                 "timings": timings.summary(),
                 "timings_by_detected_hands": timings.workload_summary(),
+                "timings_by_preview_state": timings.preview_summary(),
+                "performance_profile_enabled": profiling,
+                "pacing": pacing_report,
+                "memory": process_memory() if profiling else {"available": False, "reason": "profiling disabled"},
                 "execution_mode": "headless_tracking" if args.headless else "preview",
                 "gui": gui.metadata() if gui else {"requested": args.gui_mode, "effective": "none",
                                                   "backend": None, "fallback_reason": None},
@@ -555,8 +598,13 @@ def run(args, report=None):
             if not args.headless:
                 cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)
                 resources.callback(cv2.destroyAllWindows)
+                options_window = create_preview_window(WINDOW)
+            else:
+                options_window = None
             options = {"controller": controller} if controller is not None else {}
-            return process_frames(cap, landmarker, mp, args=args, report=report, **options)
+            return process_frames(cap, landmarker, mp, args=args, report=report,
+                                  preview_window=options_window,
+                                  profile_enabled=bool(args.benchmark or args.report or args.performance_profile), **options)
     except (ImportError, OSError, ValueError, RuntimeError, cv2.error) as exc:
         report.update(status="error", error=str(exc))
         LOGGER.error("Hand tracking failed: %s. Check the model and install dependencies with "

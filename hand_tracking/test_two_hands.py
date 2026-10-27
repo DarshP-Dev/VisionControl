@@ -123,6 +123,7 @@ class TwoHandTest(unittest.TestCase):
         cap.read.return_value = (True, np.zeros((80, 100, 3), dtype=np.uint8))
         detector.detect_for_video.return_value = detection
         with patch.object(tracker, "ApplicationFPS") as fps, \
+                patch.object(tracker.cv2, "getWindowProperty", return_value=1), \
                 patch.object(tracker.cv2, "imshow"), \
                 patch.object(tracker.cv2, "waitKey", return_value=ord("q")), \
                 self.assertLogs(tracker.LOGGER, level="INFO") as logs:

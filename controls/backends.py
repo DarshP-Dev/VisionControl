@@ -21,9 +21,10 @@ class SimulationBackend:
 
     def move(self, x, y):
         if not self.input_allowed():
-            return
+            return False
         self.position = self.screen.clamp(x, y)
         self.counts["move"] += 1
+        return True
 
     def left_down(self):
         if not self.input_allowed():

@@ -181,8 +181,9 @@ class WindowsBackend:
         dx = round((x-self.desktop.left)*65535/(self.desktop.width-1))
         dy = round((y-self.desktop.top)*65535/(self.desktop.height-1))
         if not self.input_allowed():
-            return
+            return False
         self.api.send([mouse(0xC001, dx, dy)])  # MOVE | ABSOLUTE | VIRTUALDESK
+        return True
 
     def left_down(self):
         if self.api.user.GetAsyncKeyState(1) & 0x8000:

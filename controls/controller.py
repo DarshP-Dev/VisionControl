@@ -51,6 +51,8 @@ class DesktopController:
         self._cleanup_remaining = 0
         self._cleanup_due = 0.
         self.backend.input_allowed = self._input_allowed
+        self.observed_at = None  # Optional host capture-completion clock, never a model timestamp.
+        self.move_observer = None  # Opt-in telemetry; synchronous, no input authority.
 
     def arm(self):
         """Explicit keyboard recovery. Gesture requests use the same checked path."""
@@ -212,24 +214,38 @@ class DesktopController:
 
     def _input_allowed(self):
         return (self.armed and not self._stop_requested.is_set() and self.safety_ready
-                and not self.closed and not self.faulted)
+                and not self.closed and not self.faulted
+                and (self.observed_at is None or 0 <= self.clock() - self.observed_at <= .25))
 
     def _unsafe(self, reason, *, routine=False):
         self.last_good = None
         self._disarm(reason, safety_unavailable=False, routine=routine)
 
-    def update(self, frame, features, pinches):
+    def update(self, frame, features, pinches, *, observed_at=None):
         self.last_rearm_seconds = 0.
         self.check_timeout()
         with self.lock:
             if self.closed or self.faulted:
                 return
+            self.observed_at = observed_at
+            if observed_at is not None:
+                try:
+                    fresh = (not isinstance(observed_at, bool) and math.isfinite(observed_at)
+                             and 0 <= self.clock() - observed_at <= .25)
+                except (TypeError, ValueError, OverflowError):
+                    fresh = False
+                if not fresh:
+                    self._unsafe("Stale capture observation; rearm manually")
+                    return
             try:
                 self._update(frame, features, pinches)
             except Exception:
                 self.faulted = True
                 self.disarm("Input/geometry failure; restart required")
                 LOGGER.exception("Desktop controls failed closed")
+            finally:
+                if observed_at is not None and not 0 <= self.clock() - observed_at <= .25:
+                    self._unsafe("Observation expired during input processing; rearm manually")
 
     def _update(self, frame, features, pinches):
         now = self.clock()
@@ -401,7 +417,10 @@ class DesktopController:
             if target is not None:
                 if not self._input_allowed():
                     return
-                self.backend.move(*target)
+                before_move = time.perf_counter() if self.move_observer is not None else None
+                sent = self.backend.move(*target)
+                if self.move_observer is not None and sent is not False:
+                    self.move_observer(before_move, time.perf_counter())
                 if not self._input_allowed():
                     return
                 self.last_action = f"Move ({target[0]}, {target[1]})"

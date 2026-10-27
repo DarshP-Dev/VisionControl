@@ -108,6 +108,7 @@ class GestureDebugTest(unittest.TestCase):
         detector.detect_for_video.return_value = as_result(relaxed_pointing())
         mp = SimpleNamespace(Image=lambda **kw: kw["data"], ImageFormat=SimpleNamespace(SRGB=1))
         with patch.object(tracker, "GestureDebug") as debug, \
+                patch.object(cv2, "getWindowProperty", return_value=1), \
                 patch.object(tracker, "classify_result", wraps=classify_result) as classify, \
                 patch.object(cv2, "imshow"), patch.object(cv2, "waitKey", return_value=ord("q")), \
                 patch.object(tracker, "make_preview") as preview, self.assertLogs(tracker.LOGGER):

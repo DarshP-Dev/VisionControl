@@ -1,5 +1,12 @@
 # Hand tracking with optional gesture recognition, states and events
 
+Phase 3.9 adds [background/minimized preview handling and opt-in pacing diagnostics](../PHASE_3_9.md).
+Use `--performance-profile` or existing `--benchmark --report <new-path>` for
+bounded stage, preview-state, cursor-interval and host frame-age statistics.
+Minimizing skips drawing while processing continues; closing stops controls and
+releases resources. Camera, inference, gesture and cursor defaults are preserved.
+Hardware cursor smoothness remains subject to the guide's acceptance procedure.
+
 Phase 3.8 adds experimental [3–4 hand observation and geometric track IDs](../PHASE_3_8.md).
 Use `--max-hands 1|2|3|4` (default 2). Maxima 3/4 enable IDs automatically;
 `--track-ids` opts into the same observation path at 1/2. `--multi-hand-debug`

@@ -113,6 +113,7 @@ class TrackingLifecycleTest(unittest.TestCase):
                                   side_effect=constructor_error), \
                         patch.object(tracker.cv2, "VideoCapture", return_value=cap) as factory, \
                         patch.object(tracker.cv2, "namedWindow"), \
+                        patch.object(tracker, "create_preview_window", return_value=None), \
                         patch.object(tracker.cv2, "imshow"), \
                         patch.object(tracker.cv2, "getWindowProperty", return_value=1), \
                         patch.object(tracker.cv2, "waitKey", side_effect=[ord("h"), ord("q")]), \

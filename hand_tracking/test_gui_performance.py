@@ -79,7 +79,7 @@ class GuiEventsTest(unittest.TestCase):
             GuiEvents("spin")
 
     def test_polling_pipeline_handles_help_quit_and_window_close(self):
-        for keys, visible, expected_frames in (([ord("h"), ord("Q")], 1, 2), ([-1], 0, 1)):
+        for keys, visible, expected_frames in (([ord("h"), ord("Q")], 1, 2), ([-1], 0, 0)):
             cap, detector, mp = MagicMock(), MagicMock(), MagicMock()
             cap.read.return_value = (True, np.zeros((80, 100, 3), dtype=np.uint8))
             detector.detect_for_video.return_value = result()
@@ -94,7 +94,11 @@ class GuiEventsTest(unittest.TestCase):
                     self.assertLogs(tracker.LOGGER):
                 self.assertEqual(tracker.process_frames(cap, detector, mp, report=report), 0)
             self.assertEqual(report["frames"], expected_frames)
-            self.assertFalse(preview.call_args_list[0].args[3])
+            if expected_frames:
+                self.assertFalse(preview.call_args_list[0].args[3])
+            else:
+                preview.assert_not_called()  # Close is consumed before drawing / input.
+                self.assertEqual(report["status"], "preview_closed")
             if expected_frames == 2:
                 self.assertTrue(preview.call_args_list[1].args[3])
             self.assertIn("pollKey", report["timings"])

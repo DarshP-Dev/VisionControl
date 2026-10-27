@@ -116,7 +116,7 @@ class FailureCleanupTest(unittest.TestCase):
                 args = tracker.parse_args(["--gestures", "--pinch", "--gesture-states", "--controls", "--gui-mode", "waitkey"])
                 with patch.object(cv2, "imshow", side_effect=RuntimeError("GUI failed") if scenario == "gui" else None), \
                         patch.object(cv2, "waitKey", return_value=-1), \
-                        patch.object(cv2, "getWindowProperty", return_value=0), self.assertLogs(tracker.LOGGER):
+                        patch.object(cv2, "getWindowProperty", return_value=0 if scenario == "window_close" else 1), self.assertLogs(tracker.LOGGER):
                     if scenario == "window_close":
                         tracker.process_frames(cap, detector, mp, args, report, controller)
                     else:

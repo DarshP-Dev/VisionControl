@@ -27,7 +27,7 @@ from .multi_hand import TrackedPipeline
 from .multi_hand_fixtures import hand as synthetic_hand
 
 
-WORKLOADS = ("static", "pinch", "swipes", "simulate-relative", "simulate-absolute")
+WORKLOADS = ("static", "pinch", "swipes", "simulate-relative", "simulate-absolute", "simulate-palm")
 
 
 def observations(hand_count, *, tracked=False):
@@ -65,14 +65,17 @@ def measure(workload, hand_count, frames=500, warmup=100, *, track_ids=False):
     profile = WorkloadProfile(enabled=False)
     smoother = LandmarkSmoother()
     pinch = PinchTracker() if workload != "static" else None
-    manager = GestureStateManager(swipe_settings=SwipeSettings()) if workload not in ("static", "pinch") else None
+    manager = GestureStateManager(swipe_settings=SwipeSettings(pose="pointing") if workload == "simulate-palm"
+                                  else SwipeSettings()) if workload not in ("static", "pinch") else None
     tracked = (TrackedPipeline(SimpleNamespace(max_hands=max(1, hand_count), smoothing=True, smoothing_alpha=.75,
                                               multi_hand_debug=False, gestures=True, pinch=pinch is not None,
                                               swipes=manager is not None), pinch, manager)
                if hand_count > 2 or track_ids else None)
     backend = SimulationBackend()
     stamp = 0
-    controller = (DesktopController(backend, ControlSettings(mapping=workload.removeprefix("simulate-"),
+    controller = (DesktopController(backend, ControlSettings(mapping="absolute" if workload == "simulate-palm"
+                                                            else workload.removeprefix("simulate-"),
+                                                            gesture_profile="palm-cursor" if workload == "simulate-palm" else "legacy",
                                                             mouse=True, tabs=True), clock=lambda: stamp/1000)
                   if workload.startswith("simulate-") else None)
     start = cpu_start = None
@@ -104,7 +107,7 @@ def measure(workload, hand_count, frames=500, warmup=100, *, track_ids=False):
                     profile.add("swipe_processing", manager.last_swipe_seconds)
             if controller is not None:
                 before = time.perf_counter()
-                controller.update(state, shared, pinches)
+                controller.update(state, shared, pinches, observed_at=stamp/1000)
                 if index == 0:
                     controller.arm()  # Purely virtual; this tool cannot construct a Windows backend.
                 profile.add("controller_processing", time.perf_counter()-before)
@@ -134,6 +137,7 @@ def main(argv=None):
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--max-hands", type=int, choices=(1, 2, 3, 4), default=2)
     parser.add_argument("--track-ids", action="store_true", help="benchmark the observation ID path also for 0–2 hands")
+    parser.add_argument("--palm", action="store_true", help="also benchmark the simulated palm-cursor controller")
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.frames <= 0 or args.warmup < 0 or args.repeats <= 0:
@@ -144,6 +148,8 @@ def main(argv=None):
     for repeat in range(args.repeats):
         for count in range(args.max_hands + 1):
             for workload in WORKLOADS:
+                if workload == "simulate-palm" and not args.palm:
+                    continue
                 if workload.startswith("simulate-") and (count > 2 or args.track_ids):
                     continue
                 result = measure(workload, count, args.frames, args.warmup, track_ids=args.track_ids)

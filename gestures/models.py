@@ -51,7 +51,10 @@ class Finger(StrEnum):
 
 def finite_number(value: Real, name: str) -> float:
     """Reject strings, booleans, missing values and non-finite numeric inputs."""
-    if isinstance(value, bool) or not isinstance(value, Real):
+    # SDK coordinates and geometry outputs are overwhelmingly built-in floats.
+    # Avoid the numbers.Real ABC lookup for these; retain the strict public
+    # contract (including numpy/other Real scalars and rejection of bool).
+    if type(value) not in (float, int) and (isinstance(value, bool) or not isinstance(value, Real)):
         raise ValueError(f"{name} must be a finite real number")
     try:
         number = float(value)

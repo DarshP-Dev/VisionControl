@@ -163,6 +163,7 @@ class PerformanceTest(unittest.TestCase):
         detector.detect_for_video.return_value = result()
         report = {}
         with patch.object(tracker.cv2, "imshow"), \
+                patch.object(tracker.cv2, "getWindowProperty", return_value=1), \
                 patch.object(tracker.cv2, "waitKey", return_value=ord("q")), \
                 self.assertLogs(tracker.LOGGER):
             tracker.process_frames(cap, detector, mp,

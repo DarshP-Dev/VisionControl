@@ -87,6 +87,7 @@ class WorkloadProfile(Profile):
     def __init__(self, enabled=True, capacity=8192):
         super().__init__(enabled, capacity)
         self.by_hands = {}
+        self.by_preview_state = {}
         self._frame_stages = {}
 
     def add(self, name, seconds):
@@ -94,7 +95,7 @@ class WorkloadProfile(Profile):
         if self.enabled:
             self._frame_stages[name] = self._frame_stages.get(name, 0.) + seconds
 
-    def finish_frame(self, hand_count):
+    def finish_frame(self, hand_count, preview_state=None):
         if not self.enabled:
             self._frame_stages.clear()
             return
@@ -105,10 +106,21 @@ class WorkloadProfile(Profile):
         group = self.by_hands[hand_count]
         for name, seconds in self._frame_stages.items():
             group.add(name, seconds)
+        if preview_state is not None:
+            from .diagnostics import STATES
+            if preview_state not in STATES:
+                raise ValueError("Unknown preview state")
+            if preview_state not in self.by_preview_state:
+                self.by_preview_state[preview_state] = Profile(capacity=self.capacity)
+            for name, seconds in self._frame_stages.items():
+                self.by_preview_state[preview_state].add(name, seconds)
         self._frame_stages.clear()
 
     def workload_summary(self):
         return {str(count): profile.summary() for count, profile in self.by_hands.items()}
+
+    def preview_summary(self):
+        return {state: profile.summary() for state, profile in self.by_preview_state.items()}
 
     def report(self):
         super().report()

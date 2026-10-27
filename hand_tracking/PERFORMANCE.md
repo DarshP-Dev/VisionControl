@@ -680,6 +680,18 @@ Phase 2.3; first use the local benchmark evidence.
 
 References: [Google's synchronous VIDEO API and normalized landmarks](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker/python),
 [OpenCV resize documentation](https://docs.opencv.org/4.x/da/d54/group__imgproc__transform.html).
+## Phase 3.9 background execution and pacing
+
+See [PHASE_3_9.md](../PHASE_3_9.md) for confirmed findings, the complete synchronous
+pipeline, synthetic before/after measurements, diagnostics schema and exact
+focused/unfocused/minimized/restored/closed hardware acceptance commands.
+`--performance-profile`, `--benchmark` or `--report` enable bounded statistics;
+ordinary execution collects no detailed timing samples. Reports separate average
+FPS, stage percentiles, preview state, cursor intervals and host frame age.
+Minimized previews skip drawing/display submission while capture, recognition,
+controls and the event pump continue. X stops input and releases resources.
+No hardware pacing improvement or Windows background FPS cap has been verified.
+
 # Phase 3.6 absolute mapper microbenchmark
 
 The absolute strategy reuses current EMA landmarks, the existing screen EMA,
