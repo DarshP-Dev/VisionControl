@@ -253,3 +253,20 @@ scaling, PNG preservation, timing aggregation, warm-up exclusion, FOURCC readbac
 mismatches and sequential camera failure/cleanup paths. They do not access
 or verify a physical webcam. Actual resolution, FPS, autofocus, motion quality,
 lighting behavior and framing must be tested locally with the procedure above.
+## Phase 3.11 background delivery diagnostics
+
+`python -m camera.benchmark_delivery --capture-pipeline latest-thread --preview --warmup 15 --duration 120 --report <fresh.json>`
+adds an owned HighGUI window to the existing camera-only benchmark, without
+initializing MediaPipe or desktop input. Omit `--preview` for camera-only delivery.
+Both modes support `sync`; MSMF and the existing capture settings remain default.
+Q/X end the diagnostic; minimized/hidden previews skip display work and continue
+capture/event pumping. Time focus transitions from the warmup-complete message.
+
+Reports include bounded two-second `capture_timeline` buckets for producer reads,
+copy/publication, idle gaps, handoff/waits, state residency and CPU estimates.
+See [PHASE_3_11.md](../PHASE_3_11.md) for the complete matched test matrix,
+interpretation, limitations and safety requirements. On the tested Windows 11
+system, `--windows-timer-policy honor-requests` recovered minimized delivery to
+60 FPS in both capture pipelines. It honors existing process timer requests,
+restores the original policy at shutdown, and requests no new timer period.
+The policy remains opt-in (`system` default); synchronous capture remains default.

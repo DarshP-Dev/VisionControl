@@ -40,6 +40,54 @@ class ScriptedCamera:
 
 
 class LatestCaptureTest(unittest.TestCase):
+    def test_timeline_producer_counts_and_state_transitions_without_gui_on_owner(self):
+        source, camera, owner = self.source()
+        for n, state in enumerate(("focused", "unfocused", "minimized", "focused"), 1):
+            source.timeline.record(state=state)
+            camera.send(n)
+            self.assertIsNotNone(source.take(1))
+            source.timeline.record(processed=True, hands=2)
+        source.request_stop()
+        camera.unblock.set()
+        source.close(1)
+        d = source.snapshot()
+        buckets = d["timeline"]["buckets"]
+        for name in ("successful_frames", "consumed_frames"):
+            self.assertEqual(sum(b["counts"][name] for b in buckets), d["measurement_counts"][name])
+        timings = buckets[0]["timings"]
+        self.assertEqual(timings["camera_read"]["count"], 4)
+        self.assertIn("post_publication_to_next_read", timings)
+        self.assertIn("publication_lock_wait", timings)
+        self.assertIn("read_thread_cpu", timings)
+        self.assertIn("producer_thread_cpu", timings)
+        self.assertIn("handoff_age", timings)
+        self.assertTrue(all(tid == owner[0] for _, tid in camera.calls))
+        self.assertFalse(d["worker_alive"])
+
+    def test_timeline_accepts_minimize_restore_updates_during_blocked_native_read(self):
+        source, camera, _ = self.source(startup_timeout=.03)
+        for state in ("focused", "unfocused", "minimized", "focused"):
+            source.timeline.record(state=state)
+        self.assertFalse(source.input_allowed())
+        time.sleep(.04)
+        with self.assertRaisesRegex(CaptureError, "first-frame timeout"):
+            source.check_deadline()
+        b = source.timeline.summary()["buckets"][0]
+        self.assertEqual(b["counts"]["successful_frames"], 0)
+        self.assertEqual(b["counts"]["startup_timeouts"], 1)
+        self.assertTrue(b["read_in_progress_at_end"])
+
+    def test_disabled_timeline_never_receives_producer_or_consumer_events(self):
+        from unittest.mock import patch
+        source, camera, _ = self.source(profile=False)
+        with patch.object(source.timeline, "record", side_effect=AssertionError("disabled instrumentation")):
+            camera.send()
+            self.assertIsNotNone(source.take(1))
+            source.request_stop()
+            camera.unblock.set()
+            source.close(1)
+        self.assertEqual(source.snapshot()["timeline"], {"enabled": False, "buckets": []})
+
     def source(self, *, configure=None, device_key=None, profile=True, **kwargs):
         camera = ScriptedCamera()
         owner = []

@@ -95,6 +95,22 @@ def capture_snapshot(cap, args, phase, dimensions=None):
     return snapshot
 
 
+def capture_control_readbacks(cap):
+    """Diagnostic-only, owner-thread queries. Zero may mean unsupported, not off.
+
+    These driver claims cannot establish ambient light, negotiated transport,
+    sensor exposure timing or the complete list of supported capture modes.
+    """
+    values = {}
+    for name in ("AUTO_EXPOSURE", "EXPOSURE", "AUTOFOCUS", "FOCUS", "CONVERT_RGB", "BUFFERSIZE"):
+        try:
+            value = float(cap.get(getattr(cv2, "CAP_PROP_"+name)))
+            values[name.lower()] = value if math.isfinite(value) else None
+        except (cv2.error, AttributeError, TypeError, ValueError):
+            values[name.lower()] = None
+    return {"values": values, "interpretation": "Unverified backend-specific readbacks; zero can mean unsupported. No properties were changed."}
+
+
 @dataclass
 class BenchmarkResult:
     frames: int = 0

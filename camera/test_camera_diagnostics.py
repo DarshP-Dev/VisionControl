@@ -13,6 +13,17 @@ import camera_test as camera
 
 
 class DiagnosticTest(unittest.TestCase):
+    def test_readonly_control_snapshot_never_changes_exposure_or_camera_settings(self):
+        cap = MagicMock()
+        cap.get.side_effect = [0., -5., float("nan"), cv2.error("unsupported"), 1., 0.]
+        snapshot = diagnostics.capture_control_readbacks(cap)
+        self.assertEqual(snapshot["values"]["auto_exposure"], 0.)
+        self.assertEqual(snapshot["values"]["exposure"], -5.)
+        self.assertIsNone(snapshot["values"]["autofocus"])
+        self.assertIsNone(snapshot["values"]["focus"])
+        self.assertIn("unsupported", snapshot["interpretation"])
+        cap.set.assert_not_called()
+
     def setUp(self):
         self.frame = np.zeros((480, 640, 3), dtype=np.uint8)
         self.now = 0.0

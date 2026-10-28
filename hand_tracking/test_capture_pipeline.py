@@ -53,6 +53,43 @@ class PipelineIntegrationTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             tracker.process_frames(None, None, None, args)
 
+    def test_slow_main_thread_window_query_cannot_hold_capture_lock_or_stop_publications(self):
+        source, camera = self.start(profile=True)
+        entered, published = threading.Event(), threading.Event()
+        errors = []
+        def feed():
+            try:
+                if not entered.wait(1):
+                    raise RuntimeError("GUI query not entered")
+                for n in (1, 2):
+                    camera.send(n)
+                    with source.condition:
+                        if not source.condition.wait_for(lambda: source.counts["successful_frames"] >= n, 1):
+                            raise RuntimeError("GUI query blocked publication")
+            except Exception as exc:
+                errors.append(exc)
+            finally:
+                published.set()
+        producer = threading.Thread(target=feed)
+        window, detector = MagicMock(), MagicMock()
+        def slow_state():
+            entered.set()
+            self.assertTrue(published.wait(2))
+            return "closed"
+        window.state.side_effect = slow_state
+        producer.start()
+        try:
+            with patch.object(cv2, "waitKey", return_value=-1), self.assertLogs(tracker.LOGGER):
+                tracker.process_frames(None, detector, None, tracker.parse_args(FLAGS), {},
+                                       capture_source=source, preview_window=window)
+        finally:
+            producer.join(2)
+        self.assertFalse(producer.is_alive())
+        self.assertEqual(errors, [])
+        self.assertEqual(source.counts["successful_frames"], 2)
+        self.assertEqual(source.counts["overwritten_unconsumed_frames"], 1)
+        detector.detect_for_video.assert_not_called()
+
     def test_real_worker_tracking_recognition_minimize_restore_and_unique_model_timestamps(self):
         source, camera = self.start(profile=True)
         detector = MagicMock()
@@ -87,6 +124,11 @@ class PipelineIntegrationTest(unittest.TestCase):
         self.assertIn("frame_age_at_inference_start", report["timings"])
         self.assertIn("processed_observation_interval", report["timings"])
         self.assertTrue(source.stop.is_set())
+        timeline = report["capture_timeline"]["buckets"]
+        self.assertEqual(sum(b["counts"]["processed_frames"] for b in timeline), 6)
+        self.assertEqual(sum(b["hand_count_frames"].get("2", 0) for b in timeline), 6)
+        states = {state for b in timeline for state in b["preview_state_seconds"]}
+        self.assertTrue({"focused", "unfocused", "minimized"} <= states)
 
     def test_preview_x_while_waiting_for_first_frame_cancels_drag_without_inference(self):
         source, camera = self.start()

@@ -3,14 +3,61 @@
 from dataclasses import replace
 import threading
 import unittest
+from unittest.mock import MagicMock
 
 from gestures.events import PINCH
 from gestures.pinch import PinchStatus as P
 
 from .test_controls import Harness
+from camera.capture_timeline import CaptureTimeline
+from camera.test_windows_timing import FakeAPI
+from camera.windows_timing import WindowsTimerPolicy
+from controls.safety import GlobalSafety
 
 
 class CaptureFenceTest(unittest.TestCase):
+    def test_global_emergency_releases_drag_with_background_timeline_state(self):
+        for state in ("unfocused", "minimized"):
+            with self.subTest(state=state):
+                run = Harness(mouse=True, gesture_rearm=True, emergency_hotkey="ctrl+shift+f10")
+                run.arm()
+                run.start()
+                timeline = CaptureTimeline(True)
+                timeline.begin()
+                timeline.record(state=state, hands=2)
+                api_policy = FakeAPI()
+                timer_policy = WindowsTimerPolicy("honor-requests", api=api_policy).start()
+                run.controller.pipeline_guard = lambda: True
+                api = MagicMock()
+                requested, stopped = threading.Event(), threading.Event()
+                api.stop_requested.side_effect = requested.is_set
+                original = run.controller.disarm
+                def disarm(reason):
+                    original(reason)
+                    if reason.startswith("GLOBAL"):
+                        stopped.set()
+                run.controller.disarm = disarm
+                safety = GlobalSafety(run.controller, api).start()
+                try:
+                    # Telemetry contention cannot block the independent safety path.
+                    with timeline.lock:
+                        requested.set()
+                        self.assertTrue(stopped.wait(1))
+                    self.assertFalse(run.controller.armed)
+                    self.assertFalse(run.backend.button_down)
+                    self.assertFalse(run.controller._can_gesture_rearm())
+                    before = run.backend.counts.copy()
+                    run.step(dx=.02)
+                    self.assertEqual(run.backend.counts["move"], before["move"])
+                finally:
+                    safety.close()
+                    timeline.finish()
+                    timer_policy.close()
+                self.assertFalse(safety.thread.is_alive())
+                self.assertTrue(timer_policy.restored)
+                self.assertEqual(api_policy.state, (1, 1, 1))
+                api.register_stop.assert_called_once_with("ctrl+shift+f10")
+
     def test_fault_during_arm_position_query_cannot_commit_arming(self):
         run = Harness()
         run.step()

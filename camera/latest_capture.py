@@ -17,6 +17,7 @@ import numpy as np
 
 from hand_tracking.performance import Profile
 from .camera_diagnostics import read_frame
+from .capture_timeline import CaptureTimeline
 
 
 _LEASE_LOCK = threading.Lock()
@@ -93,6 +94,9 @@ class LatestCapture:
         self.metadata = {}
         self.counts, self.measured_counts = Counter(), Counter()
         self.timings = Profile(enabled=profile and measuring)
+        self.timeline = CaptureTimeline(enabled=profile, clock=clock)
+        if measuring:
+            self.timeline.begin()
         self._measurement_start = self.origin if measuring else None
         self._measurement_end = None
         self.initialization_seconds = self.first_frame_seconds = self.shutdown_seconds = None
@@ -106,6 +110,8 @@ class LatestCapture:
         self.counts[name] += amount
         if self.measuring and self._measurement_end is None:
             self.measured_counts[name] += amount
+        if self.profile_enabled:
+            self.timeline.record(counts={name: amount})
 
     def start(self):
         if self.thread is not None or self.stop.is_set():
@@ -123,6 +129,7 @@ class LatestCapture:
             self.timings = Profile(enabled=self.profile_enabled)
             self._measurement_start = self.clock()
             self._previous_publication = None
+            self.timeline.begin()
 
     def record_rejection(self, name):
         if name not in COUNTERS:
@@ -140,6 +147,7 @@ class LatestCapture:
             self.stop.set()
             self._slot = None
             self.condition.notify_all()
+            self.timeline.finish()
 
     def raise_if_failed(self):
         if self.failed.is_set():
@@ -177,7 +185,10 @@ class LatestCapture:
             if self._slot is None and not self.stop.is_set():
                 self._count("consumer_waits")
                 self.condition.wait_for(lambda: self._slot is not None or self.stop.is_set(), timeout)
-            self.timings.add("consumer_wait", self.clock()-before)
+            waited = self.clock()-before
+            self.timings.add("consumer_wait", waited)
+            if self.profile_enabled:
+                self.timeline.record(timings={"consumer_wait": max(0., waited)})
             self.raise_if_failed()
             if self._slot is None:
                 self._count("consumer_wait_timeouts")
@@ -188,10 +199,13 @@ class LatestCapture:
                 return None
             self._consumed = packet.sequence
             self._count("consumed_frames")
+            if self.profile_enabled:
+                self.timeline.record(timings={"handoff_age": max(0., self.clock()-packet.published_at)})
             return packet
 
     def _run(self):
         cap, leased = None, False
+        previous_published = previous_cpu = None
         try:
             if self.device_key is not None:
                 with _LEASE_LOCK:
@@ -213,15 +227,29 @@ class LatestCapture:
                 with self.condition:
                     self._count("capture_attempts")
                 before = self.clock()
+                read_cpu = time.thread_time() if self.profile_enabled else None
+                if self.profile_enabled:
+                    self.timeline.record(read_started=before, timings=(
+                        {"post_publication_to_next_read": max(0., before-previous_published)}
+                        if previous_published is not None else {}))
                 try:
                     frame = read_frame(cap)
                 except OSError as exc:
+                    if self.profile_enabled:
+                        self.timeline.record(read_finished=True, timings={
+                            "camera_read": max(0., self.clock()-before),
+                            "read_thread_cpu": max(0., time.thread_time()-read_cpu)})
                     if self.stop.is_set():
                         break
                     with self.condition:
                         self._count("read_failures")
                     raise CaptureError(str(exc)) from exc
                 completed = self.clock()
+                completed_cpu = time.thread_time() if self.profile_enabled else None
+                if self.profile_enabled:
+                    self.timeline.record(read_finished=True, timings={
+                        "camera_read": max(0., completed-before),
+                        "read_thread_cpu": max(0., completed_cpu-read_cpu)})
                 if self.stop.is_set():
                     break
                 if not (math.isfinite(before) and math.isfinite(completed) and self.origin <= before <= completed):
@@ -259,10 +287,22 @@ class LatestCapture:
                     if self._previous_publication is not None:
                         self.timings.add("publication_interval", published-self._previous_publication)
                     self._previous_publication = published
+                    if self.profile_enabled:
+                        publication_cpu = time.thread_time()
+                        details = {"snapshot_copy": copied-completed,
+                                   "publication_lock_wait": published-copied,
+                                   "copy_to_publication": published-completed}
+                        if previous_published is not None:
+                            details["publication_interval"] = published-previous_published
+                            details["producer_thread_cpu"] = max(0., publication_cpu-previous_cpu)
+                        self.timeline.record(timings=details)
+                        previous_cpu = publication_cpu
+                    previous_published = published
                     if self.first_frame_seconds is None:
                         self.first_frame_seconds = published-self.origin
                     self.condition.notify_all()
         except BaseException as exc:
+            self.timeline.record(read_finished=True)
             with self.condition:
                 if not isinstance(exc, CaptureError):
                     self._count("worker_exceptions")
@@ -293,6 +333,7 @@ class LatestCapture:
             self.stop.set()
             self._slot = None
             self.condition.notify_all()
+            self.timeline.finish()
 
     def close(self, timeout=12.):
         if not math.isfinite(timeout) or timeout < 0:
@@ -317,7 +358,7 @@ class LatestCapture:
             end = self._measurement_end if self._measurement_end is not None else self.clock()
             elapsed = (max(0., end-self._measurement_start)
                        if self._measurement_start is not None else 0.)
-            return {"mode": "latest-thread", "session": self.session, "buffer_capacity": 1,
+            report = {"mode": "latest-thread", "session": self.session, "buffer_capacity": 1,
                     "max_buffer_occupancy": self.max_occupancy, "buffer_occupancy": int(self._slot is not None),
                     "lifetime_counts": {name: self.counts[name] for name in sorted(COUNTERS)},
                     "measurement_counts": {name: self.measured_counts[name] for name in sorted(COUNTERS)},
@@ -333,3 +374,5 @@ class LatestCapture:
                     "driver_duplicate_images": None, "snapshot_policy": "one owned read-only BGR copy per publication",
                     "successful_frames_semantics": "published valid snapshots; a final in-flight read can be discarded during stop",
                     "timestamp_semantics": "monotonic host read completion, not exposure time"}
+        report["timeline"] = self.timeline.summary()
+        return report

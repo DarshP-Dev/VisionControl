@@ -700,3 +700,15 @@ for coordinate formulas, DPI/display limits, exact relative/simulation/live and
 calibration commands, pinch edge-reach limitations, and manual checks. Restart
 after display or DPI changes. Hardware behavior and actual webcam FPS remain
 unmeasured; automated tests use synthetic frames and virtual/fake input only.
+## Phase 3.11 background regression diagnostics
+
+The existing profiling opt-ins now include bounded, two-second producer/consumer
+timeline buckets. [PHASE_3_11.md](../PHASE_3_11.md) contains the controlled camera-only,
+HighGUI-only, headless-inference and full-simulation commands. The new camera
+benchmark `--preview` option does not load a model or enable desktop input.
+The opt-in Windows 11 correction `--windows-timer-policy honor-requests` recovered
+minimized capture to 60 FPS and two-hand simulated processing to 41 FPS on this
+hardware. It honors existing process timer requests and restores the original
+policy at shutdown; CPU/power and host-age tradeoffs are documented in the guide.
+Normal capture still defaults to `sync`, timer policy to `system`, and
+`latest-thread` remains experimental. Phase 3.10 results are preserved separately.

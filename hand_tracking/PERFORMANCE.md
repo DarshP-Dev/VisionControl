@@ -748,3 +748,29 @@ The offline `hand_tracking.benchmark_synthetic` also accepts `--max-hands 4
 --track-ids`; it uses matched-scale prefix fixtures for 2/3/4 and excludes camera,
 inference and rendering. Its synthetic iteration rate is not webcam FPS. Choose
 a fresh JSON output path; reports refuse overwrite.
+## Phase 3.11 producer timeline and background isolation
+
+See [PHASE_3_11.md](../PHASE_3_11.md) for historical versus fresh evidence and
+the focused/unfocused/minimized/restored acceptance matrix. Existing profiling
+opt-ins now add `capture_timeline` (two-second buckets, last 300 retained, 256
+percentile samples per series/bucket). It separates publication FPS from processed
+FPS, native-boundary read wall time from CPU/idle/copy/lock/handoff/wait costs,
+observed hand distributions and main-thread window-state residency. Mixed-state
+buckets and endpoint-spanning intervals require separate interpretation.
+
+`python -m camera.benchmark_delivery --preview` isolates HighGUI without MediaPipe
+or input; existing timed `--headless` isolates real inference without HighGUI.
+Main/capture thread CPU excludes native helper threads; process CPU spans are
+estimates and not scheduler traces. Optional camera-control readbacks never set
+exposure/focus and may be unsupported. No new pixel or foreign-window data is saved.
+
+Initial instrumentation measurements alone did not establish a fix. Subsequent
+matched reports and reversible A/B/A tests isolated Windows 11 timer-request policy:
+`--windows-timer-policy honor-requests` recovered minimized capture to 60 FPS and
+full two-hand simulated processing from 14.17 to 41 FPS. Minimized frame P95 fell
+96.62→28.32 ms, while mean controller host age rose 24.24→32.76 ms. The corrected
+run detected two hands in every frame but stayed disarmed, so cursor timing and
+live interaction acceptance remain separate. See the guide for CPU/energy costs.
+The current-process policy is restored after cleanup; no new timer period,
+priority or global power setting changes. Keep sync default and latest-thread
+experimental; timer policy remains `system` unless explicitly opted in.

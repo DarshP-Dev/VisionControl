@@ -21,9 +21,11 @@ from gestures.state_machine import GestureStateManager, StateSettings
 from gestures.swipe import SwipeSettings
 from gestures.static_gestures import DEFAULT_THRESHOLDS
 from camera.camera_diagnostics import (
-    BACKENDS, capture_snapshot, configure_capture, read_frame,
+    BACKENDS, capture_control_readbacks, capture_snapshot, configure_capture, read_frame,
 )
 from camera.latest_capture import LatestCapture, CaptureError, CaptureTimestamp, ensure_camera_available
+from camera.capture_timeline import CaptureTimeline
+from camera.windows_timing import POLICIES, WindowsTimerPolicy
 from .download_model import MODEL_PATH
 from .gesture_debug import GestureDebug
 from .gesture_preview import classify_result, prepare_features
@@ -92,6 +94,8 @@ def parse_args(argv=None):
                         help="opt-in bounded stage, preview-state and cursor pacing diagnostics; also enabled by --benchmark/--report")
     parser.add_argument("--capture-pipeline", choices=("sync", "latest-thread"), default="sync",
                         help="sync (default) or experimental one-slot camera worker; model/GUI/controllers stay on main")
+    parser.add_argument("--windows-timer-policy", choices=POLICIES, default="system",
+                        help="system (default) or Windows 11 honor-requests minimized-preview correction; restored at shutdown")
     parser.add_argument("--smoothing", action=argparse.BooleanOptionalAction, default=True,
                         help="enable conservative landmark EMA (default); --no-smoothing uses raw results")
     parser.add_argument("--smoothing-alpha", type=valid_alpha, default=DEFAULT_ALPHA,
@@ -254,9 +258,19 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                  if profile_enabled is None else profile_enabled)
     timings = WorkloadProfile(enabled=measuring and profiling)
     pacing = PacingDiagnostics(enabled=measuring and profiling)
+    timeline = (capture_source.timeline if capture_source is not None
+                else CaptureTimeline(enabled=profiling, producer_mode="sync"))
+    if measuring and capture_source is None:
+        timeline.begin()
+    timeline.record(state="headless" if args.headless else "visible_unknown")
     skipped_previews = 0
     if controller is not None and profiling:
-        controller.move_observer = pacing.moved
+        def observed_move(before, after):
+            pacing.moved(before, after)
+            if profiling:
+                timeline.record(cursor_at=after, timings={"host_frame_age_at_dispatch":
+                                max(0., after-pacing.read_at)} if pacing.read_at is not None else {})
+        controller.move_observer = observed_move
     inference_input = InferenceInput(args.inference_resolution)
     renderer = PreviewRenderer() if not args.headless else None
     gui = GuiEvents(args.gui_mode) if not args.headless else None
@@ -291,6 +305,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
         before = time.perf_counter()
         waiting_key = gui.read_key()
         state = window.state()
+        if profiling:
+            timeline.record(state=state, main_cpu=time.thread_time())
         timings.add("capture_wait_gui", time.perf_counter()-before)
         if state == "closed":
             status = "preview_closed"
@@ -331,8 +347,17 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                     return 0
             before_read = time.perf_counter()
             if capture_source is None:
-                frame = read_frame(cap)
+                if profiling:
+                    timeline.record(counts={"capture_attempts": 1}, read_started=before_read)
+                try:
+                    frame = read_frame(cap)
+                except OSError:
+                    timeline.record(counts={"read_failures": 1}, read_finished=True)
+                    raise
                 after_read = time.perf_counter()
+                if profiling:
+                    timeline.record(counts={"successful_frames": 1, "consumed_frames": 1},
+                                    timings={"camera_read": after_read-before_read}, read_finished=True)
                 observed_at = (controller.clock() - (time.perf_counter()-after_read)
                                if controller is not None else None)
                 timings.add("camera_read", after_read - before_read)
@@ -388,6 +413,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             timings.add("frame_age_at_inference_start", before_inference-after_read)
             raw_result = landmarker.detect_for_video(image, timestamp_ms)
             after_inference = time.perf_counter()
+            if profiling:
+                timeline.record(timings={"inference": after_inference-before_inference},
+                                state="headless" if args.headless else None, main_cpu=time.thread_time())
             timings.add("mediapipe_image", before_inference - before_image)
             timings.add("inference", after_inference - before_inference)
             if capture_source is not None:
@@ -461,6 +489,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 timings.add(gui.api, after_events - before_events)
                 timings.add("gui_events", after_events - before_events)
                 preview_state = window.state()
+                if profiling:
+                    timeline.record(state=preview_state, timings={"gui_events": after_events-before_events})
                 timings.add("preview_state", time.perf_counter() - after_events)
                 if preview_state == "closed":
                     status = "preview_closed"
@@ -473,6 +503,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                     event.metadata.reason == "tracking_gap" for event in state_frame.events)
             if controller is not None:
                 before_controls = time.perf_counter()
+                if profiling:
+                    timeline.record(timings={"frame_age_at_controller_update": before_controls-after_read})
                 timings.add("frame_age_at_controller_update", before_controls-after_read)
                 controller.update(state_frame, tuple(prepared), pinches, observed_at=observed_at)
                 timings.add("controller_processing", time.perf_counter() - before_controls)
@@ -498,6 +530,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                                           if tracked is not None or args.max_hands != 2 else {}))
                 before_display = time.perf_counter()
                 timings.add("preview_rendering", before_display - before_preview)
+                if profiling:
+                    timeline.record(timings={"preview_rendering": before_display-before_preview})
                 cv2.imshow(WINDOW, preview)
                 end = time.perf_counter()
                 timings.add("imshow", end - before_display)
@@ -515,6 +549,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             pacing.finish(before_read, end)
             rate = None
             if measuring:
+                if profiling:
+                    timeline.record(processed=True, hands=len(raw_result.hand_landmarks), main_cpu=time.thread_time())
                 frames += 1
                 measurement_end = end
                 capture_sizes[f"{frame.shape[1]}x{frame.shape[0]}"] += 1
@@ -558,6 +594,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 timings.enabled = pacing.enabled = pacing.profile.enabled = profiling
                 if capture_source is not None:
                     capture_source.begin_measurement()
+                else:
+                    timeline.begin()
                 LOGGER.info("Warm-up complete; starting steady-state measurement.")
             elif args.benchmark and measuring and end - measurement_start >= args.duration:
                 status = "completed"
@@ -568,6 +606,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
         if controller is not None:
             controller.move_observer = None
             controller.disarm("Tracking shutdown")
+        timeline.finish()
         cpu_end = time.process_time()
         cpu_wall_seconds = (max(0.0, time.perf_counter() - measurement_start)
                             if measurement_start is not None else 0.0)
@@ -621,6 +660,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 "timings_by_detected_hands": timings.workload_summary(),
                 "timings_by_preview_state": timings.preview_summary(),
                 "performance_profile_enabled": profiling,
+                "capture_timeline": timeline.summary(),
                 "pacing": pacing_report,
                 "memory": process_memory() if profiling else {"available": False, "reason": "profiling disabled"},
                 "execution_mode": "headless_tracking" if args.headless else "preview",
@@ -676,7 +716,8 @@ def run(args, report=None):
                    "gesture_states_enabled": args.gesture_states,
                    "swipes_enabled": args.swipes,
                    "logical_cpu_count": os.cpu_count(),
-                   "python": platform.python_version(), "opencv": cv2.__version__})
+                   "python": platform.python_version(), "opencv": cv2.__version__,
+                   "platform": platform.platform(), "opencv_configured_threads": cv2.getNumThreads()})
     try:
         if not args.model.is_file() or args.model.stat().st_size == 0:
             report.update(status="error", error="Model missing or empty")
@@ -685,6 +726,14 @@ def run(args, report=None):
                          args.model)
             return 1
         with ExitStack() as resources:
+            timer_policy = WindowsTimerPolicy(args.windows_timer_policy)
+            def close_timer_policy():
+                try:
+                    timer_policy.close()
+                finally:
+                    report["windows_timer_policy"] = timer_policy.snapshot()
+            resources.callback(close_timer_policy)  # Registered first: restore after all input/camera/GUI cleanup.
+            timer_policy.start()
             controller = control_cli.create_controller(args, resources) if args.controls else None
             mp, landmarker = create_landmarker(args.model, max_hands=args.max_hands)
             report["mediapipe"] = getattr(mp, "__version__", "unavailable")
@@ -695,7 +744,10 @@ def run(args, report=None):
                     if not cap.isOpened():
                         raise CaptureError(f"Cannot open camera {args.camera_index} using {args.backend}")
                     configure_capture(cap, args)
-                    return {"driver_readback": capture_snapshot(cap, args, "After worker configuration")}
+                    metadata = {"driver_readback": capture_snapshot(cap, args, "After worker configuration")}
+                    if args.benchmark or args.report or args.performance_profile:
+                        metadata["camera_control_readbacks"] = capture_control_readbacks(cap)
+                    return metadata
                 capture_source = LatestCapture(
                     lambda: cv2.VideoCapture(args.camera_index, BACKENDS[args.backend]), configure_owned,
                     device_key=(args.backend, args.camera_index),
@@ -724,6 +776,8 @@ def run(args, report=None):
                     return 1
                 configure_capture(cap, args)
                 report["driver_readback"] = capture_snapshot(cap, args, "After configuration")
+                if args.benchmark or args.report or args.performance_profile:
+                    report["camera_control_readbacks"] = capture_control_readbacks(cap)
                 report["capture_pipeline"] = {"mode": "sync", "buffer_capacity": 0,
                                                "capture_worker_delivery_fps": None,
                                                "initialization_seconds": time.perf_counter()-before_camera_init}
