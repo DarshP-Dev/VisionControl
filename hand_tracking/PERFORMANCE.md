@@ -1,5 +1,27 @@
 # Recognition and controls performance
 
+## Phase 4.1 optional face workload
+
+See [PHASE_4_1.md](../PHASE_4_1.md) for the detector, exact commands and real data.
+`--face-detection` adds a CPU IMAGE task on the existing captured frame;
+`--face-only` skips the hand model. Face bounds default to 640×360 independently
+of hand inference. Models run every processed frame; no old face positions are
+reused. Faces are processed after hand controller dispatch.
+
+Existing opt-in reports add `face_preprocessing`, `face_image`, `face_inference`,
+`face_geometry`, `face_total`, `face_host_age_at_completion`, `face_gui_events`
+and visible `face_overlay` timings. Face count and joint hand/face distributions
+are necessary to interpret FPS. Original `inference` still means hand inference
+and is absent when the hand model is disabled. `face_detector` reports verified
+asset/mode and initialization/cleanup; no per-frame coordinates or images are saved.
+
+Real runs measured hand-only 41.85 FPS (all two-hand), face-only 59.84 FPS (all
+one-face), combined headless 39.22 FPS (variable hand count) and combined preview
+30.77 FPS (96% two-hand, at least one emitted face throughout). Preview-state FPS
+was 30.93 focused / 30.46 minimized with explicit honor-requests. These are single
+sessions, not matched accuracy scores or a guarantee. CPU, memory, frame pacing,
+host-age and incomplete physical acceptance are detailed in the guide.
+
 ## Phase 3.7: audit, matched synthetic measurements and webcam protocol
 
 Automated result: **445 passed** versus the **410-test baseline**: camera 16,

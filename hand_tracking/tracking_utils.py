@@ -274,7 +274,7 @@ class PreviewRenderer:
 def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw_result=None,
                  gesture_results=None, pinch_results=None, pinch_thresholds=None, gesture_states=None,
                  swipe_results=None, swipe_config=None, control_status=None,
-                 *, max_hands=2, track_associations=None):
+                 *, max_hands=2, track_associations=None, hand_tracking_enabled=True):
     start = time.perf_counter()
     height, width = frame.shape[:2]
     scale = min(1100 / width, 650 / height, 1.0)
@@ -329,6 +329,10 @@ def make_preview(frame, result, fps, show_help, renderer=None, timings=None, raw
         lines.append("Left: green | Right: blue | Raw: white + | H: Hide help"
                      if raw_result is not None else
                      "Show one or two hands. Left: green | Right: blue | H: Hide help")
+    if not hand_tracking_enabled:
+        lines[0] = f"App FPS: {rate} | Face detection | {width} x {height} | Q: Quit | H: Help"
+        if show_help:
+            lines[1] = "Face boxes and current offsets only. X right; Y down. H: Hide help"
     lines.extend(control_lines)
     for index, text in enumerate(lines):
         font = (min(.5, max(.12, (preview.shape[1]-16) / max(1, cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, .5, 1)[0][0]) * .5))

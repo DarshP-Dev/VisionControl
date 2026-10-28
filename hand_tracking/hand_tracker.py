@@ -10,6 +10,7 @@ import os
 import platform
 from pathlib import Path
 import time
+from types import SimpleNamespace
 
 import cv2
 
@@ -80,6 +81,14 @@ def parse_args(argv=None):
                         help="format request only; actual MSMF transport is unverified")
     parser.add_argument("--model", type=Path, default=MODEL_PATH,
                         help="local Hand Landmarker .task bundle")
+    parser.add_argument("--face-detection", action="store_true", help="optional per-frame face detection on the same captured frame")
+    parser.add_argument("--face-only", action="store_true", help="face detection without the hand model, gestures or controls")
+    parser.add_argument("--face-model", type=Path,
+                        default=Path(__file__).resolve().parents[1]/"face_tracking"/"models"/"blaze_face_short_range.tflite")
+    parser.add_argument("--face-inference-resolution", type=inference_resolution, default=(640, 360),
+                        help="face-only aspect-preserving bounds, default 640x360; independent of hand inference")
+    parser.add_argument("--face-min-confidence", type=float, default=.5)
+    parser.add_argument("--face-overlay", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--inference-resolution", type=inference_resolution, default=None,
                         help="full (default), 1280x720, 960x540, 640x360 or WIDTHxHEIGHT bounds; "
                              "preserves aspect ratio, never upscales")
@@ -149,6 +158,12 @@ def parse_args(argv=None):
     parser.add_argument("--swipe-pose", choices=("open-palm", "open-palm-or-fist", "pointing"), default=None)
     control_cli.add_arguments(parser)
     args = parser.parse_args(argv)
+    args.face_detection = args.face_detection or args.face_only
+    if not math.isfinite(args.face_min_confidence) or not 0 <= args.face_min_confidence <= 1:
+        parser.error("--face-min-confidence must be finite and within [0,1]")
+    if args.face_only and any((args.controls, args.gestures, args.pinch, args.gesture_states, args.swipes,
+                              args.show_raw_landmarks, args.track_ids, args.multi_hand_debug, args.control_gesture_rearm)):
+        parser.error("--face-only cannot enable hand gestures, track IDs or desktop controls")
     if args.headless and not args.benchmark:
         parser.error("--headless requires --benchmark for a timed run (Ctrl+C can interrupt)")
     if args.headless and args.show_raw_landmarks:
@@ -227,8 +242,12 @@ def create_landmarker(model_path, max_hands=2):
 
 
 def process_frames(cap, landmarker, mp, args=None, report=None, controller=None, *,
-                   preview_window=None, profile_enabled=None, capture_source=None):
+                   preview_window=None, profile_enabled=None, capture_source=None, face_detector=None):
     args = args if args is not None else parse_args([])
+    if args.face_detection != (face_detector is not None):
+        raise ValueError("Enabled face detection requires its owning detector; disabled mode cannot run one")
+    if args.face_only and (controller is not None or args.controls or landmarker is not None):
+        raise ValueError("Face-only mode cannot own a hand model or desktop controller")
     if args.controls and (args.max_hands > 2 or args.track_ids):
         raise ValueError("Multi-hand track-ID observation cannot dispatch desktop input")
     if (args.capture_pipeline == "latest-thread") != (capture_source is not None):
@@ -238,7 +257,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
         with ExitStack() as resources:
             configured_controller = control_cli.create_controller(args, resources)
             return process_frames(cap, landmarker, mp, args, report, configured_controller,
-                                  preview_window=preview_window, profile_enabled=profile_enabled, capture_source=capture_source)
+                                  preview_window=preview_window, profile_enabled=profile_enabled, capture_source=capture_source,
+                                  face_detector=face_detector)
     start = time.perf_counter()
     timestamps = FrameTimestamp(start)
     captured_timestamps = CaptureTimestamp(capture_source.origin) if capture_source is not None else None
@@ -277,6 +297,12 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
     window = (preview_window or PreviewWindow(WINDOW)) if not args.headless else None
     smoother = LandmarkSmoother(enabled=args.smoothing, alpha=args.smoothing_alpha)
     capture_sizes, inference_sizes, hand_counts = Counter(), Counter(), Counter()
+    face_counts, face_sizes = (Counter(), Counter()) if face_detector is not None else (None, None)
+    joint_counts = Counter() if face_detector is not None else None
+    expired_faces = 0
+    if face_detector is not None:
+        from face_tracking.face_models import FaceFrame
+        from face_tracking.preview import draw_faces
     gesture_counts = Counter()
     gesture_image_size = None
     gesture_debug = GestureDebug() if args.gesture_debug else None
@@ -288,7 +314,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                                        swipe_settings=configured_swipes if args.swipes else None,
                                        swipe_diagnostics=args.swipe_debug) if args.gesture_states else None)
     tracked = (TrackedPipeline(args, pinch_tracker, state_manager)
-               if args.max_hands > 2 or args.track_ids else None)
+               if not args.face_only and (args.max_hands > 2 or args.track_ids) else None)
     state_counts, event_counts = Counter(), Counter()
     swipe_counts = Counter()
     frames = 0
@@ -298,16 +324,18 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
     show_help = False
     previous_frame_end = start
     warmup_origin = start if capture_source is None else None
-    def poll_capture_wait():
-        nonlocal show_help, status
+    last_polled_state = "headless" if args.headless else "visible_unknown"
+    def poll_capture_wait(stage="capture_wait_gui"):
+        nonlocal show_help, status, last_polled_state
         if window is None:
             return False
         before = time.perf_counter()
         waiting_key = gui.read_key()
         state = window.state()
+        last_polled_state = state
         if profiling:
             timeline.record(state=state, main_cpu=time.thread_time())
-        timings.add("capture_wait_gui", time.perf_counter()-before)
+        timings.add(stage, time.perf_counter()-before)
         if state == "closed":
             status = "preview_closed"
             return True
@@ -406,18 +434,23 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 timings.add("camera_read", packet.read_seconds)
                 delivery_counts["skipped_sequences"] += max(0, packet.sequence - delivery_counts.get("last_sequence", 0) - 1)
                 delivery_counts["last_sequence"] = packet.sequence
-            rgb = inference_input.prepare(frame, timings)
-            before_image = time.perf_counter()
-            image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
-            before_inference = time.perf_counter()
-            timings.add("frame_age_at_inference_start", before_inference-after_read)
-            raw_result = landmarker.detect_for_video(image, timestamp_ms)
-            after_inference = time.perf_counter()
-            if profiling:
-                timeline.record(timings={"inference": after_inference-before_inference},
-                                state="headless" if args.headless else None, main_cpu=time.thread_time())
-            timings.add("mediapipe_image", before_inference - before_image)
-            timings.add("inference", after_inference - before_inference)
+            if args.face_only:
+                rgb = None
+                raw_result = SimpleNamespace(hand_landmarks=(), handedness=(), hand_world_landmarks=())
+                after_inference = time.perf_counter()
+            else:
+                rgb = inference_input.prepare(frame, timings)
+                before_image = time.perf_counter()
+                image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+                before_inference = time.perf_counter()
+                timings.add("frame_age_at_inference_start", before_inference-after_read)
+                raw_result = landmarker.detect_for_video(image, timestamp_ms)
+                after_inference = time.perf_counter()
+                if profiling:
+                    timeline.record(timings={"inference": after_inference-before_inference},
+                                    state="headless" if args.headless else None, main_cpu=time.thread_time())
+                timings.add("mediapipe_image", before_inference - before_image)
+                timings.add("inference", after_inference - before_inference)
             if capture_source is not None:
                 capture_source.raise_if_failed()  # Faults during native inference must cancel its result.
                 if after_inference-after_read > .25:
@@ -510,11 +543,37 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 timings.add("controller_processing", time.perf_counter() - before_controls)
                 if args.control_gesture_rearm:
                     timings.add("gesture_rearm", controller.last_rearm_seconds)
+            # Faces are observation-only. Dispatch current hand input first so
+            # optional face inference does not age that observation before input.
+            face_observation = None
+            render_state = preview_state
+            if face_detector is not None:
+                before_face = time.perf_counter()
+                face_observation = face_detector.detect(frame, timestamp_ms, timings, rgb_hint=rgb)
+                after_face = time.perf_counter()
+                timings.add("face_total", after_face-before_face)
+                if profiling:
+                    timeline.record(timings={"face_total": after_face-before_face})
+                timings.add("face_host_age_at_completion", after_face-after_read)
+                if capture_source is not None:
+                    capture_source.raise_if_failed()
+                if after_face-after_read > .25:
+                    face_observation = FaceFrame(timestamp_ms, (frame.shape[1], frame.shape[0]),
+                                                 face_detector.last_inference_size, status="expired")
+                    if measuring:
+                        expired_faces += 1
+                if poll_capture_wait("face_gui_events"):
+                    return 0
+                render_state = last_polled_state
             if not capture_logged:
-                LOGGER.info("Actual capture: %d x %d | actual inference: %d x %d",
-                            frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])
+                if args.face_only:
+                    LOGGER.info("Actual capture: %d x %d | hand model disabled | face inference: %d x %d",
+                                frame.shape[1], frame.shape[0], *face_detector.last_inference_size)
+                else:
+                    LOGGER.info("Actual capture: %d x %d | actual hand inference: %d x %d",
+                                frame.shape[1], frame.shape[0], rgb.shape[1], rgb.shape[0])
                 capture_logged = True
-            if window is not None and window.should_render(preview_state):
+            if window is not None and window.should_render(render_state):
                 before_preview = time.perf_counter()
                 preview = make_preview(frame, result, fps.current, show_help,
                                        renderer=renderer, timings=timings,
@@ -527,7 +586,15 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                                        control_status=controller.status() if controller is not None else None,
                                        **({"track_associations": tracked.associations if tracked is not None else None,
                                            "max_hands": args.max_hands}
-                                          if tracked is not None or args.max_hands != 2 else {}))
+                                          if tracked is not None or args.max_hands != 2 else {}),
+                                       **({"hand_tracking_enabled": False} if args.face_only else {}))
+                if face_detector is not None and args.face_overlay:
+                    if time.perf_counter()-after_read > .25:
+                        face_observation = FaceFrame(timestamp_ms, (frame.shape[1], frame.shape[0]),
+                                                     face_detector.last_inference_size, status="expired")
+                    before_face_overlay = time.perf_counter()
+                    draw_faces(preview, face_observation)
+                    timings.add("face_overlay", time.perf_counter()-before_face_overlay)
                 before_display = time.perf_counter()
                 timings.add("preview_rendering", before_display - before_preview)
                 if profiling:
@@ -552,9 +619,14 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 if profiling:
                     timeline.record(processed=True, hands=len(raw_result.hand_landmarks), main_cpu=time.thread_time())
                 frames += 1
+                if face_observation is not None:
+                    face_counts[str(len(face_observation.faces))] += 1
+                    joint_counts[f"hands={len(raw_result.hand_landmarks)},faces={len(face_observation.faces)}"] += 1
+                    face_sizes[f"{face_observation.inference_size[0]}x{face_observation.inference_size[1]}"] += 1
                 measurement_end = end
                 capture_sizes[f"{frame.shape[1]}x{frame.shape[0]}"] += 1
-                inference_sizes[f"{rgb.shape[1]}x{rgb.shape[0]}"] += 1
+                if rgb is not None:
+                    inference_sizes[f"{rgb.shape[1]}x{rgb.shape[0]}"] += 1
                 hand_counts[str(len(result.hand_landmarks))] += 1
                 if classifications is not None:
                     gesture_counts.update(item.gesture.value for item in classifications)
@@ -643,6 +715,14 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 "status": status, "benchmark": args.benchmark,
                 "frames": frames, "measurement_seconds": duration,
                 "average_application_fps": average,
+                "hand_tracking_enabled": not args.face_only,
+                "face_detection": {"enabled": face_detector is not None,
+                    "mode": "face_only" if args.face_only else "combined" if face_detector is not None else "disabled",
+                    "observed_face_count_frames": dict(face_counts) if face_counts is not None else {},
+                    "observed_hand_face_count_frames": dict(joint_counts) if joint_counts is not None else {},
+                    "inference_resolution_frames": dict(face_sizes) if face_sizes is not None else {},
+                    "expired_results": expired_faces, "overlay_enabled": args.face_overlay,
+                    "cadence": "every processed capture; no reused detection coordinates", "freshness_limit_ms": 250},
                 "max_hands_requested": args.max_hands,
                 "capture_pipeline_mode": args.capture_pipeline,
                 "capture_consumer": dict(delivery_counts),
@@ -719,11 +799,15 @@ def run(args, report=None):
                    "python": platform.python_version(), "opencv": cv2.__version__,
                    "platform": platform.platform(), "opencv_configured_threads": cv2.getNumThreads()})
     try:
-        if not args.model.is_file() or args.model.stat().st_size == 0:
+        if not args.face_only and (not args.model.is_file() or args.model.stat().st_size == 0):
             report.update(status="error", error="Model missing or empty")
             LOGGER.error("Hand Landmarker model missing or empty: %s. "
                          "Run: .\\.venv\\Scripts\\python.exe -m hand_tracking.download_model",
                          args.model)
+            return 1
+        if args.face_detection and (not args.face_model.is_file() or args.face_model.stat().st_size == 0):
+            report.update(status="error", error="Face model missing or empty; run python -m face_tracking.download_model")
+            LOGGER.error(report["error"])
             return 1
         with ExitStack() as resources:
             timer_policy = WindowsTimerPolicy(args.windows_timer_policy)
@@ -735,9 +819,22 @@ def run(args, report=None):
             resources.callback(close_timer_policy)  # Registered first: restore after all input/camera/GUI cleanup.
             timer_policy.start()
             controller = control_cli.create_controller(args, resources) if args.controls else None
-            mp, landmarker = create_landmarker(args.model, max_hands=args.max_hands)
+            mp, landmarker = (None, None) if args.face_only else create_landmarker(args.model, max_hands=args.max_hands)
+            if landmarker is not None:
+                resources.callback(landmarker.close)
+            face_detector = None
+            if args.face_detection:
+                from face_tracking.face_detector import FaceDetector
+                face_detector = FaceDetector(args.face_model, bounds=args.face_inference_resolution,
+                                             min_confidence=args.face_min_confidence, mp=mp)
+                def close_faces():
+                    try:
+                        face_detector.close()
+                    finally:
+                        report["face_detector"] = face_detector.metadata()
+                resources.callback(close_faces)
+                mp = mp if mp is not None else face_detector.mp
             report["mediapipe"] = getattr(mp, "__version__", "unavailable")
-            resources.callback(landmarker.close)
             capture_source = None
             if args.capture_pipeline == "latest-thread":
                 def configure_owned(cap):
@@ -781,7 +878,13 @@ def run(args, report=None):
                 report["capture_pipeline"] = {"mode": "sync", "buffer_capacity": 0,
                                                "capture_worker_delivery_fps": None,
                                                "initialization_seconds": time.perf_counter()-before_camera_init}
-            LOGGER.info("MediaPipe Hand Landmarker: VIDEO mode | CPU | maximum %d hands", args.max_hands)
+            if args.face_only:
+                LOGGER.info("Hand model disabled: face-only observations, no desktop controls")
+            else:
+                LOGGER.info("MediaPipe Hand Landmarker: VIDEO mode | CPU | maximum %d hands", args.max_hands)
+            if face_detector is not None:
+                LOGGER.info("Face Detector: IMAGE mode | CPU | inference bounds %s | per-frame primary only",
+                            args.face_inference_resolution or "full")
             LOGGER.info("Landmark smoothing: %s | alpha: %.2f | raw comparison markers: %s",
                         args.smoothing, args.smoothing_alpha, args.show_raw_landmarks)
             LOGGER.info("Static gestures: %s (heuristic rules; no confidence probability)", args.gestures)
@@ -815,7 +918,8 @@ def run(args, report=None):
             return process_frames(cap, landmarker, mp, args=args, report=report,
                                   preview_window=options_window,
                                   profile_enabled=bool(args.benchmark or args.report or args.performance_profile),
-                                  capture_source=capture_source, **options)
+                                  capture_source=capture_source, **options,
+                                  **({"face_detector": face_detector} if face_detector is not None else {}))
     except CaptureError as exc:
         report.update(status="error", error=str(exc))
         LOGGER.error("Camera pipeline failed closed: %s. Inspect capture_pipeline cleanup status; restart after an unreleased native call.", exc)

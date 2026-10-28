@@ -24,7 +24,7 @@ STAGES = frozenset(("camera_read", "snapshot_copy", "publication_interval", "con
     "handoff_age", "post_publication_to_next_read", "publication_lock_wait", "copy_to_publication",
     "frame_interval", "inference", "frame_age_at_controller_update", "gui_events",
     "preview_rendering", "cursor_update_interval", "host_frame_age_at_dispatch",
-    "read_thread_cpu", "producer_thread_cpu", "main_thread_cpu"))
+    "read_thread_cpu", "producer_thread_cpu", "main_thread_cpu", "face_inference", "face_total"))
 
 
 class CaptureTimeline:

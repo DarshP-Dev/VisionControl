@@ -224,6 +224,7 @@ __marimo__/
 
 # Downloaded MediaPipe model bundles
 /hand_tracking/models/
+/face_tracking/models/
 
 # Local performance benchmark reports
 /hand_tracking/benchmarks/

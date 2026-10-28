@@ -1,5 +1,11 @@
 # Hand tracking with optional gesture recognition, states and events
 
+Phase 4.1 adds optional [face detection and positioning](../face_tracking/README.md).
+`--face-detection` combines both models on the same captured frames; `--face-only`
+skips the hand model and disallows controls. Face inference defaults to 640×360
+bounds independently of hand resolution. Existing hand-only behavior, camera
+ownership, timer-policy defaults and desktop safety remain unchanged.
+
 Phase 3.10 adds an opt-in [latest-frame capture experiment](../PHASE_3_10.md):
 `--capture-pipeline latest-thread`. Default `sync` is preserved. One owning camera
 thread replaces a single pending snapshot; inference, gestures, controllers and
