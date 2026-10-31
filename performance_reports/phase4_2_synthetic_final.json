@@ -1,0 +1,2978 @@
+{
+  "phase": "4.2",
+  "kind": "synthetic_host_only",
+  "python": "3.13.16",
+  "created_utc": "2026-10-29T01:05:19.792906+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "tracker_defaults": {
+    "confirmation_hits": 3,
+    "confirmation_seconds": 0.06,
+    "lost_timeout": 0.8,
+    "smoothing_tau": 0.07,
+    "max_tracks": 8,
+    "confirmation_gap": 0.25,
+    "smoothing_reset_gap": 0.25
+  },
+  "source_sha256": {
+    "benchmark_tracking.py": "8fa77af87c2178e770b644b8412f73fedf8ab85be1bf37b9cce78ae9ba3be859",
+    "face_tracker.py": "ce62c89b7794c8bd62c24ea5633b7f1e2db35890cff780c92ee86ec844b8f679",
+    "track_models.py": "a42a42882a2e1abd1848a56dc9a413d11e5afcfd02d9e1647e9cefb19b34eb16",
+    "face_geometry.py": "9f759e96e57d81461fcb963b2df496d59e3c5a281829ae7fded8ceb83a502b50"
+  },
+  "limitations": "No capture, neural inference, preview, desktop input or physical identity ground truth. Before is unchanged Phase 4.1 output adaptation; hand host is two-hand EMA/static recognition only. Timing includes bounded profiling. Memory snapshots share a process and are not isolated per-case deltas.",
+  "cases": [
+    {
+      "repeat": 0,
+      "faces": 1,
+      "hands": 0,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 6.864999159006402e-05,
+          "max_ms": 0.0040000013541430235,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000100000761449337,
+          "p99_ms": 0.000100000761449337
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0128424499562243,
+          "max_ms": 0.04090000584255904,
+          "p50_ms": 0.012599994079209864,
+          "p95_ms": 0.013900003978051245,
+          "p99_ms": 0.020300994656281546
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.012962699962372426,
+          "max_ms": 0.04099999205209315,
+          "p50_ms": 0.012699994840659201,
+          "p95_ms": 0.014005004049977282,
+          "p99_ms": 0.020500996033661067
+        }
+      },
+      "synthetic_host_iterations_per_second": 70633.93959998964,
+      "resources": {
+        "process_cpu_seconds": 0.03125,
+        "process_wall_seconds": 0.02831500000320375,
+        "process_cpu_percent_of_one_core": 110.3655306249838,
+        "process_cpu_ms_per_frame": 0.015625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 49827840,
+        "peak_working_set_bytes_process_lifetime": 49827840
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 0,
+      "faces": 1,
+      "hands": 0,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.015550249911029823,
+          "max_ms": 0.4558000073302537,
+          "p50_ms": 0.01340000017080456,
+          "p95_ms": 0.016999998479150236,
+          "p99_ms": 0.13624200393678615
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.01392640006088186,
+          "max_ms": 0.18780000391416252,
+          "p50_ms": 0.012400007108226418,
+          "p95_ms": 0.015500001609325409,
+          "p99_ms": 0.02531200341763905
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.05576950000249781,
+          "max_ms": 0.4965000116499141,
+          "p50_ms": 0.05160000000614673,
+          "p95_ms": 0.06261001035454682,
+          "p99_ms": 0.19161700372933407
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0001213999858009629,
+          "max_ms": 0.000600004568696022,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000200001522898674
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.01683055009925738,
+          "max_ms": 0.047900000936351717,
+          "p50_ms": 0.016400008462369442,
+          "p95_ms": 0.019104999955743544,
+          "p99_ms": 0.025301003479398787
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.07603840004594531,
+          "max_ms": 0.5161000008229166,
+          "p50_ms": 0.07150000601541251,
+          "p95_ms": 0.0851100070576649,
+          "p99_ms": 0.21211999977822413
+        }
+      },
+      "synthetic_host_iterations_per_second": 12513.029191572641,
+      "resources": {
+        "process_cpu_seconds": 0.15625,
+        "process_wall_seconds": 0.1598334000009345,
+        "process_cpu_percent_of_one_core": 97.75804055916126,
+        "process_cpu_ms_per_frame": 0.078125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 50585600,
+        "peak_working_set_bytes_process_lifetime": 50585600
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 1,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 1,
+        "primary_id": 1,
+        "ids_allocated": 1,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 0,
+      "faces": 1,
+      "hands": 2,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6161041001614649,
+          "max_ms": 1.542800004244782,
+          "p50_ms": 0.5779999919468537,
+          "p95_ms": 0.8042849971388931,
+          "p99_ms": 1.0993840031733269
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.02168324995727744,
+          "max_ms": 0.20729999232571572,
+          "p50_ms": 0.019499988411553204,
+          "p95_ms": 0.032620001002214835,
+          "p99_ms": 0.045400996459648006
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6378900000709109,
+          "max_ms": 1.5779000095790252,
+          "p50_ms": 0.5986000032862648,
+          "p95_ms": 0.8375999903364573,
+          "p99_ms": 1.1487140010285657
+        }
+      },
+      "synthetic_host_iterations_per_second": 1561.2739120648687,
+      "resources": {
+        "process_cpu_seconds": 1.265625,
+        "process_wall_seconds": 1.281005200013169,
+        "process_cpu_percent_of_one_core": 98.79936474785497,
+        "process_cpu_ms_per_frame": 0.6328125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 52248576,
+        "peak_working_set_bytes_process_lifetime": 52248576
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 0,
+      "faces": 1,
+      "hands": 2,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.019163400116667617,
+          "max_ms": 0.1416000013705343,
+          "p50_ms": 0.017700003809295595,
+          "p95_ms": 0.026699999580159783,
+          "p99_ms": 0.040302001143572845
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.013868850059225224,
+          "max_ms": 0.17980000120587647,
+          "p50_ms": 0.01309999788645655,
+          "p95_ms": 0.01920000067912042,
+          "p99_ms": 0.02490798608050681
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.06365415009349817,
+          "max_ms": 0.22879999596625566,
+          "p50_ms": 0.05989999044686556,
+          "p95_ms": 0.08143000814015974,
+          "p99_ms": 0.12090800373698583
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6156913999948301,
+          "max_ms": 1.3732000079471618,
+          "p50_ms": 0.5832000024383888,
+          "p95_ms": 0.7726000039838254,
+          "p99_ms": 1.007560002617538
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.021328700058802497,
+          "max_ms": 0.2013000048464164,
+          "p50_ms": 0.019800005247816443,
+          "p95_ms": 0.029004988755332303,
+          "p99_ms": 0.042506003519520164
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.7047859503072686,
+          "max_ms": 1.524099992820993,
+          "p50_ms": 0.6696999917039648,
+          "p95_ms": 0.8762199933698865,
+          "p99_ms": 1.1753199991653671
+        }
+      },
+      "synthetic_host_iterations_per_second": 1409.0549109509564,
+      "resources": {
+        "process_cpu_seconds": 1.421875,
+        "process_wall_seconds": 1.4193910999892978,
+        "process_cpu_percent_of_one_core": 100.17499757541955,
+        "process_cpu_ms_per_frame": 0.7109375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 52617216,
+        "peak_working_set_bytes_process_lifetime": 52617216
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 1,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 1,
+        "primary_id": 1,
+        "ids_allocated": 1,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 0,
+      "faces": 2,
+      "hands": 0,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 7.315000402741134e-05,
+          "max_ms": 0.000300002284348011,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000100000761449337,
+          "p99_ms": 0.000200001522898674
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.023684150219196454,
+          "max_ms": 0.1841999910539016,
+          "p50_ms": 0.02200000744778663,
+          "p95_ms": 0.02720000338740647,
+          "p99_ms": 0.06099099817220113
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.02381115021125879,
+          "max_ms": 0.1843999925768003,
+          "p50_ms": 0.022199994418770075,
+          "p95_ms": 0.027305003459332504,
+          "p99_ms": 0.0611909996950998
+        }
+      },
+      "synthetic_host_iterations_per_second": 39818.90362411295,
+      "resources": {
+        "process_cpu_seconds": 0.046875,
+        "process_wall_seconds": 0.05022740000276826,
+        "process_cpu_percent_of_one_core": 93.32555536901472,
+        "process_cpu_ms_per_frame": 0.0234375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 52621312,
+        "peak_working_set_bytes_process_lifetime": 52621312
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 0,
+      "faces": 2,
+      "hands": 0,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.033137450147478376,
+          "max_ms": 0.6752000044798478,
+          "p50_ms": 0.030000010156072676,
+          "p95_ms": 0.04499999340623617,
+          "p99_ms": 0.06810099468566477
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.02980375006882241,
+          "max_ms": 7.711700003710575,
+          "p50_ms": 0.024100008886307478,
+          "p95_ms": 0.03470500232651829,
+          "p99_ms": 0.04960099919117056
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.11217310015490511,
+          "max_ms": 7.804799999576062,
+          "p50_ms": 0.09490000957157463,
+          "p95_ms": 0.17922499682754275,
+          "p99_ms": 0.3203699942969251
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.00013710011990042403,
+          "max_ms": 0.0005999900167807937,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.02946479983802419,
+          "max_ms": 0.19639999663922936,
+          "p50_ms": 0.027699992642737925,
+          "p95_ms": 0.039705011295154684,
+          "p99_ms": 0.056299992284039035
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.14623045011103386,
+          "max_ms": 8.058999999775551,
+          "p50_ms": 0.12709999282378703,
+          "p95_ms": 0.23419999342877418,
+          "p99_ms": 0.3597170031571295
+        }
+      },
+      "synthetic_host_iterations_per_second": 6637.043329985297,
+      "resources": {
+        "process_cpu_seconds": 0.296875,
+        "process_wall_seconds": 0.30133899999782443,
+        "process_cpu_percent_of_one_core": 98.51861192946924,
+        "process_cpu_ms_per_frame": 0.1484375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 52662272,
+        "peak_working_set_bytes_process_lifetime": 52662272
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 2,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 2,
+        "primary_id": 2,
+        "ids_allocated": 2,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 0,
+      "faces": 2,
+      "hands": 2,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.5868229499319568,
+          "max_ms": 1.2346000003162771,
+          "p50_ms": 0.5689500030712225,
+          "p95_ms": 0.6543050054460764,
+          "p99_ms": 0.7623070127738174
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.030575750053685624,
+          "max_ms": 0.15279999934136868,
+          "p50_ms": 0.0295999925583601,
+          "p95_ms": 0.036805003037443385,
+          "p99_ms": 0.04730301079689525
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6175004999895464,
+          "max_ms": 1.2811000051442534,
+          "p50_ms": 0.599599996348843,
+          "p95_ms": 0.6864299881272018,
+          "p99_ms": 0.7933490014693234
+        }
+      },
+      "synthetic_host_iterations_per_second": 1613.3082442301966,
+      "resources": {
+        "process_cpu_seconds": 1.21875,
+        "process_wall_seconds": 1.239688700006809,
+        "process_cpu_percent_of_one_core": 98.3109711327776,
+        "process_cpu_ms_per_frame": 0.609375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 52674560,
+        "peak_working_set_bytes_process_lifetime": 52674560
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 0,
+      "faces": 2,
+      "hands": 2,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.035258249859907664,
+          "max_ms": 0.10629999451339245,
+          "p50_ms": 0.033899996196851134,
+          "p95_ms": 0.04410500114317983,
+          "p99_ms": 0.05800500497571193
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.02541610006301198,
+          "max_ms": 0.07680000271648169,
+          "p50_ms": 0.024599998141638935,
+          "p95_ms": 0.03249998626415618,
+          "p99_ms": 0.04030400130432099
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.10540365011547692,
+          "max_ms": 0.21969999943394214,
+          "p50_ms": 0.1019000046653673,
+          "p95_ms": 0.1255099952686578,
+          "p99_ms": 0.16182499515707602
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6043559499448747,
+          "max_ms": 8.180300006642938,
+          "p50_ms": 0.5741999921156093,
+          "p95_ms": 0.7341100019402802,
+          "p99_ms": 0.8782290069211739
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.031235100075718947,
+          "max_ms": 0.1432000135537237,
+          "p50_ms": 0.029800008633174002,
+          "p95_ms": 0.03990499826613813,
+          "p99_ms": 0.05510499759111553
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.7458750500445603,
+          "max_ms": 8.35259999439586,
+          "p50_ms": 0.7143499969970435,
+          "p95_ms": 0.8835449902107939,
+          "p99_ms": 1.077099993563024
+        }
+      },
+      "synthetic_host_iterations_per_second": 1332.0943967380015,
+      "resources": {
+        "process_cpu_seconds": 1.5,
+        "process_wall_seconds": 1.5013951000000816,
+        "process_cpu_percent_of_one_core": 99.90707975535011,
+        "process_cpu_ms_per_frame": 0.75
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 52686848,
+        "peak_working_set_bytes_process_lifetime": 52686848
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 2,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 2,
+        "primary_id": 2,
+        "ids_allocated": 2,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 0,
+      "faces": 4,
+      "hands": 0,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 7.495003228541464e-05,
+          "max_ms": 0.000400003045797348,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000100000761449337,
+          "p99_ms": 0.000200001522898674
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.040679250116227195,
+          "max_ms": 0.12400001287460327,
+          "p50_ms": 0.03859998832922429,
+          "p95_ms": 0.05523499785340388,
+          "p99_ms": 0.08050100179389119
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.04081020010926295,
+          "max_ms": 0.12419999984558672,
+          "p50_ms": 0.038700003642588854,
+          "p95_ms": 0.05533999865292568,
+          "p99_ms": 0.08080098967184311
+        }
+      },
+      "synthetic_host_iterations_per_second": 23746.7926976283,
+      "resources": {
+        "process_cpu_seconds": 0.09375,
+        "process_wall_seconds": 0.08422190000419505,
+        "process_cpu_percent_of_one_core": 111.31309077013266,
+        "process_cpu_ms_per_frame": 0.046875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 52695040,
+        "peak_working_set_bytes_process_lifetime": 52695040
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 0,
+      "faces": 4,
+      "hands": 0,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.12355034999200143,
+          "max_ms": 0.8228999940911308,
+          "p50_ms": 0.09989998943638057,
+          "p95_ms": 0.16569499493925824,
+          "p99_ms": 0.5706120083050337
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.04981930006033508,
+          "max_ms": 0.5376000190153718,
+          "p50_ms": 0.045400025555863976,
+          "p95_ms": 0.053104996914044016,
+          "p99_ms": 0.08359998188097961
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.24254939985257806,
+          "max_ms": 0.9462000016355887,
+          "p50_ms": 0.2142999874195084,
+          "p95_ms": 0.6202500073413829,
+          "p99_ms": 0.6925479907658882
+        },
+        "face_observation_age": {
+          "count": 8000,
+          "percentile_samples": 8000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.00014330005797091872,
+          "max_ms": 0.0013999961083754897,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000200001522898674
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.048159149853745475,
+          "max_ms": 0.10760000441223383,
+          "p50_ms": 0.04710000939667225,
+          "p95_ms": 0.05470500836963765,
+          "p99_ms": 0.06730100300046615
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.2966285497896024,
+          "max_ms": 1.0019000037573278,
+          "p50_ms": 0.2683999919099733,
+          "p95_ms": 0.6756199931260198,
+          "p99_ms": 0.7456500020634849
+        }
+      },
+      "synthetic_host_iterations_per_second": 3317.1715208173528,
+      "resources": {
+        "process_cpu_seconds": 0.609375,
+        "process_wall_seconds": 0.6029233000008389,
+        "process_cpu_percent_of_one_core": 101.07006977490371,
+        "process_cpu_ms_per_frame": 0.3046875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 52912128,
+        "peak_working_set_bytes_process_lifetime": 52912128
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 4,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 4,
+        "primary_id": 3,
+        "ids_allocated": 4,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 0,
+      "faces": 4,
+      "hands": 2,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.5837195499334484,
+          "max_ms": 0.8925000001909211,
+          "p50_ms": 0.56744999892544,
+          "p95_ms": 0.6602450062928255,
+          "p99_ms": 0.7254679939069318
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.050712500073132105,
+          "max_ms": 0.1041999930748716,
+          "p50_ms": 0.04919999628327787,
+          "p95_ms": 0.06060499581508338,
+          "p99_ms": 0.07900300493929535
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6345329500618391,
+          "max_ms": 0.9615000017220154,
+          "p50_ms": 0.618350000877399,
+          "p95_ms": 0.7183399982750416,
+          "p99_ms": 0.7841240041307174
+        }
+      },
+      "synthetic_host_iterations_per_second": 1570.280247909033,
+      "resources": {
+        "process_cpu_seconds": 1.265625,
+        "process_wall_seconds": 1.2736580000055255,
+        "process_cpu_percent_of_one_core": 99.36929693799351,
+        "process_cpu_ms_per_frame": 0.6328125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53018624,
+        "peak_working_set_bytes_process_lifetime": 53018624
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 0,
+      "faces": 4,
+      "hands": 2,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.11278670002502622,
+          "max_ms": 0.27799999224953353,
+          "p50_ms": 0.10910000128205866,
+          "p95_ms": 0.1296049973461777,
+          "p99_ms": 0.15750100603327155
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.04915515051106922,
+          "max_ms": 0.17929999739862978,
+          "p50_ms": 0.047599998652003706,
+          "p95_ms": 0.056999983644345775,
+          "p99_ms": 0.07629999905475415
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.23599150016525527,
+          "max_ms": 0.44850000995211303,
+          "p50_ms": 0.23130000045057386,
+          "p95_ms": 0.26451000521774404,
+          "p99_ms": 0.30300399361294694
+        },
+        "face_observation_age": {
+          "count": 8000,
+          "percentile_samples": 8000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.634820149942243,
+          "max_ms": 1.8434999947203323,
+          "p50_ms": 0.5988999982946552,
+          "p95_ms": 0.8428250002907589,
+          "p99_ms": 0.9765669994521886
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.051882349980587605,
+          "max_ms": 0.1345000055152923,
+          "p50_ms": 0.05040000542066991,
+          "p95_ms": 0.059999991208314896,
+          "p99_ms": 0.0738129945239052
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.9295096997884684,
+          "max_ms": 2.413800000795163,
+          "p50_ms": 0.8964999942691065,
+          "p95_ms": 1.1394250024750363,
+          "p99_ms": 1.2918399985937865
+        }
+      },
+      "synthetic_host_iterations_per_second": 1069.2785005850665,
+      "resources": {
+        "process_cpu_seconds": 1.875,
+        "process_wall_seconds": 1.8704201000073226,
+        "process_cpu_percent_of_one_core": 100.24485942984998,
+        "process_cpu_ms_per_frame": 0.9375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53243904,
+        "peak_working_set_bytes_process_lifetime": 53243904
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 4,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 4,
+        "primary_id": 3,
+        "ids_allocated": 4,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 1,
+      "hands": 0,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.014847299935354386,
+          "max_ms": 0.17139999545179307,
+          "p50_ms": 0.013299999409355223,
+          "p95_ms": 0.01661500937188974,
+          "p99_ms": 0.02650299808010459
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.014334499966935255,
+          "max_ms": 0.22109999554231763,
+          "p50_ms": 0.012400007108226418,
+          "p95_ms": 0.014914997154846775,
+          "p99_ms": 0.04888400027993968
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.05562764997739578,
+          "max_ms": 0.29429999995045364,
+          "p50_ms": 0.05160000000614673,
+          "p95_ms": 0.0610999995842576,
+          "p99_ms": 0.1984029974846635
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.00011880019155796617,
+          "max_ms": 0.000400003045797348,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000200001522898674
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.016632199833111372,
+          "max_ms": 0.04679999256040901,
+          "p50_ms": 0.016299993149004877,
+          "p95_ms": 0.018000006093643606,
+          "p99_ms": 0.02490100043360144
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.07567975019628648,
+          "max_ms": 0.3189999988535419,
+          "p50_ms": 0.07130000449251384,
+          "p95_ms": 0.08160500947269611,
+          "p99_ms": 0.219919000955997
+        }
+      },
+      "synthetic_host_iterations_per_second": 12579.890164344004,
+      "resources": {
+        "process_cpu_seconds": 0.15625,
+        "process_wall_seconds": 0.15898390000802465,
+        "process_cpu_percent_of_one_core": 98.28039190893753,
+        "process_cpu_ms_per_frame": 0.078125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53248000,
+        "peak_working_set_bytes_process_lifetime": 53248000
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 1,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 1,
+        "primary_id": 1,
+        "ids_allocated": 1,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 1,
+      "hands": 0,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 6.900005246279761e-05,
+          "max_ms": 0.000200001522898674,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000100000761449337,
+          "p99_ms": 0.000100000761449337
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.013096099959511776,
+          "max_ms": 0.030000010156072676,
+          "p50_ms": 0.012899996363557875,
+          "p95_ms": 0.013500000932253897,
+          "p99_ms": 0.02060399681795388
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.01321785001346143,
+          "max_ms": 0.030300012440420687,
+          "p50_ms": 0.012999997125007212,
+          "p95_ms": 0.013699988630833104,
+          "p99_ms": 0.020803998195333403
+        }
+      },
+      "synthetic_host_iterations_per_second": 69424.67768562488,
+      "resources": {
+        "process_cpu_seconds": 0.03125,
+        "process_wall_seconds": 0.02880820000427775,
+        "process_cpu_percent_of_one_core": 108.47605888378887,
+        "process_cpu_ms_per_frame": 0.015625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53248000,
+        "peak_working_set_bytes_process_lifetime": 53248000
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 1,
+      "faces": 1,
+      "hands": 2,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.017577099919435568,
+          "max_ms": 0.04640000406652689,
+          "p50_ms": 0.016999998479150236,
+          "p95_ms": 0.02160000440198928,
+          "p99_ms": 0.027499991265358403
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.013206900192017201,
+          "max_ms": 0.04220000118948519,
+          "p50_ms": 0.012799995602108538,
+          "p95_ms": 0.015804990107426416,
+          "p99_ms": 0.021702005033148453
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.05996299995604204,
+          "max_ms": 0.11280000035185367,
+          "p50_ms": 0.058200006606057286,
+          "p95_ms": 0.06890000076964498,
+          "p99_ms": 0.09290399437304586
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.5973599997887504,
+          "max_ms": 1.078899993444793,
+          "p50_ms": 0.5789999995613471,
+          "p95_ms": 0.6696150048810523,
+          "p99_ms": 0.7825310065527447
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.01982664993556682,
+          "max_ms": 0.051000009989365935,
+          "p50_ms": 0.01920000067912042,
+          "p95_ms": 0.025200002710334957,
+          "p99_ms": 0.03140100612654351
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6809327496594051,
+          "max_ms": 1.1922999983653426,
+          "p50_ms": 0.6616499958909117,
+          "p95_ms": 0.7597100069688167,
+          "p99_ms": 0.8749299970804714
+        }
+      },
+      "synthetic_host_iterations_per_second": 1458.9517008926648,
+      "resources": {
+        "process_cpu_seconds": 1.359375,
+        "process_wall_seconds": 1.3708473000006052,
+        "process_cpu_percent_of_one_core": 99.16312342004831,
+        "process_cpu_ms_per_frame": 0.6796875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53268480,
+        "peak_working_set_bytes_process_lifetime": 53268480
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 1,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 1,
+        "primary_id": 1,
+        "ids_allocated": 1,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 1,
+      "hands": 2,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.5868960499865352,
+          "max_ms": 1.1183000024175271,
+          "p50_ms": 0.5722499990952201,
+          "p95_ms": 0.6440099990868475,
+          "p99_ms": 0.6942010036436841
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.019341099919984117,
+          "max_ms": 0.06570000550709665,
+          "p50_ms": 0.018799997633323073,
+          "p95_ms": 0.02300000051036477,
+          "p99_ms": 0.029699993319809437
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6063358498722664,
+          "max_ms": 1.1484999995445833,
+          "p50_ms": 0.5915999936405569,
+          "p95_ms": 0.6660099927103147,
+          "p99_ms": 0.7140320088365114
+        }
+      },
+      "synthetic_host_iterations_per_second": 1643.0022316940497,
+      "resources": {
+        "process_cpu_seconds": 1.21875,
+        "process_wall_seconds": 1.2172837999969488,
+        "process_cpu_percent_of_one_core": 100.12044849385614,
+        "process_cpu_ms_per_frame": 0.609375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53268480,
+        "peak_working_set_bytes_process_lifetime": 53268480
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 1,
+      "faces": 2,
+      "hands": 0,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.029365650028921664,
+          "max_ms": 0.21230000129435211,
+          "p50_ms": 0.028399997972883284,
+          "p95_ms": 0.0340049977239687,
+          "p99_ms": 0.04490699269808828
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.02880740016553318,
+          "max_ms": 0.2835999912349507,
+          "p50_ms": 0.023499989765696228,
+          "p95_ms": 0.029999982507433742,
+          "p99_ms": 0.19142098768497817
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.09887075005826773,
+          "max_ms": 0.35319999733474106,
+          "p50_ms": 0.09190000128000975,
+          "p95_ms": 0.11562000654521397,
+          "p99_ms": 0.26300400888430886
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.00013530003343475983,
+          "max_ms": 0.000600004568696022,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000200001522898674
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.026528849768510554,
+          "max_ms": 0.1382000045850873,
+          "p50_ms": 0.025900008040480316,
+          "p95_ms": 0.0295999925583601,
+          "p99_ms": 0.038509002042701454
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.12969225004781038,
+          "max_ms": 0.3850999928545207,
+          "p50_ms": 0.12229999992996454,
+          "p95_ms": 0.14879499722155734,
+          "p99_ms": 0.2934120075951796
+        }
+      },
+      "synthetic_host_iterations_per_second": 7477.851538328819,
+      "resources": {
+        "process_cpu_seconds": 0.265625,
+        "process_wall_seconds": 0.2674565000052098,
+        "process_cpu_percent_of_one_core": 99.31521574342963,
+        "process_cpu_ms_per_frame": 0.1328125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53268480,
+        "peak_working_set_bytes_process_lifetime": 53268480
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 2,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 2,
+        "primary_id": 2,
+        "ids_allocated": 2,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 2,
+      "hands": 0,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 7.339999865507707e-05,
+          "max_ms": 0.000300002284348011,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000100000761449337,
+          "p99_ms": 0.000100000761449337
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.022394399784388952,
+          "max_ms": 0.21180001203902066,
+          "p50_ms": 0.02200000744778663,
+          "p95_ms": 0.023100001271814108,
+          "p99_ms": 0.02789999431115575
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.022518149788083974,
+          "max_ms": 0.21200001356191933,
+          "p50_ms": 0.022100008209235966,
+          "p95_ms": 0.023200002033263445,
+          "p99_ms": 0.028099995688535273
+        }
+      },
+      "synthetic_host_iterations_per_second": 42044.89554297351,
+      "resources": {
+        "process_cpu_seconds": 0.046875,
+        "process_wall_seconds": 0.047568199996021576,
+        "process_cpu_percent_of_one_core": 98.54272392884415,
+        "process_cpu_ms_per_frame": 0.0234375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53268480,
+        "peak_working_set_bytes_process_lifetime": 53268480
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 1,
+      "faces": 2,
+      "hands": 2,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.03628895001747878,
+          "max_ms": 0.13040000339969993,
+          "p50_ms": 0.03470000228844583,
+          "p95_ms": 0.04630000330507755,
+          "p99_ms": 0.06010199198499322
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.025884050337481312,
+          "max_ms": 0.09719999798107892,
+          "p50_ms": 0.024900000425986946,
+          "p95_ms": 0.03240501318941824,
+          "p99_ms": 0.043901999742956825
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.10750310003641061,
+          "max_ms": 0.22529999841935933,
+          "p50_ms": 0.10370000381954014,
+          "p95_ms": 0.13041000347584486,
+          "p99_ms": 0.16492200418724676
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6180684999708319,
+          "max_ms": 9.379399998579174,
+          "p50_ms": 0.5858999938936904,
+          "p95_ms": 0.7579800061648708,
+          "p99_ms": 0.9375250073208007
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0318730500221136,
+          "max_ms": 0.10799999290611595,
+          "p50_ms": 0.03060000017285347,
+          "p95_ms": 0.040405002073384814,
+          "p99_ms": 0.05180200139875523
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.762433299816621,
+          "max_ms": 9.562100007315166,
+          "p50_ms": 0.7288500055437908,
+          "p95_ms": 0.9213950012053828,
+          "p99_ms": 1.1352319993602578
+        }
+      },
+      "synthetic_host_iterations_per_second": 1303.0064659078973,
+      "resources": {
+        "process_cpu_seconds": 1.53125,
+        "process_wall_seconds": 1.5349118000012822,
+        "process_cpu_percent_of_one_core": 99.76143254607338,
+        "process_cpu_ms_per_frame": 0.765625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53268480,
+        "peak_working_set_bytes_process_lifetime": 53268480
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 2,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 2,
+        "primary_id": 2,
+        "ids_allocated": 2,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 2,
+      "hands": 2,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.5879705500192358,
+          "max_ms": 1.181999992695637,
+          "p50_ms": 0.570699994568713,
+          "p95_ms": 0.6525100056023803,
+          "p99_ms": 0.7482640072703362
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.03089049995469395,
+          "max_ms": 0.08909999451134354,
+          "p50_ms": 0.029799994081258774,
+          "p95_ms": 0.03840000135824084,
+          "p99_ms": 0.05000400225981138
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6189655000343919,
+          "max_ms": 1.2466999905882403,
+          "p50_ms": 0.6014500031596981,
+          "p95_ms": 0.6858099979581311,
+          "p99_ms": 0.7794249967264476
+        }
+      },
+      "synthetic_host_iterations_per_second": 1609.4464204428712,
+      "resources": {
+        "process_cpu_seconds": 1.234375,
+        "process_wall_seconds": 1.242663299999549,
+        "process_cpu_percent_of_one_core": 99.33302126170845,
+        "process_cpu_ms_per_frame": 0.6171875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53268480,
+        "peak_working_set_bytes_process_lifetime": 53268480
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 1,
+      "faces": 4,
+      "hands": 0,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.12774664995959029,
+          "max_ms": 0.9405000018887222,
+          "p50_ms": 0.10089999705087394,
+          "p95_ms": 0.18106499555869943,
+          "p99_ms": 0.5974150086694863
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.05049109998071799,
+          "max_ms": 0.6128999957581982,
+          "p50_ms": 0.04569999873638153,
+          "p95_ms": 0.0561000058951322,
+          "p99_ms": 0.07571699446998535
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.24847974973818054,
+          "max_ms": 1.1213999969186261,
+          "p50_ms": 0.21654999727616087,
+          "p95_ms": 0.6534999993164092,
+          "p99_ms": 0.7298269981401972
+        },
+        "face_observation_age": {
+          "count": 8000,
+          "percentile_samples": 8000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.00014380023640114814,
+          "max_ms": 0.000700005330145359,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000200001522898674
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.04970044989022426,
+          "max_ms": 0.11150000500492752,
+          "p50_ms": 0.04820000322069973,
+          "p95_ms": 0.05740000051446259,
+          "p99_ms": 0.07670198756386526
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.3042612500867108,
+          "max_ms": 1.2046000047121197,
+          "p50_ms": 0.2719000040087849,
+          "p95_ms": 0.7088049984304234,
+          "p99_ms": 0.7830829959129914
+        }
+      },
+      "synthetic_host_iterations_per_second": 3234.1814165872806,
+      "resources": {
+        "process_cpu_seconds": 0.625,
+        "process_wall_seconds": 0.6183944999938831,
+        "process_cpu_percent_of_one_core": 101.06816926835252,
+        "process_cpu_ms_per_frame": 0.3125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53276672,
+        "peak_working_set_bytes_process_lifetime": 53276672
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 4,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 4,
+        "primary_id": 3,
+        "ids_allocated": 4,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 4,
+      "hands": 0,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 7.235003431560472e-05,
+          "max_ms": 0.000200001522898674,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000100000761449337,
+          "p99_ms": 0.000100000761449337
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.04018549996544607,
+          "max_ms": 0.0855999969644472,
+          "p50_ms": 0.03959999594371766,
+          "p95_ms": 0.04400000034365803,
+          "p99_ms": 0.04950299859046935
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.04031189999659546,
+          "max_ms": 0.08579999848734587,
+          "p50_ms": 0.039700011257082224,
+          "p95_ms": 0.04410000110510737,
+          "p99_ms": 0.04970299996784888
+        }
+      },
+      "synthetic_host_iterations_per_second": 24057.86397252033,
+      "resources": {
+        "process_cpu_seconds": 0.09375,
+        "process_wall_seconds": 0.08313290000660345,
+        "process_cpu_percent_of_one_core": 112.77123737118903,
+        "process_cpu_ms_per_frame": 0.046875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53276672,
+        "peak_working_set_bytes_process_lifetime": 53276672
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 1,
+      "faces": 4,
+      "hands": 2,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.10863964998134179,
+          "max_ms": 0.2606000052765012,
+          "p50_ms": 0.10619999375194311,
+          "p95_ms": 0.11870500165969133,
+          "p99_ms": 0.14910700017935596
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.04824764999648323,
+          "max_ms": 0.15239999629557133,
+          "p50_ms": 0.04709999484475702,
+          "p95_ms": 0.05500001207110472,
+          "p99_ms": 0.06451899636886081
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.22926630007714266,
+          "max_ms": 0.41930000588763505,
+          "p50_ms": 0.225499999942258,
+          "p95_ms": 0.24541000602766871,
+          "p99_ms": 0.29271598716150027
+        },
+        "face_observation_age": {
+          "count": 8000,
+          "percentile_samples": 8000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.619725800024753,
+          "max_ms": 0.9848000045167282,
+          "p50_ms": 0.5871999965165742,
+          "p95_ms": 0.7861300051445141,
+          "p99_ms": 0.8615339970856439
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.05125564991612919,
+          "max_ms": 0.19270001212134957,
+          "p50_ms": 0.05029999010730535,
+          "p95_ms": 0.0577000027988106,
+          "p99_ms": 0.0671100015460979
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.9066975000387174,
+          "max_ms": 1.3595999917015433,
+          "p50_ms": 0.87340000027325,
+          "p95_ms": 1.0767450054117944,
+          "p99_ms": 1.152520000905497
+        }
+      },
+      "synthetic_host_iterations_per_second": 1096.4291932646079,
+      "resources": {
+        "process_cpu_seconds": 1.828125,
+        "process_wall_seconds": 1.8241031999932602,
+        "process_cpu_percent_of_one_core": 100.22048094684307,
+        "process_cpu_ms_per_frame": 0.9140625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53329920,
+        "peak_working_set_bytes_process_lifetime": 53329920
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 4,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 4,
+        "primary_id": 3,
+        "ids_allocated": 4,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 4,
+      "hands": 2,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.5897688500408549,
+          "max_ms": 1.1227999930270016,
+          "p50_ms": 0.570999996853061,
+          "p95_ms": 0.6492400098068174,
+          "p99_ms": 0.853704010223737
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.05063860004156595,
+          "max_ms": 0.1201999984914437,
+          "p50_ms": 0.049299997044727206,
+          "p95_ms": 0.05849999506608583,
+          "p99_ms": 0.07571800873847676
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6405095001246082,
+          "max_ms": 1.2136000004829839,
+          "p50_ms": 0.621749997662846,
+          "p95_ms": 0.7025199942290783,
+          "p99_ms": 0.9262290093465708
+        }
+      },
+      "synthetic_host_iterations_per_second": 1555.6764143147411,
+      "resources": {
+        "process_cpu_seconds": 1.28125,
+        "process_wall_seconds": 1.2856144000106724,
+        "process_cpu_percent_of_one_core": 99.6605202920381,
+        "process_cpu_ms_per_frame": 0.640625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53329920,
+        "peak_working_set_bytes_process_lifetime": 53329920
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 2,
+      "faces": 1,
+      "hands": 0,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 6.960010068723932e-05,
+          "max_ms": 0.000600004568696022,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000100000761449337,
+          "p99_ms": 0.00010100076906382947
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.013085149919788819,
+          "max_ms": 0.05469999450724572,
+          "p50_ms": 0.012599994079209864,
+          "p95_ms": 0.014905010903021315,
+          "p99_ms": 0.022600997472181916
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.013206850067945197,
+          "max_ms": 0.05499999679159373,
+          "p50_ms": 0.012699994840659201,
+          "p95_ms": 0.015099998563528061,
+          "p99_ms": 0.022799998987466097
+        }
+      },
+      "synthetic_host_iterations_per_second": 69417.44877469966,
+      "resources": {
+        "process_cpu_seconds": 0.03125,
+        "process_wall_seconds": 0.0288111999980174,
+        "process_cpu_percent_of_one_core": 108.46476371046823,
+        "process_cpu_ms_per_frame": 0.015625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53329920,
+        "peak_working_set_bytes_process_lifetime": 53329920
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 2,
+      "faces": 1,
+      "hands": 0,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.01520464988425374,
+          "max_ms": 0.255000006291084,
+          "p50_ms": 0.013199998647905886,
+          "p95_ms": 0.01640999398659914,
+          "p99_ms": 0.14870899714878758
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.01346385020588059,
+          "max_ms": 0.1807999942684546,
+          "p50_ms": 0.012100004823878407,
+          "p95_ms": 0.013905003288527945,
+          "p99_ms": 0.020799998310394585
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.05445810015226016,
+          "max_ms": 0.3070999955525622,
+          "p50_ms": 0.05060000694356859,
+          "p95_ms": 0.05999999193591066,
+          "p99_ms": 0.19252399608376433
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.00012164990039309487,
+          "max_ms": 0.000600004568696022,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000200001522898674
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.01640535012120381,
+          "max_ms": 0.0422999873990193,
+          "p50_ms": 0.016000005416572094,
+          "p95_ms": 0.01811000693123787,
+          "p99_ms": 0.023504004348069426
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0742247500893427,
+          "max_ms": 0.3282999969087541,
+          "p50_ms": 0.06999999459367245,
+          "p95_ms": 0.08070500334724784,
+          "p99_ms": 0.21330900883185674
+        }
+      },
+      "synthetic_host_iterations_per_second": 12820.66896945918,
+      "resources": {
+        "process_cpu_seconds": 0.15625,
+        "process_wall_seconds": 0.15599810000276193,
+        "process_cpu_percent_of_one_core": 100.16147632389985,
+        "process_cpu_ms_per_frame": 0.078125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53329920,
+        "peak_working_set_bytes_process_lifetime": 53329920
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 1,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 1,
+        "primary_id": 1,
+        "ids_allocated": 1,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 2,
+      "faces": 1,
+      "hands": 2,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6030898999597412,
+          "max_ms": 1.3457000022754073,
+          "p50_ms": 0.5718000029446557,
+          "p95_ms": 0.7137599925044923,
+          "p99_ms": 1.0997879918431863
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.020044399963808246,
+          "max_ms": 0.06740000389982015,
+          "p50_ms": 0.01889999839477241,
+          "p95_ms": 0.02780500726657919,
+          "p99_ms": 0.03950599522795528
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6232340999267763,
+          "max_ms": 1.393300000927411,
+          "p50_ms": 0.5911499974899925,
+          "p95_ms": 0.7349649931711609,
+          "p99_ms": 1.1373569871648215
+        }
+      },
+      "synthetic_host_iterations_per_second": 1598.3774550783648,
+      "resources": {
+        "process_cpu_seconds": 1.25,
+        "process_wall_seconds": 1.251268899999559,
+        "process_cpu_percent_of_one_core": 99.8985909423978,
+        "process_cpu_ms_per_frame": 0.625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53329920,
+        "peak_working_set_bytes_process_lifetime": 53329920
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 2,
+      "faces": 1,
+      "hands": 2,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.01816150023660157,
+          "max_ms": 0.06650001159869134,
+          "p50_ms": 0.017300000763498247,
+          "p95_ms": 0.02379999205004424,
+          "p99_ms": 0.030300997896119952
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.013549849994888064,
+          "max_ms": 0.15859999984968454,
+          "p50_ms": 0.012900010915473104,
+          "p95_ms": 0.01780500460881739,
+          "p99_ms": 0.02269999822601676
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.06137774982926203,
+          "max_ms": 0.20509999012574553,
+          "p50_ms": 0.05889999738428742,
+          "p95_ms": 0.07359999362961389,
+          "p99_ms": 0.09860199410468339
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6091579999410897,
+          "max_ms": 1.5394999936688691,
+          "p50_ms": 0.5850000015925616,
+          "p95_ms": 0.713410004391335,
+          "p99_ms": 0.8872440035338514
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.020658200068282895,
+          "max_ms": 0.1703000016277656,
+          "p50_ms": 0.019700004486367106,
+          "p95_ms": 0.02729999032453634,
+          "p99_ms": 0.036403000704012804
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6950800000195159,
+          "max_ms": 1.7011000018101186,
+          "p50_ms": 0.6695999909425154,
+          "p95_ms": 0.8072700053162406,
+          "p99_ms": 1.0074880020692945
+        }
+      },
+      "synthetic_host_iterations_per_second": 1429.115206909778,
+      "resources": {
+        "process_cpu_seconds": 1.390625,
+        "process_wall_seconds": 1.399467299997923,
+        "process_cpu_percent_of_one_core": 99.3681667304455,
+        "process_cpu_ms_per_frame": 0.6953125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53329920,
+        "peak_working_set_bytes_process_lifetime": 53329920
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 1,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 1,
+        "primary_id": 1,
+        "ids_allocated": 1,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 2,
+      "faces": 2,
+      "hands": 0,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 7.12500186637044e-05,
+          "max_ms": 0.0027999922167509794,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000100000761449337,
+          "p99_ms": 0.000100000761449337
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.022641900002781767,
+          "max_ms": 0.06900000153109431,
+          "p50_ms": 0.022200008970685303,
+          "p95_ms": 0.023500004317611456,
+          "p99_ms": 0.031025988719193244
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.022765599976992235,
+          "max_ms": 0.06920000305399299,
+          "p50_ms": 0.02239999594166875,
+          "p95_ms": 0.023600005079060793,
+          "p99_ms": 0.031423991749761605
+        }
+      },
+      "synthetic_host_iterations_per_second": 41651.65470696795,
+      "resources": {
+        "process_cpu_seconds": 0.046875,
+        "process_wall_seconds": 0.048017300010542385,
+        "process_cpu_percent_of_one_core": 97.62106571945614,
+        "process_cpu_ms_per_frame": 0.0234375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53329920,
+        "peak_working_set_bytes_process_lifetime": 53329920
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 2,
+      "faces": 2,
+      "hands": 0,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.029906949908763636,
+          "max_ms": 0.22600000374950469,
+          "p50_ms": 0.028700000257231295,
+          "p95_ms": 0.03349999387864955,
+          "p99_ms": 0.04841900474275461
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.030362599820364267,
+          "max_ms": 8.089900002232753,
+          "p50_ms": 0.0236999912885949,
+          "p95_ms": 0.02740500422078184,
+          "p99_ms": 0.18860600976040584
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.10333699990587775,
+          "max_ms": 8.168900007149205,
+          "p50_ms": 0.09270000737160444,
+          "p95_ms": 0.10812500768224706,
+          "p99_ms": 0.26220800282317214
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.00013095005851937458,
+          "max_ms": 0.001100008375942707,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000200001522898674
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.02683414983766852,
+          "max_ms": 0.10730000212788582,
+          "p50_ms": 0.026399997295811772,
+          "p95_ms": 0.029700007871724665,
+          "p99_ms": 0.03460200154222548
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.13447759993141517,
+          "max_ms": 8.204100013244897,
+          "p50_ms": 0.12340000830590725,
+          "p95_ms": 0.14637500789831387,
+          "p99_ms": 0.29490100452676415
+        }
+      },
+      "synthetic_host_iterations_per_second": 7213.627985796606,
+      "resources": {
+        "process_cpu_seconds": 0.28125,
+        "process_wall_seconds": 0.27725300000747666,
+        "process_cpu_percent_of_one_core": 101.44164355026476,
+        "process_cpu_ms_per_frame": 0.140625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53329920,
+        "peak_working_set_bytes_process_lifetime": 53329920
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 2,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 2,
+        "primary_id": 2,
+        "ids_allocated": 2,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 2,
+      "faces": 2,
+      "hands": 2,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.5895303998477175,
+          "max_ms": 1.2755000061588362,
+          "p50_ms": 0.571600001421757,
+          "p95_ms": 0.6430099921999499,
+          "p99_ms": 0.7398070016643032
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.03076784990116721,
+          "max_ms": 0.1860999909695238,
+          "p50_ms": 0.029699993319809437,
+          "p95_ms": 0.03709999145939946,
+          "p99_ms": 0.05290499539114534
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6203998997516464,
+          "max_ms": 1.337299996521324,
+          "p50_ms": 0.6017999985488132,
+          "p95_ms": 0.675899995258078,
+          "p99_ms": 0.7712100078060757
+        }
+      },
+      "synthetic_host_iterations_per_second": 1605.83496191134,
+      "resources": {
+        "process_cpu_seconds": 1.234375,
+        "process_wall_seconds": 1.2454580000048736,
+        "process_cpu_percent_of_one_core": 99.11012655546553,
+        "process_cpu_ms_per_frame": 0.6171875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53329920,
+        "peak_working_set_bytes_process_lifetime": 53329920
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 2,
+      "faces": 2,
+      "hands": 2,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.034661050216527656,
+          "max_ms": 0.08039998647291213,
+          "p50_ms": 0.033899996196851134,
+          "p95_ms": 0.040799991256790236,
+          "p99_ms": 0.04760699870530515
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.025083349952183198,
+          "max_ms": 0.07940000796224922,
+          "p50_ms": 0.024500011932104826,
+          "p95_ms": 0.02820499648805707,
+          "p99_ms": 0.03500100443488918
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.10389600005873945,
+          "max_ms": 0.195999993593432,
+          "p50_ms": 0.10189999011345208,
+          "p95_ms": 0.11330000415910035,
+          "p99_ms": 0.1362009895092342
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.5997185497617465,
+          "max_ms": 0.8932000055210665,
+          "p50_ms": 0.5807999987155199,
+          "p95_ms": 0.6706500120344572,
+          "p99_ms": 0.8075439932872541
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.030851300223730505,
+          "max_ms": 0.08440000237897038,
+          "p50_ms": 0.030199997127056122,
+          "p95_ms": 0.036805003037443385,
+          "p99_ms": 0.042001999681815505
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.7392370999514242,
+          "max_ms": 1.0846000077435747,
+          "p50_ms": 0.7200000109151006,
+          "p95_ms": 0.8184649894246832,
+          "p99_ms": 0.9533099974214565
+        }
+      },
+      "synthetic_host_iterations_per_second": 1344.0905379358005,
+      "resources": {
+        "process_cpu_seconds": 1.453125,
+        "process_wall_seconds": 1.4879950000031386,
+        "process_cpu_percent_of_one_core": 97.65657814689801,
+        "process_cpu_ms_per_frame": 0.7265625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53350400,
+        "peak_working_set_bytes_process_lifetime": 53350400
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 2,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 2,
+        "primary_id": 2,
+        "ids_allocated": 2,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 2,
+      "faces": 4,
+      "hands": 0,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 7.759993604850024e-05,
+          "max_ms": 0.0037999998312443495,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000100000761449337,
+          "p99_ms": 0.000100000761449337
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.04047390008781804,
+          "max_ms": 0.12889999197795987,
+          "p50_ms": 0.03979999746661633,
+          "p95_ms": 0.044599991088034585,
+          "p99_ms": 0.05030599015299231
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.040608949995657895,
+          "max_ms": 0.12919999426230788,
+          "p50_ms": 0.03999999898951501,
+          "p95_ms": 0.04479999261093326,
+          "p99_ms": 0.05050499181379564
+        }
+      },
+      "synthetic_host_iterations_per_second": 23870.45029222324,
+      "resources": {
+        "process_cpu_seconds": 0.078125,
+        "process_wall_seconds": 0.08378559999982826,
+        "process_cpu_percent_of_one_core": 93.24394645399703,
+        "process_cpu_ms_per_frame": 0.0390625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53366784,
+        "peak_working_set_bytes_process_lifetime": 53366784
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 2,
+      "faces": 4,
+      "hands": 0,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.1276739998938865,
+          "max_ms": 7.322300007217564,
+          "p50_ms": 0.10080001084133983,
+          "p95_ms": 0.16834500129334623,
+          "p99_ms": 0.578405995038338
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.05020455090561882,
+          "max_ms": 0.6266999989748001,
+          "p50_ms": 0.045900000259280205,
+          "p95_ms": 0.05340497154975309,
+          "p99_ms": 0.07622299817739984
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.24757924996811198,
+          "max_ms": 7.457200001226738,
+          "p50_ms": 0.2160500007448718,
+          "p95_ms": 0.6342650107399094,
+          "p99_ms": 0.7016010017832741
+        },
+        "face_observation_age": {
+          "count": 8000,
+          "percentile_samples": 8000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.00014049995661480352,
+          "max_ms": 0.00100000761449337,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000200001522898674
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.04875165029807249,
+          "max_ms": 0.09789998875930905,
+          "p50_ms": 0.047900000936351717,
+          "p95_ms": 0.05470000905916095,
+          "p99_ms": 0.07420101188472472
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.3022661502691335,
+          "max_ms": 7.513799995649606,
+          "p50_ms": 0.27099999715574086,
+          "p95_ms": 0.691400009964127,
+          "p99_ms": 0.75850099849049
+        }
+      },
+      "synthetic_host_iterations_per_second": 3256.7434129212415,
+      "resources": {
+        "process_cpu_seconds": 0.609375,
+        "process_wall_seconds": 0.614110399998026,
+        "process_cpu_percent_of_one_core": 99.22890086244408,
+        "process_cpu_ms_per_frame": 0.3046875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53497856,
+        "peak_working_set_bytes_process_lifetime": 53497856
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 4,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 4,
+        "primary_id": 3,
+        "ids_allocated": 4,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    },
+    {
+      "repeat": 2,
+      "faces": 4,
+      "hands": 2,
+      "tracking": false,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.5925061998641468,
+          "max_ms": 1.2507999927038327,
+          "p50_ms": 0.5765000023529865,
+          "p95_ms": 0.6620150052185636,
+          "p99_ms": 0.8184600027743726
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.051235800099675544,
+          "max_ms": 0.1816000003600493,
+          "p50_ms": 0.050000002374872565,
+          "p95_ms": 0.058599995099939406,
+          "p99_ms": 0.07641399977728723
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6438451500507654,
+          "max_ms": 1.3520000065909699,
+          "p50_ms": 0.6277000065892935,
+          "p95_ms": 0.7141099958971608,
+          "p99_ms": 0.8698790012567769
+        }
+      },
+      "synthetic_host_iterations_per_second": 1547.580238358983,
+      "resources": {
+        "process_cpu_seconds": 1.28125,
+        "process_wall_seconds": 1.2923401000007289,
+        "process_cpu_percent_of_one_core": 99.14185901987236,
+        "process_cpu_ms_per_frame": 0.640625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53587968,
+        "peak_working_set_bytes_process_lifetime": 53587968
+      },
+      "synthetic_known_trajectory_id_switches": null,
+      "tracker": null
+    },
+    {
+      "repeat": 2,
+      "faces": 4,
+      "hands": 2,
+      "tracking": true,
+      "frames": 2000,
+      "warmup_frames": 200,
+      "timings": {
+        "face_association": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.10892414997942979,
+          "max_ms": 0.239099987084046,
+          "p50_ms": 0.10629999451339245,
+          "p95_ms": 0.12150500842835754,
+          "p99_ms": 0.1554020046023652
+        },
+        "face_smoothing": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.048119600061909296,
+          "max_ms": 0.09039998985826969,
+          "p50_ms": 0.04709999484475702,
+          "p95_ms": 0.055100012104958296,
+          "p99_ms": 0.06660099796135908
+        },
+        "face_tracking": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.23004889988078503,
+          "max_ms": 0.42219999886583537,
+          "p50_ms": 0.225800002226606,
+          "p95_ms": 0.25190499727614224,
+          "p99_ms": 0.29790601271088235
+        },
+        "face_observation_age": {
+          "count": 8000,
+          "percentile_samples": 8000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.6251493998643127,
+          "max_ms": 1.17790000513196,
+          "p50_ms": 0.5920999974478036,
+          "p95_ms": 0.8197249982913489,
+          "p99_ms": 0.8843070102739148
+        },
+        "face_detector_output_geometry": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.05138375028036535,
+          "max_ms": 0.11049999739043415,
+          "p50_ms": 0.050300004659220576,
+          "p95_ms": 0.05950000195298344,
+          "p99_ms": 0.07250899914652108
+        },
+        "host_total": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.9130459499938297,
+          "max_ms": 1.6304000018863007,
+          "p50_ms": 0.8811500010779127,
+          "p95_ms": 1.1062899975513574,
+          "p99_ms": 1.1826389974157792
+        }
+      },
+      "synthetic_host_iterations_per_second": 1088.717048210748,
+      "resources": {
+        "process_cpu_seconds": 1.828125,
+        "process_wall_seconds": 1.837024599997676,
+        "process_cpu_percent_of_one_core": 99.5155426880137,
+        "process_cpu_ms_per_frame": 0.9140625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 53710848,
+        "peak_working_set_bytes_process_lifetime": 53710848
+      },
+      "synthetic_known_trajectory_id_switches": 0,
+      "tracker": {
+        "enabled": true,
+        "config": {
+          "confirmation_hits": 3,
+          "confirmation_seconds": 0.06,
+          "lost_timeout": 0.8,
+          "smoothing_tau": 0.07,
+          "max_tracks": 8,
+          "confirmation_gap": 0.25,
+          "smoothing_reset_gap": 0.25
+        },
+        "counters": {
+          "created": 4,
+          "primary_acquisitions": 1
+        },
+        "counter_scope": "whole session including warmup",
+        "active_tracks": 4,
+        "primary_id": 3,
+        "ids_allocated": 4,
+        "identity_switches": null,
+        "identity_switches_reason": "No real-person identity ground truth; see synthetic sequence benchmark",
+        "ambiguity_policy": "quarantine involved IDs until expiration; no spatial identity guarantee"
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "faces": 1,
+      "hands": 0,
+      "before_mean_ms_median_run": 0.013206850067945197,
+      "after_mean_ms_median_run": 0.07567975019628648,
+      "delta_ms": 0.06247290012834128,
+      "change_percent": 473.0340679793997
+    },
+    {
+      "faces": 1,
+      "hands": 2,
+      "before_mean_ms_median_run": 0.6232340999267763,
+      "after_mean_ms_median_run": 0.6950800000195159,
+      "delta_ms": 0.07184590009273961,
+      "change_percent": 11.527915449616888
+    },
+    {
+      "faces": 2,
+      "hands": 0,
+      "before_mean_ms_median_run": 0.022765599976992235,
+      "after_mean_ms_median_run": 0.13447759993141517,
+      "delta_ms": 0.11171199995442294,
+      "change_percent": 490.70527492059625
+    },
+    {
+      "faces": 2,
+      "hands": 2,
+      "before_mean_ms_median_run": 0.6189655000343919,
+      "after_mean_ms_median_run": 0.7458750500445603,
+      "delta_ms": 0.12690955001016846,
+      "change_percent": 20.50349332929169
+    },
+    {
+      "faces": 4,
+      "hands": 0,
+      "before_mean_ms_median_run": 0.040608949995657895,
+      "after_mean_ms_median_run": 0.3022661502691335,
+      "delta_ms": 0.2616572002734756,
+      "change_percent": 644.3338237050041
+    },
+    {
+      "faces": 4,
+      "hands": 2,
+      "before_mean_ms_median_run": 0.6405095001246082,
+      "after_mean_ms_median_run": 0.9130459499938297,
+      "delta_ms": 0.27253644986922154,
+      "change_percent": 42.54994653728021
+    }
+  ],
+  "memory_probe": {
+    "frames": 10000,
+    "faces": 4,
+    "retained_python_bytes_delta": 4816,
+    "peak_python_traced_bytes": 875470,
+    "active_tracks": 4,
+    "notes": "Python allocations only; separate from timed runs; includes adapter and tracker"
+  },
+  "continuity_probe": {
+    "plausible_primary_reacquisition_preserved_id": true,
+    "crossing_status": "uncertain",
+    "crossing_current_coordinates_withheld": true,
+    "counters": {
+      "created": 2,
+      "primary_acquisitions": 1,
+      "primary_loss_events": 2,
+      "plausible_reacquisitions": 1,
+      "primary_reacquisitions": 1,
+      "quarantined_tracks": 2,
+      "ambiguous_frames": 1,
+      "uncertain": 1
+    }
+  }
+}

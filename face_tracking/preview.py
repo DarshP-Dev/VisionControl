@@ -29,3 +29,37 @@ def draw_faces(preview, observation):
                 (0, 0, 0), 3, cv2.LINE_AA)
     cv2.putText(preview, label, (8, max(12, height-8)), cv2.FONT_HERSHEY_SIMPLEX, .45,
                 (0, 220, 255), 1, cv2.LINE_AA)
+
+
+def draw_tracks(preview, observation, *, now, debug=False):
+    """Only draw currently fresh detections, including after a slow GUI restore."""
+    height, width = preview.shape[:2]
+    primary = observation.primary
+    for track in observation.tracks:
+        if not track.detected or now-track.last_detected > .25:
+            continue
+        face = track.smoothed
+        b = face.box_normalized
+        point = lambda x, y: (max(0, min(width-1, round(x*width))), max(0, min(height-1, round(y*height))))
+        p1, p2 = point(b.x_min, b.y_min), point(b.x_max, b.y_max)
+        center = point(face.normalized_center_x, face.normalized_center_y)
+        color = (0, 220, 255) if track.primary else (220, 180, 0) if track.state == "TRACKED" else (150, 150, 150)
+        cv2.rectangle(preview, p1, p2, color, 2 if track.primary else 1, cv2.LINE_AA)
+        cv2.circle(preview, center, 3, color, -1, cv2.LINE_AA)
+        if debug:
+            raw = point(track.raw.normalized_center_x, track.raw.normalized_center_y)
+            cv2.circle(preview, raw, 4, (220, 50, 220), 1, cv2.LINE_AA)
+            cv2.line(preview, raw, center, (220, 50, 220), 1, cv2.LINE_AA)
+        label = f"FACE #{track.track_id} | {track.state}" + (" | PRIMARY" if track.primary else "")
+        cv2.putText(preview, label, (p1[0], max(12, p1[1]-4)), cv2.FONT_HERSHEY_SIMPLEX, .4, color, 1, cv2.LINE_AA)
+    if primary is None:
+        label = "FACE: unlocked"
+    elif not primary.detected or now-primary.last_detected > .25:
+        label = f"FACE #{primary.track_id} | PRIMARY LOST" + (" | UNCERTAIN" if primary.uncertain else "")
+    else:
+        face = primary.smoothed
+        label = f"FACE #{primary.track_id} | PRIMARY | X: {face.normalized_offset_x:+.2f} | Y: {face.normalized_offset_y:+.2f}"
+    if observation.status != "valid":
+        label += f" | {observation.status}"
+    cv2.putText(preview, label, (8, max(12, height-8)), cv2.FONT_HERSHEY_SIMPLEX, .45, (0, 0, 0), 3, cv2.LINE_AA)
+    cv2.putText(preview, label, (8, max(12, height-8)), cv2.FONT_HERSHEY_SIMPLEX, .45, (0, 220, 255), 1, cv2.LINE_AA)

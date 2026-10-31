@@ -1,14 +1,19 @@
-# Face detection and positioning — Phase 4.1
+# Face detection and temporal tracking — Phases 4.1 / 4.2
 
 Optional MediaPipe BlazeFace **detection**, using the existing camera owner and
-application loop. No identity, temporal tracking, pose, motor or desktop actions.
+application loop. Optional Phase 4.2 spatial tracking adds temporary IDs and a
+primary lock. No identity recognition, pose, motor or desktop actions.
 See [PHASE_4_1.md](../PHASE_4_1.md) for architecture, real measurements and acceptance.
+See [PHASE_4_2.md](../PHASE_4_2.md) for temporal tracking, synthetic measurements
+and pending physical acceptance.
 
 ```powershell
 Set-Location C:\Users\Darsh\VisionControl
 .\.venv\Scripts\python.exe -m face_tracking.download_model
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-only
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-detection
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-only --face-tracking --face-tracking-debug
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-tracking
 ```
 
 The hand-only command is unchanged. `--face-only` skips the hand model and rejects
@@ -35,7 +40,40 @@ Primary selection: highest known confidence, then largest clipped area, then
 ascending box coordinates. Missing confidence ranks last. `FACE 1` is a current
 rank, never a persistent identity. Empty results have no primary/coordinates;
 results older than 250 ms at completion/draw are cleared and marked expired.
-There is no smoothing, reuse of old detections or reduced detection cadence.
+Detection-only mode has no smoothing, reuse of old detections or reduced cadence.
+
+## Temporal tracking (opt-in)
+
+`--face-tracking` implies detection, retaining the same camera and model. It runs
+after current hand-controller processing. Defaults: three observations spanning
+at least 60 ms to confirm, 800 ms missing timeout, 70 ms EMA time constant. Tune
+`--face-confirmation-hits 3`, `--face-lost-timeout .8`, `--face-smoothing-tau .07`
+(zero disables EMA). `--face-tracking-debug` adds raw magenta centers alongside
+smoothed centers; `--no-face-overlay` skips both kinds of face drawing.
+
+`FaceTracker.update(FaceFrame, observed_at=host_read_completion, now=host_now,
+profile=optional_profile)` returns immutable `TrackedFaces` / `FaceTrack`
+snapshots. Current raw/smoothed `FaceDetection` values are absent when lost,
+expired or uncertain. Confidence and timestamps describe the last real detection.
+Default offline clocks derive from source milliseconds; production passes actual
+monotonic host times. Replay/backward timestamps never refresh detections.
+
+IDs increment per tracker session, including across `reset()`, and are never
+stored persistently. Initial primary selection uses confidence, area and geometry
+after confirmation; healthy locks survive score changes and short losses.
+Expired locks can reacquire only a single confirmed visible candidate. Ambiguous
+matches quarantine affected IDs until expiration, withholding current coordinates.
+Position-only reacquisition is spatial plausibility, never proof of identity.
+All active/lost state is bounded to eight tracks; no frame/trajectory archive.
+
+Existing `--benchmark`, `--performance-profile` and `--report` expose association,
+smoothing, total tracker overhead and observation ages, plus session transition
+counters. No camera frames, face coordinates or identifying data are written to
+reports. The synthetic benchmark uses generated boxes and existing hand fixtures:
+
+```powershell
+.\.venv\Scripts\python.exe -m face_tracking.benchmark_tracking --frames 2000 --warmup 200 --repeats 3 --report "hand_tracking/benchmarks/face_tracking_$((Get-Date).ToString('yyyyMMdd_HHmmss_fff')).json"
+```
 
 ## Model provenance and license
 

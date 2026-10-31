@@ -89,6 +89,11 @@ def parse_args(argv=None):
                         help="face-only aspect-preserving bounds, default 640x360; independent of hand inference")
     parser.add_argument("--face-min-confidence", type=float, default=.5)
     parser.add_argument("--face-overlay", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--face-tracking", action="store_true", help="opt-in temporal face IDs and primary lock; implies face detection")
+    parser.add_argument("--face-confirmation-hits", type=positive_int, default=3)
+    parser.add_argument("--face-lost-timeout", type=positive_float, default=.8, help="lost-track retention in seconds (default .8)")
+    parser.add_argument("--face-smoothing-tau", type=float, default=.07, help="time-aware face EMA seconds; 0 disables smoothing (default .07)")
+    parser.add_argument("--face-tracking-debug", action="store_true", help="requires --face-tracking; show raw and smoothed centers")
     parser.add_argument("--inference-resolution", type=inference_resolution, default=None,
                         help="full (default), 1280x720, 960x540, 640x360 or WIDTHxHEIGHT bounds; "
                              "preserves aspect ratio, never upscales")
@@ -158,7 +163,13 @@ def parse_args(argv=None):
     parser.add_argument("--swipe-pose", choices=("open-palm", "open-palm-or-fist", "pointing"), default=None)
     control_cli.add_arguments(parser)
     args = parser.parse_args(argv)
-    args.face_detection = args.face_detection or args.face_only
+    args.face_detection = args.face_detection or args.face_only or args.face_tracking
+    if args.face_confirmation_hits > 100:
+        parser.error("--face-confirmation-hits must be within [1,100]")
+    if not math.isfinite(args.face_smoothing_tau) or args.face_smoothing_tau < 0:
+        parser.error("--face-smoothing-tau must be finite and nonnegative")
+    if args.face_tracking_debug and not args.face_tracking:
+        parser.error("--face-tracking-debug requires --face-tracking")
     if not math.isfinite(args.face_min_confidence) or not 0 <= args.face_min_confidence <= 1:
         parser.error("--face-min-confidence must be finite and within [0,1]")
     if args.face_only and any((args.controls, args.gestures, args.pinch, args.gesture_states, args.swipes,
@@ -300,9 +311,15 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
     face_counts, face_sizes = (Counter(), Counter()) if face_detector is not None else (None, None)
     joint_counts = Counter() if face_detector is not None else None
     expired_faces = 0
+    face_tracker = None
     if face_detector is not None:
         from face_tracking.face_models import FaceFrame
         from face_tracking.preview import draw_faces
+        if args.face_tracking:
+            from face_tracking.face_tracker import FaceTracker, TrackerConfig
+            from face_tracking.preview import draw_tracks
+            face_tracker = FaceTracker(TrackerConfig(confirmation_hits=args.face_confirmation_hits,
+                lost_timeout=args.face_lost_timeout, smoothing_tau=args.face_smoothing_tau))
     gesture_counts = Counter()
     gesture_image_size = None
     gesture_debug = GestureDebug() if args.gesture_debug else None
@@ -546,6 +563,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             # Faces are observation-only. Dispatch current hand input first so
             # optional face inference does not age that observation before input.
             face_observation = None
+            face_tracks = None
             render_state = preview_state
             if face_detector is not None:
                 before_face = time.perf_counter()
@@ -562,6 +580,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                                                  face_detector.last_inference_size, status="expired")
                     if measuring:
                         expired_faces += 1
+                if face_tracker is not None:
+                    face_tracks = face_tracker.update(face_observation, observed_at=after_read,
+                                                       now=time.perf_counter(), profile=timings)
                 if poll_capture_wait("face_gui_events"):
                     return 0
                 render_state = last_polled_state
@@ -593,7 +614,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                         face_observation = FaceFrame(timestamp_ms, (frame.shape[1], frame.shape[0]),
                                                      face_detector.last_inference_size, status="expired")
                     before_face_overlay = time.perf_counter()
-                    draw_faces(preview, face_observation)
+                    if face_tracker is not None:
+                        draw_tracks(preview, face_tracks, now=time.perf_counter(), debug=args.face_tracking_debug)
+                    else:
+                        draw_faces(preview, face_observation)
                     timings.add("face_overlay", time.perf_counter()-before_face_overlay)
                 before_display = time.perf_counter()
                 timings.add("preview_rendering", before_display - before_preview)
@@ -716,6 +740,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 "frames": frames, "measurement_seconds": duration,
                 "average_application_fps": average,
                 "hand_tracking_enabled": not args.face_only,
+                "face_tracking": face_tracker.metadata() if face_tracker is not None else {"enabled": False},
                 "face_detection": {"enabled": face_detector is not None,
                     "mode": "face_only" if args.face_only else "combined" if face_detector is not None else "disabled",
                     "observed_face_count_frames": dict(face_counts) if face_counts is not None else {},

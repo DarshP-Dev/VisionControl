@@ -6,6 +6,12 @@ skips the hand model and disallows controls. Face inference defaults to 640×360
 bounds independently of hand resolution. Existing hand-only behavior, camera
 ownership, timer-policy defaults and desktop safety remain unchanged.
 
+Phase 4.2 adds opt-in `--face-tracking` (implies face detection), persistent
+session-local IDs, conservative primary locking and time-aware face smoothing.
+Use `--face-only --face-tracking` without the hand model or desktop controls.
+Detection-only behavior remains available. See [PHASE_4_2.md](../PHASE_4_2.md)
+for defaults, limitations, synthetic results and owner hardware acceptance.
+
 Phase 3.10 adds an opt-in [latest-frame capture experiment](../PHASE_3_10.md):
 `--capture-pipeline latest-thread`. Default `sync` is preserved. One owning camera
 thread replaces a single pending snapshot; inference, gestures, controllers and
