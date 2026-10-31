@@ -12,6 +12,13 @@ Use `--face-only --face-tracking` without the hand model or desktop controls.
 Detection-only behavior remains available. See [PHASE_4_2.md](../PHASE_4_2.md)
 for defaults, limitations, synthetic results and owner hardware acceptance.
 
+Phase 4.3 adds `--face-centering`, implying face tracking/detection. It reuses the
+locked smoothed face center and displays normalized pan/tilt demand; it never
+moves the camera or issues desktop input. Use `--face-only --face-centering`
+without the hand model, or `--face-centering` for combined tracking. Optional
+`--face-centering-debug` draws the inner/outer dead zones. See
+[PHASE_4_3.md](../PHASE_4_3.md) for geometry, thresholds, benchmarks and acceptance.
+
 Phase 3.10 adds an opt-in [latest-frame capture experiment](../PHASE_3_10.md):
 `--capture-pipeline latest-thread`. Default `sync` is preserved. One owning camera
 thread replaces a single pending snapshot; inference, gestures, controllers and

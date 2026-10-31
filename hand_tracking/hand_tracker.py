@@ -94,6 +94,10 @@ def parse_args(argv=None):
     parser.add_argument("--face-lost-timeout", type=positive_float, default=.8, help="lost-track retention in seconds (default .8)")
     parser.add_argument("--face-smoothing-tau", type=float, default=.07, help="time-aware face EMA seconds; 0 disables smoothing (default .07)")
     parser.add_argument("--face-tracking-debug", action="store_true", help="requires --face-tracking; show raw and smoothed centers")
+    parser.add_argument("--face-centering", action="store_true", help="read-only centering recommendations; implies face tracking and detection")
+    parser.add_argument("--face-centering-activation", type=float, default=.12, help="normalized half-frame activation threshold for both axes (default .12)")
+    parser.add_argument("--face-centering-deactivation", type=float, default=.07, help="normalized half-frame deactivation threshold for both axes (default .07)")
+    parser.add_argument("--face-centering-debug", action="store_true", help="requires --face-centering; draw inner and outer dead-zone boundaries")
     parser.add_argument("--inference-resolution", type=inference_resolution, default=None,
                         help="full (default), 1280x720, 960x540, 640x360 or WIDTHxHEIGHT bounds; "
                              "preserves aspect ratio, never upscales")
@@ -163,7 +167,13 @@ def parse_args(argv=None):
     parser.add_argument("--swipe-pose", choices=("open-palm", "open-palm-or-fist", "pointing"), default=None)
     control_cli.add_arguments(parser)
     args = parser.parse_args(argv)
+    args.face_tracking = args.face_tracking or args.face_centering
     args.face_detection = args.face_detection or args.face_only or args.face_tracking
+    if (not all(math.isfinite(v) for v in (args.face_centering_activation, args.face_centering_deactivation))
+            or not 0 <= args.face_centering_deactivation < args.face_centering_activation <= 1):
+        parser.error("face-centering thresholds require 0 <= deactivation < activation <= 1")
+    if args.face_centering_debug and not args.face_centering:
+        parser.error("--face-centering-debug requires --face-centering")
     if args.face_confirmation_hits > 100:
         parser.error("--face-confirmation-hits must be within [1,100]")
     if not math.isfinite(args.face_smoothing_tau) or args.face_smoothing_tau < 0:
@@ -312,6 +322,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
     joint_counts = Counter() if face_detector is not None else None
     expired_faces = 0
     face_tracker = None
+    face_centering = None
+    expired_centering_previews = 0
     if face_detector is not None:
         from face_tracking.face_models import FaceFrame
         from face_tracking.preview import draw_faces
@@ -320,6 +332,11 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             from face_tracking.preview import draw_tracks
             face_tracker = FaceTracker(TrackerConfig(confirmation_hits=args.face_confirmation_hits,
                 lost_timeout=args.face_lost_timeout, smoothing_tau=args.face_smoothing_tau))
+            if args.face_centering:
+                from face_tracking.centering import FaceCentering, CenteringConfig, DeadZone
+                from face_tracking.centering_preview import draw_centering
+                zone = DeadZone(args.face_centering_activation, args.face_centering_deactivation)
+                face_centering = FaceCentering(CenteringConfig(horizontal=zone, vertical=zone))
     gesture_counts = Counter()
     gesture_image_size = None
     gesture_debug = GestureDebug() if args.gesture_debug else None
@@ -564,6 +581,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             # optional face inference does not age that observation before input.
             face_observation = None
             face_tracks = None
+            centering_result = None
             render_state = preview_state
             if face_detector is not None:
                 before_face = time.perf_counter()
@@ -583,6 +601,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 if face_tracker is not None:
                     face_tracks = face_tracker.update(face_observation, observed_at=after_read,
                                                        now=time.perf_counter(), profile=timings)
+                    if face_centering is not None:
+                        centering_result = face_centering.update(face_tracks, now=time.perf_counter(), profile=timings)
                 if poll_capture_wait("face_gui_events"):
                     return 0
                 render_state = last_polled_state
@@ -619,6 +639,11 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                     else:
                         draw_faces(preview, face_observation)
                     timings.add("face_overlay", time.perf_counter()-before_face_overlay)
+                    if face_centering is not None:
+                        before_centering_overlay = time.perf_counter()
+                        expired_centering_previews += int(draw_centering(preview, centering_result, now=before_centering_overlay,
+                            config=face_centering.config, debug=args.face_centering_debug))
+                        timings.add("face_centering_overlay", time.perf_counter()-before_centering_overlay)
                 before_display = time.perf_counter()
                 timings.add("preview_rendering", before_display - before_preview)
                 if profiling:
@@ -741,6 +766,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 "average_application_fps": average,
                 "hand_tracking_enabled": not args.face_only,
                 "face_tracking": face_tracker.metadata() if face_tracker is not None else {"enabled": False},
+                "face_centering": {**face_centering.metadata(), "preview_freshness_suppressions": expired_centering_previews}
+                                  if face_centering is not None else {"enabled": False},
                 "face_detection": {"enabled": face_detector is not None,
                     "mode": "face_only" if args.face_only else "combined" if face_detector is not None else "disabled",
                     "observed_face_count_frames": dict(face_counts) if face_counts is not None else {},

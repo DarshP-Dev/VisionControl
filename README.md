@@ -8,7 +8,9 @@ simulation and DISARMED; live input requires explicit arming. Optional
 [face detection and Phase 4.2 temporal tracking](face_tracking/README.md) share the same
 camera frames. `--face-tracking` adds temporary IDs, primary locking and smoothing;
 combine with `--face-only` to skip the hand model. Detection alone remains available.
-See [Phase 4.2 validation and hardware acceptance](PHASE_4_2.md). Voice and motor
+`--face-centering` adds read-only pan/tilt recommendations with dead-zone hysteresis;
+it enables face tracking automatically. See [Phase 4.3 validation and hardware
+acceptance](PHASE_4_3.md). Voice and motor
 features remain future work. Follow staged controls validation
 before live use.
 

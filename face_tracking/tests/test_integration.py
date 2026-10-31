@@ -32,7 +32,7 @@ class IntegrationTest(unittest.TestCase):
                       ['--face-min-confidence','nan'],['--face-min-confidence','1.1'],['--face-inference-resolution','bad']):
             with redirect_stderr(io.StringIO()),self.assertRaises(SystemExit):app.parse_args(flags)
 
-    def pipeline(self, face_only=False, latest=False, fail=False, minimized=False, tracking=False, background_state='minimized'):
+    def pipeline(self, face_only=False, latest=False, fail=False, minimized=False, tracking=False, background_state='minimized', centering=False):
         cap,hand,face,window=MagicMock(),MagicMock(),MagicMock(),MagicMock()
         frame=np.zeros((12,20,3),np.uint8)
         cap.read.return_value=(True,frame)
@@ -58,10 +58,10 @@ class IntegrationTest(unittest.TestCase):
         face.detect.side_effect=detect
         window.state.side_effect=lambda:background_state if minimized and face.detect.call_count==2 else 'focused'
         window.should_render.side_effect=PreviewWindow.should_render
-        args=app.parse_args((['--face-only'] if face_only else ['--face-detection'])+(['--face-tracking'] if tracking else [])+
+        args=app.parse_args((['--face-only'] if face_only else ['--face-detection'])+(['--face-tracking'] if tracking else [])+(['--face-centering'] if centering else [])+
                             ['--gui-mode','waitkey','--capture-pipeline','latest-thread' if latest else 'sync'])
         with patch.object(cv2,'waitKey',side_effect=lambda *_:ord('q') if face.detect.call_count>=4 else -1), \
-                patch.object(cv2,'imshow') as display,patch('face_tracking.preview.draw_tracks' if tracking else 'face_tracking.preview.draw_faces') as overlay, \
+                patch.object(cv2,'imshow') as display,patch('face_tracking.preview.draw_tracks' if tracking or centering else 'face_tracking.preview.draw_faces') as overlay, \
                 patch.object(cv2,'VideoCapture') as opener,self.assertLogs(app.LOGGER):
             report={}
             app.process_frames(None if latest else cap,None if face_only else hand,MP,args,report,

@@ -1,4 +1,4 @@
-# Face detection and temporal tracking — Phases 4.1 / 4.2
+# Face detection, tracking and centering — Phases 4.1–4.3
 
 Optional MediaPipe BlazeFace **detection**, using the existing camera owner and
 application loop. Optional Phase 4.2 spatial tracking adds temporary IDs and a
@@ -6,6 +6,8 @@ primary lock. No identity recognition, pose, motor or desktop actions.
 See [PHASE_4_1.md](../PHASE_4_1.md) for architecture, real measurements and acceptance.
 See [PHASE_4_2.md](../PHASE_4_2.md) for temporal tracking, synthetic measurements
 and pending physical acceptance.
+Phase 4.3 adds optional, read-only centering recommendations. See
+[PHASE_4_3.md](../PHASE_4_3.md) for calculations, measurements and owner acceptance.
 
 ```powershell
 Set-Location C:\Users\Darsh\VisionControl
@@ -14,6 +16,8 @@ Set-Location C:\Users\Darsh\VisionControl
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-detection
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-only --face-tracking --face-tracking-debug
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-tracking
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-only --face-centering --face-centering-debug
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-centering
 ```
 
 The hand-only command is unchanged. `--face-only` skips the hand model and rejects
@@ -74,6 +78,37 @@ reports. The synthetic benchmark uses generated boxes and existing hand fixtures
 ```powershell
 .\.venv\Scripts\python.exe -m face_tracking.benchmark_tracking --frames 2000 --warmup 200 --repeats 3 --report "hand_tracking/benchmarks/face_tracking_$((Get-Date).ToString('yyyyMMdd_HHmmss_fff')).json"
 ```
+
+## Read-only centering (opt-in)
+
+`--face-centering` implies both tracking and detection. It uses the confirmed,
+currently detected, certain primary track's existing smoothed position. Positive
+X means conceptual pan right; positive Y means tilt down. Pixels are always in
+the original captured frame; normalized error divides by half width/height.
+Demand is bounded to [-1,1] and is not degrees, motor speed or input authorization.
+No second EMA, crop, model pass, camera instance or output backend is added.
+
+Independent X/Y hysteresis activates above `.12` and deactivates at/below `.07`.
+Tune both axes with `--face-centering-activation .12` and
+`--face-centering-deactivation .07`. Reversals need the opposite activation
+threshold; small reversals become inactive. `--face-centering-debug` draws the
+dead zones. `--no-face-overlay` hides drawing while calculations continue.
+Lost, uncertain, unconfirmed, invalid or older-than-250-ms observations produce
+zero demand and no current coordinates. Recovery/target changes reset hysteresis.
+
+`FaceCentering.update(TrackedFaces, now=host_monotonic_time, profile=optional)`
+returns immutable `CenteringResult` with per-axis measured/raw errors, active
+state, conceptual direction and demand, plus target ID, status, current centers,
+frame dimensions and actual observation timestamp/age. `actionable` describes
+validity at calculation time, including a zero-demand centered hold; a stored
+result must pass `fresh_at(now)` before later use. `CenteringConfig` supports
+separate axis thresholds and a manually configured normalized target point;
+the CLI uses frame center. Angles await explicit FOV calibration in a later phase.
+
+Headless/minimized modes share the existing processing and capture ownership.
+Existing report opt-ins include `face_centering`, `centering_observation_age`,
+`face_centering_overlay` timings and bounded state/transition/stale counters.
+Reports store numeric summaries, not face coordinates or camera frames.
 
 ## Model provenance and license
 
