@@ -28,6 +28,15 @@ outlines the viewport on the original preview. Closing the crop window disables
 only that preview. See [PHASE_4_4.md](../PHASE_4_4.md) for motion, lifecycle,
 benchmarks and exact owner acceptance commands.
 
+Phase 4.5 adds `--motor-simulate`, implying face centering/tracking/detection.
+`--face-only --motor-simulate` skips hand controls; combined hand tracking and
+optional `--digital-reframe` share the same original source. The separate motor
+window shows virtual degrees, speeds and stop state; hardware output is always
+disabled. Closing it stops/disables simulation until restart. Use
+`--no-motor-sim-preview` for calculations only. The real webcam remains stationary;
+virtual rotation does not recenter its actual image. See
+[PHASE_4_5.md](../PHASE_4_5.md) and [motor_control](../motor_control/README.md).
+
 Phase 3.10 adds an opt-in [latest-frame capture experiment](../PHASE_3_10.md):
 `--capture-pipeline latest-thread`. Default `sync` is preserved. One owning camera
 thread replaces a single pending snapshot; inference, gestures, controllers and

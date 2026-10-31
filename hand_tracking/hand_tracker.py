@@ -47,6 +47,7 @@ from .tracking_utils import (
 LOGGER = logging.getLogger("hand_tracking")
 WINDOW = "VisionControl - Hand Tracking"
 REFRAME_WINDOW = "VisionControl - Digital Auto-Frame"
+MOTOR_WINDOW = "VisionControl - Motor Simulation (No Hardware)"
 
 
 def positive_int(value):
@@ -106,6 +107,13 @@ def parse_args(argv=None):
     parser.add_argument("--reframe-max-speed", type=positive_float, default=600., help="Euclidean source pixels/second (default 600)")
     parser.add_argument("--reframe-dead-zone", type=positive_float, default=.10, help="crop half-size activation fraction; deactivation is 60% of this (default .10)")
     parser.add_argument("--reframe-debug", action="store_true", help="requires --digital-reframe; outline crop on original preview")
+    parser.add_argument("--motor-simulate", action="store_true", help="virtual motors only; enables face centering/tracking/detection, never hardware")
+    parser.add_argument("--motor-sim-preview", action=argparse.BooleanOptionalAction, default=True, help="motor visualization when simulation is enabled; disable for calculations only")
+    parser.add_argument("--motor-sim-debug", action="store_true", help="requires --motor-simulate; extra virtual command diagnostics")
+    parser.add_argument("--motor-pan-limit", type=positive_float, default=45., help="symmetric illustrative virtual pan degrees, <=180")
+    parser.add_argument("--motor-tilt-limit", type=positive_float, default=25., help="symmetric illustrative virtual tilt degrees, <=180")
+    parser.add_argument("--motor-max-pan-speed", type=positive_float, default=30., help="illustrative virtual degrees/second, <=360")
+    parser.add_argument("--motor-max-tilt-speed", type=positive_float, default=20., help="illustrative virtual degrees/second, <=360")
     parser.add_argument("--inference-resolution", type=inference_resolution, default=None,
                         help="full (default), 1280x720, 960x540, 640x360 or WIDTHxHEIGHT bounds; "
                              "preserves aspect ratio, never upscales")
@@ -175,7 +183,11 @@ def parse_args(argv=None):
     parser.add_argument("--swipe-pose", choices=("open-palm", "open-palm-or-fist", "pointing"), default=None)
     control_cli.add_arguments(parser)
     args = parser.parse_args(argv)
-    args.face_centering = args.face_centering or args.digital_reframe
+    args.face_centering = args.face_centering or args.digital_reframe or args.motor_simulate
+    if max(args.motor_pan_limit,args.motor_tilt_limit)>180 or max(args.motor_max_pan_speed,args.motor_max_tilt_speed)>360:
+        parser.error("virtual motor angle limits must be <=180 degrees and speeds <=360 degrees/second")
+    if args.motor_sim_debug and not args.motor_simulate:
+        parser.error("--motor-sim-debug requires --motor-simulate")
     if args.reframe_scale > 1 or args.reframe_dead_zone > 1:
         parser.error("--reframe-scale and --reframe-dead-zone must be within (0,1]")
     if not math.isfinite(args.reframe_follow_tau) or args.reframe_follow_tau < 0:
@@ -278,7 +290,7 @@ def create_landmarker(model_path, max_hands=2):
 
 
 def process_frames(cap, landmarker, mp, args=None, report=None, controller=None, *,
-                   preview_window=None, profile_enabled=None, capture_source=None, face_detector=None, reframe_window=None):
+                   preview_window=None, profile_enabled=None, capture_source=None, face_detector=None, reframe_window=None, motor_window=None):
     args = args if args is not None else parse_args([])
     if args.face_detection != (face_detector is not None):
         raise ValueError("Enabled face detection requires its owning detector; disabled mode cannot run one")
@@ -294,7 +306,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             configured_controller = control_cli.create_controller(args, resources)
             return process_frames(cap, landmarker, mp, args, report, configured_controller,
                                   preview_window=preview_window, profile_enabled=profile_enabled, capture_source=capture_source,
-                                  face_detector=face_detector, reframe_window=reframe_window)
+                                  face_detector=face_detector, reframe_window=reframe_window, motor_window=motor_window)
     start = time.perf_counter()
     timestamps = FrameTimestamp(start)
     captured_timestamps = CaptureTimestamp(capture_source.origin) if capture_source is not None else None
@@ -343,6 +355,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
     auxiliary_closed = False
     auxiliary_states = Counter()
     auxiliary_rendered = auxiliary_skipped = 0
+    motor = motor_renderer = motor_preview = None
+    motor_preview_closed = False
+    motor_preview_states = Counter()
+    motor_rendered = motor_skipped = 0
     if face_detector is not None:
         from face_tracking.face_models import FaceFrame
         from face_tracking.preview import draw_faces
@@ -356,6 +372,17 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 from face_tracking.centering_preview import draw_centering
                 zone = DeadZone(args.face_centering_activation, args.face_centering_deactivation)
                 face_centering = FaceCentering(CenteringConfig(horizontal=zone, vertical=zone))
+                if args.motor_simulate:
+                    from motor_control.controller import MotorController
+                    from motor_control.models import MotorConfig, AxisConfig
+                    from motor_control.centering_adapter import from_centering as motor_input
+                    motor = MotorController(MotorConfig(
+                        pan=AxisConfig(-args.motor_pan_limit,args.motor_pan_limit,args.motor_max_pan_speed,60.),
+                        tilt=AxisConfig(-args.motor_tilt_limit,args.motor_tilt_limit,args.motor_max_tilt_speed,40.)),enabled=True)
+                    if not args.headless and args.motor_sim_preview:
+                        from motor_control.visualization import MotorRenderer
+                        motor_renderer = MotorRenderer(debug=args.motor_sim_debug)
+                        motor_preview = motor_window or PreviewWindow(MOTOR_WINDOW)
                 if args.digital_reframe:
                     from face_tracking.digital_reframing import DigitalReframer, ReframeConfig
                     reframer = DigitalReframer(ReframeConfig(scale=args.reframe_scale, follow_tau=args.reframe_follow_tau,
@@ -400,8 +427,23 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             reframe_renderer = None
         return state
 
+    def motor_window_state():
+        nonlocal motor_preview, motor_renderer, motor_preview_closed
+        if motor_preview is None:
+            return "closed" if motor_preview_closed else "headless" if args.headless else "disabled"
+        state = motor_preview.state()
+        if state == "closed":
+            motor_preview_closed = True
+            motor_preview = None
+            motor.set_enabled(False,now=time.perf_counter())
+            motor_renderer.close()
+            motor_renderer = None
+        return state
+
     def poll_capture_wait(stage="capture_wait_gui"):
         nonlocal show_help, status, last_polled_state
+        if motor is not None:
+            motor.check_timeout(now=time.perf_counter())
         if window is None:
             return False
         before = time.perf_counter()
@@ -409,6 +451,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
         state = window.state()
         if auxiliary is not None:
             auxiliary_state()
+        if motor_preview is not None:
+            motor_window_state()
         last_polled_state = state
         if profiling:
             timeline.record(state=state, main_cpu=time.thread_time())
@@ -601,6 +645,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 preview_state = window.state()
                 if auxiliary is not None:
                     auxiliary_state()
+                if motor_preview is not None:
+                    motor_window_state()
                 if profiling:
                     timeline.record(state=preview_state, timings={"gui_events": after_events-before_events})
                 timings.add("preview_state", time.perf_counter() - after_events)
@@ -649,6 +695,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                                                        now=time.perf_counter(), profile=timings)
                     if face_centering is not None:
                         centering_result = face_centering.update(face_tracks, now=time.perf_counter(), profile=timings)
+                        if motor is not None:
+                            before_motor = time.perf_counter()
+                            motor.update(motor_input(centering_result,now=before_motor),now=before_motor,profile=timings)
+                            timings.add("motor_total",time.perf_counter()-before_motor)
                         if reframer is not None:
                             viewport = reframer.update(centering_result, source_size=(frame.shape[1],frame.shape[0]),
                                                        now=time.perf_counter(), profile=timings)
@@ -727,6 +777,23 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 else:
                     auxiliary_skipped += 1
                     end = time.perf_counter()
+            if motor is not None and not args.headless:
+                motor_state = motor_window_state()
+                motor_preview_states[motor_state] += 1
+                if motor_preview is not None and motor_preview.should_render(motor_state):
+                    before_motor_preview = time.perf_counter()
+                    safe_motor_state = motor.check_timeout(now=before_motor_preview)
+                    motor_canvas = motor_renderer.render(safe_motor_state,motor.config,profile=timings)
+                    before_motor_display = time.perf_counter()
+                    cv2.imshow(MOTOR_WINDOW,motor_canvas)
+                    end = time.perf_counter()
+                    timings.add("motor_imshow",end-before_motor_display)
+                    timings.add("motor_preview_total",end-before_motor_preview)
+                    motor_rendered += 1
+                    del motor_canvas
+                else:
+                    motor_skipped += 1
+                    end = time.perf_counter()
             timings.add("processing", end - after_read)
             timings.add("end_to_end", end - before_read)
             timings.add("frame_interval", end - previous_frame_end)
@@ -798,6 +865,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             controller.disarm("Tracking shutdown")
         if reframe_renderer is not None:
             reframe_renderer.close()
+        if motor is not None:
+            motor.shutdown(now=time.perf_counter())
+        if motor_renderer is not None:
+            motor_renderer.close()
         timeline.finish()
         cpu_end = time.process_time()
         cpu_wall_seconds = (max(0.0, time.perf_counter() - measurement_start)
@@ -844,6 +915,12 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                     "rendered_frames": auxiliary_rendered, "skipped_frames": auxiliary_skipped,
                     "frames_by_state": dict(auxiliary_states), "close_policy": "disable auxiliary preview only"}}
                     if reframer is not None else {"enabled": False},
+                "motor_simulation": {**motor.metadata(), "preview": {
+                    "requested": args.motor_sim_preview and not args.headless, "closed": motor_preview_closed,
+                    "rendered_frames": motor_rendered, "skipped_frames": motor_skipped,
+                    "frames_by_state": dict(motor_preview_states),
+                    "close_policy": "stop and disable simulation until restart; other outputs continue"}}
+                    if motor is not None else {"enabled": False,"hardware_output_enabled":False},
                 "face_detection": {"enabled": face_detector is not None,
                     "mode": "face_only" if args.face_only else "combined" if face_detector is not None else "disabled",
                     "observed_face_count_frames": dict(face_counts) if face_counts is not None else {},
@@ -1040,6 +1117,11 @@ def run(args, report=None):
                 cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)
                 resources.callback(cv2.destroyAllWindows)
                 options_window = create_preview_window(WINDOW)
+                if args.motor_simulate and args.motor_sim_preview:
+                    cv2.namedWindow(MOTOR_WINDOW, cv2.WINDOW_AUTOSIZE)
+                    options_motor_window = create_preview_window(MOTOR_WINDOW)
+                else:
+                    options_motor_window = None
                 if args.digital_reframe and args.reframe_preview:
                     cv2.namedWindow(REFRAME_WINDOW, cv2.WINDOW_AUTOSIZE)
                     options_reframe_window = create_preview_window(REFRAME_WINDOW)
@@ -1048,12 +1130,14 @@ def run(args, report=None):
             else:
                 options_window = None
                 options_reframe_window = None
+                options_motor_window = None
             options = {"controller": controller} if controller is not None else {}
             return process_frames(cap, landmarker, mp, args=args, report=report,
                                   preview_window=options_window,
                                   profile_enabled=bool(args.benchmark or args.report or args.performance_profile),
                                   capture_source=capture_source, **options,
                                   **({"reframe_window": options_reframe_window} if options_reframe_window is not None else {}),
+                                  **({"motor_window": options_motor_window} if options_motor_window is not None else {}),
                                   **({"face_detector": face_detector} if face_detector is not None else {}))
     except CaptureError as exc:
         report.update(status="error", error=str(exc))

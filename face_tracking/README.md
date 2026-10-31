@@ -10,6 +10,10 @@ Phase 4.3 adds optional, read-only centering recommendations. See
 [PHASE_4_3.md](../PHASE_4_3.md) for calculations, measurements and owner acceptance.
 Phase 4.4 adds output-only digital following. See
 [PHASE_4_4.md](../PHASE_4_4.md) for geometry, dual-window behavior and acceptance.
+Phase 4.5 optionally consumes the same locked centering snapshot for a
+[virtual motor simulator](../motor_control/README.md). `--motor-simulate` enables
+the prerequisites; no physical motion or feedback into webcam images occurs.
+The separate [mount concept](../hardware/concepts/README.md) is not fabrication-ready.
 
 ```powershell
 Set-Location C:\Users\Darsh\VisionControl

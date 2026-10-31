@@ -11,8 +11,10 @@ combine with `--face-only` to skip the hand model. Detection alone remains avail
 `--face-centering` adds read-only pan/tilt recommendations with dead-zone hysteresis;
 it enables face tracking automatically. `--digital-reframe` adds smooth digital
 following in a separate crop preview while tracking still uses the original image.
-See [Phase 4.4 validation and hardware acceptance](PHASE_4_4.md). Voice and motor
-features remain future work. Follow staged controls validation
+`--motor-simulate` adds a [virtual pan/tilt controller and visualizer](motor_control/README.md)
+with hardware output always disabled. An [editable mount concept](hardware/concepts/README.md)
+is also available. See [Phase 4.5 validation and acceptance](PHASE_4_5.md).
+Voice and physical motor control remain future work. Follow staged controls validation
 before live use.
 
 [Phase 3.7 reliability report and final acceptance plan](PHASE_3_7.md) documents

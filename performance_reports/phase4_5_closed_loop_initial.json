@@ -1,0 +1,3240 @@
+{
+  "mode": "synthetic_closed_loop",
+  "assumptions": {
+    "horizontal_fov_deg": 60.0,
+    "vertical_fov_deg": 40.0,
+    "projection": "independent explicit focal scales; rigid yaw/pitch inverse ray transform; no actuator delay/noise/backlash",
+    "world_target_pan_deg": 18,
+    "world_target_tilt_deg": -8,
+    "fps": 60,
+    "duration": 8
+  },
+  "initial_error": [
+    0.5627774222552396,
+    -0.4060040210442042
+  ],
+  "final_error": [
+    0.07020941740792873,
+    -0.07007112287564825
+  ],
+  "maximum_pan_speed_deg_s": 14.121165011949799,
+  "maximum_tilt_speed_deg_s": 6.37013840380508,
+  "maximum_ordinary_pan_acceleration_deg_s2": 60.00000000000011,
+  "maximum_ordinary_tilt_acceleration_deg_s2": 27.274303234628885,
+  "motor": {
+    "enabled": true,
+    "enabled_at_start": true,
+    "simulation_enabled": true,
+    "hardware_output_enabled": false,
+    "driver": "SimulatedMotorDriver only",
+    "config": {
+      "pan": {
+        "minimum_deg": -45,
+        "maximum_deg": 45,
+        "max_speed_deg_s": 30,
+        "max_acceleration_deg_s2": 60,
+        "home_deg": 0.0
+      },
+      "tilt": {
+        "minimum_deg": -25,
+        "maximum_deg": 25,
+        "max_speed_deg_s": 20,
+        "max_acceleration_deg_s2": 40,
+        "home_deg": 0.0
+      },
+      "max_update_interval": 0.1,
+      "max_observation_age": 0.25
+    },
+    "counters": {
+      "updates": 481,
+      "limit_hits": 0,
+      "status_transitions": 1
+    },
+    "reasons": {
+      "INITIALIZING": 1,
+      "TRACKING": 480
+    },
+    "requested_nonzero_update_seconds": 8.0,
+    "accepted_nonzero_update_seconds": 8.0,
+    "final_virtual_angles_deg": {
+      "pan": 15.656698304041965,
+      "tilt": -6.545664996808177
+    },
+    "counter_scope": "whole session including warmup; seconds cover accepted update intervals, not sensor time",
+    "camera_feedback": "real webcam is stationary; simulated rotation does not alter real observations"
+  },
+  "timings": {
+    "motor_planning": {
+      "count": 481,
+      "percentile_samples": 481,
+      "mean_ms": 0.0066257793124254,
+      "max_ms": 0.028000009479001164,
+      "p50_ms": 0.005799985956400633,
+      "p95_ms": 0.010000017937272787,
+      "p99_ms": 0.015740003436803807
+    },
+    "motor_simulated_step": {
+      "count": 481,
+      "percentile_samples": 481,
+      "mean_ms": 0.015588149487906428,
+      "max_ms": 0.12059998698532581,
+      "p50_ms": 0.013300013961270452,
+      "p95_ms": 0.022799998987466097,
+      "p99_ms": 0.03667998826131223
+    },
+    "motor_control_update": {
+      "count": 481,
+      "percentile_samples": 481,
+      "mean_ms": 0.03735322285958579,
+      "max_ms": 0.16029999824240804,
+      "p50_ms": 0.032199983252212405,
+      "p95_ms": 0.06010002107359469,
+      "p99_ms": 0.08104000589810312
+    },
+    "motor_observation_age": {
+      "count": 481,
+      "percentile_samples": 481,
+      "mean_ms": 0.0,
+      "max_ms": 0.0,
+      "p50_ms": 0.0,
+      "p95_ms": 0.0,
+      "p99_ms": 0.0
+    }
+  },
+  "samples": [
+    {
+      "time": 0.0,
+      "pan_deg": 0.0,
+      "tilt_deg": 0.0,
+      "pan_velocity_deg_s": 0.0,
+      "tilt_velocity_deg_s": 0.0,
+      "projected_error": [
+        0.5627774222552396,
+        -0.4060040210442042
+      ],
+      "reason": "INITIALIZING",
+      "visible": true
+    },
+    {
+      "time": 0.03333333333333333,
+      "pan_deg": 0.03333333333333333,
+      "tilt_deg": -0.015152256434287132,
+      "pan_velocity_deg_s": 2.0,
+      "tilt_velocity_deg_s": -0.9091273309601595,
+      "projected_error": [
+        0.5624934292213025,
+        -0.40579922611799474
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.06666666666666667,
+      "pan_deg": 0.13333333333333333,
+      "tilt_deg": -0.06060583542050134,
+      "pan_velocity_deg_s": 4.0,
+      "tilt_velocity_deg_s": -1.8180403028059866,
+      "projected_error": [
+        0.5602227384785168,
+        -0.4041614456649358
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.1,
+      "pan_deg": 0.30000000000000004,
+      "tilt_deg": -0.1363476008653665,
+      "pan_velocity_deg_s": 6.000000000000001,
+      "tilt_velocity_deg_s": -2.726361977981278,
+      "projected_error": [
+        0.5556880113578594,
+        -0.4008890772034493
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.13333333333333333,
+      "pan_deg": 0.5333333333333333,
+      "tilt_deg": -0.24234878572329713,
+      "pan_velocity_deg_s": 8.0,
+      "tilt_velocity_deg_s": -3.633514371774068,
+      "projected_error": [
+        0.5489023989779329,
+        -0.39598871676582637
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.16666666666666666,
+      "pan_deg": 0.8333333333333333,
+      "tilt_deg": -0.3785548877471009,
+      "pan_velocity_deg_s": 10.0,
+      "tilt_velocity_deg_s": -4.538486120676552,
+      "projected_error": [
+        0.5398852315499103,
+        -0.38947062981539093
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.2,
+      "pan_deg": 1.2000000000000002,
+      "tilt_deg": -0.5448606312717138,
+      "pan_velocity_deg_s": 12.000000000000002,
+      "tilt_velocity_deg_s": -5.439072595399328,
+      "projected_error": [
+        0.5286615536851419,
+        -0.3813493826568321
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.23333333333333334,
+      "pan_deg": 1.6333333333333333,
+      "tilt_deg": -0.7410085234827486,
+      "pan_velocity_deg_s": 14.000000000000002,
+      "tilt_velocity_deg_s": -6.3268349091050124,
+      "projected_error": [
+        0.5152615438254646,
+        -0.37164590084104826
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.26666666666666666,
+      "pan_deg": 2.1002415061933393,
+      "tilt_deg": -0.9515308380180466,
+      "pan_velocity_deg_s": 13.868829144781065,
+      "tilt_velocity_deg_s": -6.248473720907857,
+      "projected_error": [
+        0.4999337034882131,
+        -0.36055402802221526
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.3,
+      "pan_deg": 2.5512357006647366,
+      "tilt_deg": -1.1543646389769329,
+      "pan_velocity_deg_s": 13.378463786691517,
+      "tilt_velocity_deg_s": -6.012033140853093,
+      "projected_error": [
+        0.48473237738743696,
+        -0.3495595410496688
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.3333333333333333,
+      "pan_deg": 2.986308256631771,
+      "tilt_deg": -1.3495226901979989,
+      "pan_velocity_deg_s": 12.908175096705726,
+      "tilt_velocity_deg_s": -5.7853315419206215,
+      "projected_error": [
+        0.4701534279978773,
+        -0.3390179166993088
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.36666666666666664,
+      "pan_deg": 3.4061085793466237,
+      "tilt_deg": -1.5373213602133247,
+      "pan_velocity_deg_s": 12.456879386212934,
+      "tilt_velocity_deg_s": -5.567900703110812,
+      "projected_error": [
+        0.45616326097260096,
+        -0.32890738269465264
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.4,
+      "pan_deg": 3.8112511441534838,
+      "tilt_deg": -1.7180617283412154,
+      "pan_velocity_deg_s": 12.023573238704964,
+      "tilt_velocity_deg_s": -5.359299736596776,
+      "projected_error": [
+        0.44273077039985376,
+        -0.3192074377517501
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.43333333333333335,
+      "pan_deg": 4.202318161654909,
+      "tilt_deg": -1.8920305304195453,
+      "pan_velocity_deg_s": 11.607328348574958,
+      "tilt_velocity_deg_s": -5.159114430363543,
+      "projected_error": [
+        0.42982717880582366,
+        -0.30989882101190463
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.4666666666666667,
+      "pan_deg": 4.579861981784856,
+      "tilt_deg": -2.059501031171006,
+      "pan_velocity_deg_s": 11.207283994863515,
+      "tilt_velocity_deg_s": -4.966955080997887,
+      "projected_error": [
+        0.41742580384076905,
+        -0.30096341126640164
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.5,
+      "pan_deg": 4.944407256858506,
+      "tilt_deg": -2.2207338249324757,
+      "pan_velocity_deg_s": 10.822640431569459,
+      "tilt_velocity_deg_s": -4.782454556672574,
+      "projected_error": [
+        0.40550185337865313,
+        -0.29238413688527465
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.5333333333333333,
+      "pan_deg": 5.296452893114627,
+      "tilt_deg": -2.375977572483184,
+      "pan_velocity_deg_s": 10.45265306604024,
+      "tilt_velocity_deg_s": -4.605266560438247,
+      "projected_error": [
+        0.3940322450472474,
+        -0.28414489506037843
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.5666666666666667,
+      "pan_deg": 5.636473816087949,
+      "tilt_deg": -2.5254696806801906,
+      "pan_velocity_deg_s": 10.096627317186535,
+      "tilt_velocity_deg_s": -4.4350640684122125,
+      "projected_error": [
+        0.3829954468327825,
+        -0.2762304791811678
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.6,
+      "pan_deg": 5.96492257163869,
+      "tilt_deg": -2.6694369307419343,
+      "pan_velocity_deg_s": 9.753914062001455,
+      "tilt_velocity_deg_s": -4.271537921199837,
+      "projected_error": [
+        0.37237133592204513,
+        -0.26862651333579235
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.6333333333333333,
+      "pan_deg": 6.282230781505154,
+      "tilt_deg": -2.8080960602837686,
+      "pan_velocity_deg_s": 9.423905592727161,
+      "tilt_velocity_deg_s": -4.114395550008752,
+      "projected_error": [
+        0.3621410733745418,
+        -0.26131939307540697
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.6666666666666666,
+      "pan_deg": 6.588810469737445,
+      "tilt_deg": -2.941654303581113,
+      "pan_velocity_deg_s": 9.106032018540523,
+      "tilt_velocity_deg_s": -3.9633598215327033,
+      "projected_error": [
+        0.3522869925747562,
+        -0.2542962317012708
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.7,
+      "pan_deg": 6.885055274238622,
+      "tilt_deg": -3.0703098939981577,
+      "pan_velocity_deg_s": 8.799758055258515,
+      "tilt_velocity_deg_s": -3.8181679878819965,
+      "projected_error": [
+        0.34279249971301395,
+        -0.24754481143651264
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.7333333333333333,
+      "pan_deg": 7.171341555821105,
+      "tilt_deg": -3.1942525320580533,
+      "pan_velocity_deg_s": 8.504580154635072,
+      "tilt_velocity_deg_s": -3.678570729694606,
+      "projected_error": [
+        0.333641984793687,
+        -0.24105353893079903
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.7666666666666667,
+      "pan_deg": 7.4480294156296925,
+      "tilt_deg": -3.313663822232258,
+      "pan_velocity_deg_s": 8.22002393161351,
+      "tilt_velocity_deg_s": -3.5443312821351936,
+      "projected_error": [
+        0.3248207418800188,
+        -0.23481140461928648
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.8,
+      "pan_deg": 7.7154636304460915,
+      "tilt_deg": -3.4287176811821656,
+      "pan_velocity_deg_s": 7.945641853633074,
+      "tilt_velocity_deg_s": -3.415224634826429,
+      "projected_error": [
+        0.3163148974626253,
+        -0.2288079455194289
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.8333333333333334,
+      "pan_deg": 7.973974514238822,
+      "tilt_deg": -3.539580719887123,
+      "pan_velocity_deg_s": 7.681011160946893,
+      "tilt_velocity_deg_s": -3.2910367978978616,
+      "projected_error": [
+        0.30811134598935364,
+        -0.22303321110225058
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.8666666666666667,
+      "pan_deg": 8.223878713328142,
+      "tilt_deg": -3.6464126018326075,
+      "pan_velocity_deg_s": 7.425731991038368,
+      "tilt_velocity_deg_s": -3.171564127313555,
+      "projected_error": [
+        0.30019769172218935,
+        -0.21747773192008021
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.9,
+      "pan_deg": 8.465479941674479,
+      "tilt_deg": -3.7493663792050196,
+      "pan_velocity_deg_s": 7.179425683743848,
+      "tilt_velocity_deg_s": -3.056612703477293,
+      "projected_error": [
+        0.29256219619605905,
+        -0.21213249071169427
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.9333333333333333,
+      "pan_deg": 8.69906966205103,
+      "tilt_deg": -3.848588808840467,
+      "pan_velocity_deg_s": 6.9417332466999815,
+      "tilt_velocity_deg_s": -2.9459977578355185,
+      "projected_error": [
+        0.28519373064769954,
+        -0.2069888957393516
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 0.9666666666666667,
+      "pan_deg": 8.924927718210025,
+      "tilt_deg": -3.9442206495000796,
+      "pan_velocity_deg_s": 6.7123139633162054,
+      "tilt_velocity_deg_s": -2.8395431428205042,
+      "projected_error": [
+        0.27808173286280213,
+        -0.2020387561411534
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.0,
+      "pan_deg": 9.143322922583971,
+      "tilt_deg": -4.036396941890433,
+      "pan_velocity_deg_s": 6.490844127692013,
+      "tilt_velocity_deg_s": -2.737080841015413,
+      "projected_error": [
+        0.2712161679584524,
+        -0.1972742591072165
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.0333333333333334,
+      "pan_deg": 9.354513603566081,
+      "tilt_deg": -4.125247272711755,
+      "pan_velocity_deg_s": 6.2770158928134725,
+      "tilt_velocity_deg_s": -2.6384505098904936,
+      "projected_error": [
+        0.26458749267721754,
+        -0.19268794870990782
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.0666666666666667,
+      "pan_deg": 9.558748115978284,
+      "tilt_deg": -4.210896023896256,
+      "pan_velocity_deg_s": 6.070536220016168,
+      "tilt_velocity_deg_s": -2.543499058866849,
+      "projected_error": [
+        0.2581866228205011,
+        -0.1882727062373085
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.1,
+      "pan_deg": 9.756265317952453,
+      "tilt_deg": -4.293462608092183,
+      "pan_velocity_deg_s": 5.871125919135618,
+      "tilt_velocity_deg_s": -2.4520802558191948,
+      "projected_error": [
+        0.2520049034932042,
+        -0.1840217318955923
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.1333333333333333,
+      "pan_deg": 9.947295017113296,
+      "tilt_deg": -4.373061691354259,
+      "pan_velocity_deg_s": 5.678518770009784,
+      "tilt_velocity_deg_s": -2.364054360439578,
+      "projected_error": [
+        0.24603408187030334,
+        -0.17992852776044047
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.1666666666666667,
+      "pan_deg": 10.132058388654205,
+      "tilt_deg": -4.449803403916519,
+      "pan_velocity_deg_s": 5.492460717081153,
+      "tilt_velocity_deg_s": -2.279287782156356,
+      "projected_error": [
+        0.24026628222951596,
+        -0.17598688187027067
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.2,
+      "pan_deg": 10.31076836763452,
+      "tilt_deg": -4.523793539847904,
+      "pan_velocity_deg_s": 5.312709129790242,
+      "tilt_velocity_deg_s": -2.197652760541375,
+      "projected_error": [
+        0.23469398302349756,
+        -0.17219085336517398
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.2333333333333334,
+      "pan_deg": 10.483630017594114,
+      "tilt_deg": -4.595133746323321,
+      "pan_velocity_deg_s": 5.139032122277252,
+      "tilt_velocity_deg_s": -2.1190270663493207,
+      "projected_error": [
+        0.22930999579059494,
+        -0.1685347585852432
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.2666666666666666,
+      "pan_deg": 10.650840877374874,
+      "tilt_deg": -4.663921703182026,
+      "pan_velocity_deg_s": 4.971207926631305,
+      "tilt_velocity_deg_s": -2.043293721518477,
+      "projected_error": [
+        0.22410744572557054,
+        -0.16501315805060923
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.3,
+      "pan_deg": 10.812591287855414,
+      "tilt_deg": -4.730251293390611,
+      "pan_velocity_deg_s": 4.809024314560285,
+      "tilt_velocity_deg_s": -1.9703407366267423,
+      "projected_error": [
+        0.21907975375136882,
+        -0.16162084425314346
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.3333333333333333,
+      "pan_deg": 10.96906470014225,
+      "tilt_deg": -4.794212764978599,
+      "pan_velocity_deg_s": 4.6522780629114155,
+      "tilt_velocity_deg_s": -1.9000608644416692,
+      "projected_error": [
+        0.21422061995025382,
+        -0.15835283019653768
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.3666666666666667,
+      "pan_deg": 11.120437966615347,
+      "tilt_deg": -4.855892884970227,
+      "pan_velocity_deg_s": 4.500774458963016,
+      "tilt_velocity_deg_s": -1.832351368333125,
+      "projected_error": [
+        0.20952400822785347,
+        -0.15520433862749025
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.4,
+      "pan_deg": 11.266881616096148,
+      "tilt_deg": -4.915375085795776,
+      "pan_velocity_deg_s": 4.354326841840354,
+      "tilt_velocity_deg_s": -1.7671138044313939,
+      "projected_error": [
+        0.204984132097051,
+        -0.15217079190605975
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.4333333333333333,
+      "pan_deg": 11.40856011429032,
+      "tilt_deg": -4.97273960462938,
+      "pan_velocity_deg_s": 4.212756176790352,
+      "tilt_velocity_deg_s": -1.7042538165163466,
+      "projected_error": [
+        0.2005954414805009,
+        -0.14924780246801006
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.4666666666666666,
+      "pan_deg": 11.54563211055349,
+      "tilt_deg": -5.028063616067151,
+      "pan_velocity_deg_s": 4.075890659387964,
+      "tilt_velocity_deg_s": -1.6436809427144317,
+      "projected_error": [
+        0.19635261044102692,
+        -0.146431163836221
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.5,
+      "pan_deg": 11.67825067193527,
+      "tilt_deg": -5.0814213585294015,
+      "pan_velocity_deg_s": 3.9435653470463636,
+      "tilt_velocity_deg_s": -1.5853084331621028,
+      "projected_error": [
+        0.19225052575843726,
+        -0.14371684214203792
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.5333333333333334,
+      "pan_deg": 11.80656350537327,
+      "tilt_deg": -5.132884254743307,
+      "pan_velocity_deg_s": 3.8156218154686776,
+      "tilt_velocity_deg_s": -1.5290530778675124,
+      "projected_error": [
+        0.18828427627952893,
+        -0.14110096812083942
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.5666666666666667,
+      "pan_deg": 11.930713168833572,
+      "tilt_deg": -5.18252102663734,
+      "pan_velocity_deg_s": 3.6919078379151977,
+      "tilt_velocity_deg_s": -1.4748350440680014,
+      "projected_error": [
+        0.18444914297537113,
+        -0.13857982954916206
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.6,
+      "pan_deg": 12.050837272126728,
+      "tilt_deg": -5.230397804955981,
+      "pan_velocity_deg_s": 3.5722770853698944,
+      "tilt_velocity_deg_s": -1.4225777224401128,
+      "projected_error": [
+        0.18074058964646667,
+        -0.13614986409346544
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.6333333333333333,
+      "pan_deg": 12.167068668067168,
+      "tilt_deg": -5.276578233882218,
+      "pan_velocity_deg_s": 3.4565888458771874,
+      "tilt_velocity_deg_s": -1.3722075815720562,
+      "projected_error": [
+        0.1771542542221929,
+        -0.1338076525431005
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.6666666666666667,
+      "pan_deg": 12.279535634589049,
+      "tilt_deg": -5.321123570936197,
+      "pan_velocity_deg_s": 3.344707761487082,
+      "tilt_velocity_deg_s": -1.3236540301564523,
+      "projected_error": [
+        0.17368594060609951,
+        -0.13154991240227498
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.7,
+      "pan_deg": 12.388362048381792,
+      "tilt_deg": -5.364092782400735,
+      "pan_velocity_deg_s": 3.236503581395441,
+      "tilt_velocity_deg_s": -1.2768492864049572,
+      "projected_error": [
+        0.17033161102325872,
+        -0.1293734918178305
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.7333333333333334,
+      "pan_deg": 12.493667550563679,
+      "tilt_deg": -5.405542634508218,
+      "pan_velocity_deg_s": 3.1318509300000796,
+      "tilt_velocity_deg_s": -1.2317282542251882,
+      "projected_error": [
+        0.16708737883000252,
+        -0.12727536382147128
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.7666666666666666,
+      "pan_deg": 12.595567704871002,
+      "tilt_deg": -5.445527780608429,
+      "pan_velocity_deg_s": 3.0306290887121756,
+      "tilt_velocity_deg_s": -1.188228405736293,
+      "projected_error": [
+        0.16394950175007747,
+        -0.12525262086673747
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.8,
+      "pan_deg": 12.694174148803471,
+      "tilt_deg": -5.484100844523139,
+      "pan_velocity_deg_s": 2.9327217904699943,
+      "tilt_velocity_deg_s": -1.1462896697318017,
+      "projected_error": [
+        0.16091437550456994,
+        -0.12330246964252863
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.8333333333333333,
+      "pan_deg": 12.789594738132957,
+      "tilt_deg": -5.521312500280515,
+      "pan_velocity_deg_s": 2.8380170259975905,
+      "tilt_velocity_deg_s": -1.105854325727675,
+      "projected_error": [
+        0.15797852780592536,
+        -0.12142222614633691
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.8666666666666667,
+      "pan_deg": 12.88193368515217,
+      "tilt_deg": -5.557211548410688,
+      "pan_velocity_deg_s": 2.7464068609376318,
+      "tilt_velocity_deg_s": -1.066866903260372,
+      "projected_error": [
+        0.15513861268906654,
+        -0.11960931100160727
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.9,
+      "pan_deg": 12.971291691012139,
+      "tilt_deg": -5.5918449889729,
+      "pan_velocity_deg_s": 2.657787263064967,
+      "tilt_velocity_deg_s": -1.0292740861239993,
+      "projected_error": [
+        0.15239140515501395,
+        -0.1178612450047661
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.9333333333333333,
+      "pan_deg": 13.057766072472047,
+      "tilt_deg": -5.625258091474562,
+      "pan_velocity_deg_s": 2.572057938857463,
+      "tilt_velocity_deg_s": -0.9930246212581613,
+      "projected_error": [
+        0.14973379610458135,
+        -0.11617564488850467
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 1.9666666666666666,
+      "pan_deg": 13.141450883361916,
+      "tilt_deg": -5.657494461833193,
+      "pan_velocity_deg_s": 2.489122178763516,
+      "tilt_velocity_deg_s": -0.9580692320182259,
+      "projected_error": [
+        0.1471627875416689,
+        -0.11455021928884743
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.0,
+      "pan_deg": 13.222437031037582,
+      "tilt_deg": -5.6885961065234865,
+      "pan_velocity_deg_s": 2.4088867105624296,
+      "tilt_velocity_deg_s": -0.9243605355785658,
+      "projected_error": [
+        0.14467548802743535,
+        -0.11298276490440332
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.033333333333333,
+      "pan_deg": 13.300812388088119,
+      "tilt_deg": -5.718603494043662,
+      "pan_velocity_deg_s": 2.331261560265193,
+      "tilt_velocity_deg_s": -0.8918529642364736,
+      "projected_error": [
+        0.14226910836822101,
+        -0.11147116283699597
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.066666666666667,
+      "pan_deg": 13.376661899538203,
+      "tilt_deg": -5.747555613827703,
+      "pan_velocity_deg_s": 2.2561599200493427,
+      "tilt_velocity_deg_s": -0.8605026903999877,
+      "projected_error": [
+        0.1399409575215295,
+        -0.11001337510359942
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.1,
+      "pan_deg": 13.450067685771812,
+      "tilt_deg": -5.77549003272306,
+      "pan_velocity_deg_s": 2.1834980227637715,
+      "tilt_velocity_deg_s": -0.830267555057518,
+      "projected_error": [
+        0.13768843870567696,
+        -0.10860744131017448
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.1333333333333333,
+      "pan_deg": 13.521109141388767,
+      "tilt_deg": -5.802442949146831,
+      "pan_velocity_deg_s": 2.113195022577182,
+      "tilt_velocity_deg_s": -0.8011069995403395,
+      "projected_error": [
+        0.13550904569989258,
+        -0.10725147547862594
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.1666666666666665,
+      "pan_deg": 13.589863030191998,
+      "tilt_deg": -5.828449245027272,
+      "pan_velocity_deg_s": 2.0451728813780976,
+      "tilt_velocity_deg_s": -0.772982000401319,
+      "projected_error": [
+        0.13340035932272104,
+        -0.10594366301866145
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.2,
+      "pan_deg": 13.656403576490943,
+      "tilt_deg": -5.853542535631819,
+      "pan_velocity_deg_s": 1.9793562605660906,
+      "tilt_velocity_deg_s": -0.7458550072444989,
+      "projected_error": [
+        0.1313600440775488,
+        -0.10468225783686928
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.2333333333333334,
+      "pan_deg": 13.720802552894856,
+      "tilt_deg": -5.877755217377348,
+      "pan_velocity_deg_s": 1.9156724179016182,
+      "tilt_velocity_deg_s": -0.7196898833507254,
+      "projected_error": [
+        0.12938584495495004,
+        -0.10346557957580882
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.2666666666666666,
+      "pan_deg": 13.783129364759272,
+      "tilt_deg": -5.901118513713463,
+      "pan_velocity_deg_s": 1.8540511091081866,
+      "tilt_velocity_deg_s": -0.694451848954003,
+      "projected_error": [
+        0.12747558438235376,
+        -0.10229201097636126
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.3,
+      "pan_deg": 13.843451131438952,
+      "tilt_deg": -5.923662519164809,
+      "pan_velocity_deg_s": 1.7944244939436698,
+      "tilt_velocity_deg_s": -0.6701074270323699,
+      "projected_error": [
+        0.12562715931225377,
+        -0.1011599953570053
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.3333333333333335,
+      "pan_deg": 13.901832764491658,
+      "tilt_deg": -5.9454162416140415,
+      "pan_velocity_deg_s": 1.7367270464790745,
+      "tilt_velocity_deg_s": -0.6466243914852067,
+      "projected_error": [
+        0.1238385384408514,
+        -0.10006803420406205
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.3666666666666667,
+      "pan_deg": 13.958337042968674,
+      "tilt_deg": -5.966407642902894,
+      "pan_velocity_deg_s": 1.6808954693426466,
+      "tilt_velocity_deg_s": -0.6239717175767558,
+      "projected_error": [
+        0.12210775954962204,
+        -0.09901468486731921
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.4,
+      "pan_deg": 14.013024685920206,
+      "tilt_deg": -5.986663677824887,
+      "pan_velocity_deg_s": 1.6268686117047138,
+      "tilt_velocity_deg_s": -0.6021195345326507,
+      "projected_error": [
+        0.12043292696284603,
+        -0.09799855835576847
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.433333333333333,
+      "pan_deg": 14.065954422236615,
+      "tilt_deg": -6.006210331579574,
+      "pan_velocity_deg_s": 1.5745873907952186,
+      "tilt_velocity_deg_s": -0.5810390801828936,
+      "projected_error": [
+        0.11881220911465168,
+        -0.09701831722850462
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.466666666666667,
+      "pan_deg": 14.117183057939783,
+      "tilt_deg": -6.025072655754715,
+      "pan_velocity_deg_s": 1.5239947167604735,
+      "tilt_velocity_deg_s": -0.5607026575509855,
+      "projected_error": [
+        0.11724383621957463,
+        -0.09607267357612083
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.5,
+      "pan_deg": 14.166765541032621,
+      "tilt_deg": -6.043274802899565,
+      "pan_velocity_deg_s": 1.4750354206793597,
+      "tilt_velocity_deg_s": -0.5410835932945747,
+      "projected_error": [
+        0.11572609804106004,
+        -0.09516038708819774
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.533333333333333,
+      "pan_deg": 14.214755024009026,
+      "tilt_deg": -6.060840059749334,
+      "pan_velocity_deg_s": 1.4276561855715697,
+      "tilt_velocity_deg_s": -0.5221561979084565,
+      "projected_error": [
+        0.11425734175271868,
+        -0.09428026320274328
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.566666666666667,
+      "pan_deg": 14.26120292412117,
+      "tilt_deg": -6.077790879158057,
+      "pan_velocity_deg_s": 1.3818054802421311,
+      "tilt_velocity_deg_s": -0.503895727605592,
+      "projected_error": [
+        0.11283596988750615,
+        -0.0934311513336601
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.6,
+      "pan_deg": 14.306158981496013,
+      "tilt_deg": -6.094148910794293,
+      "pan_velocity_deg_s": 1.337433495816421,
+      "tilt_velocity_deg_s": -0.48627834779671475,
+      "projected_error": [
+        0.11146043837030904,
+        -0.09261194317254728
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.6333333333333333,
+      "pan_deg": 14.349671315188225,
+      "tilt_deg": -6.109935030651556,
+      "pan_velocity_deg_s": 1.294492084830062,
+      "tilt_velocity_deg_s": -0.46928109809326296,
+      "projected_error": [
+        0.11012925462973192,
+        -0.09182157106133668
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.6666666666666665,
+      "pan_deg": 14.391786477252339,
+      "tilt_deg": -6.125169369422904,
+      "pan_velocity_deg_s": 1.2529347027465312,
+      "tilt_velocity_deg_s": -0.45288185876259596,
+      "projected_error": [
+        0.1088409757851426,
+        -0.09105900643246084
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.7,
+      "pan_deg": 14.432549504912846,
+      "tilt_deg": -6.139871339786836,
+      "pan_velocity_deg_s": 1.2127163517836452,
+      "tilt_velocity_deg_s": -0.4370593185682284,
+      "projected_error": [
+        0.10759420690529309,
+        -0.09032325831342268
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.7333333333333334,
+      "pan_deg": 14.472003970907181,
+      "tilt_deg": -6.154059662649418,
+      "pan_velocity_deg_s": 1.173793526937423,
+      "tilt_velocity_deg_s": -0.4217929439313396,
+      "projected_error": [
+        0.10638759933505997,
+        -0.08961337189280737
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.7666666666666666,
+      "pan_deg": 14.51019203207283,
+      "tilt_deg": -6.16775239238555,
+      "pan_velocity_deg_s": 1.136124164098904,
+      "tilt_velocity_deg_s": -0.4070629493533709,
+      "projected_error": [
+        0.10521984908706601,
+        -0.08892842714493185
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.8,
+      "pan_deg": 14.547154476246527,
+      "tilt_deg": -6.180966941120276,
+      "pan_velocity_deg_s": 1.0996675901659196,
+      "tilt_velocity_deg_s": -0.3928502690424259,
+      "projected_error": [
+        0.10408969529514346,
+        -0.08826753751047293
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.8333333333333335,
+      "pan_deg": 14.582930767540313,
+      "tilt_deg": -6.1937201020892125,
+      "pan_velocity_deg_s": 1.0643844750572966,
+      "tilt_velocity_deg_s": -0.3791365296893513,
+      "projected_error": [
+        0.10299591872677624,
+        -0.08762984863055484
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.8666666666666667,
+      "pan_deg": 14.617559090056185,
+      "tilt_deg": -6.206028072115417,
+      "pan_velocity_deg_s": 1.0302367855430965,
+      "tilt_velocity_deg_s": -0.365904024342063,
+      "projected_error": [
+        0.10193734035183588,
+        -0.08701453713190593
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.9,
+      "pan_deg": 14.651076390098392,
+      "tilt_deg": -6.217906473238325,
+      "pan_velocity_deg_s": 0.9971877408088644,
+      "tilt_velocity_deg_s": -0.35313568732933376,
+      "projected_error": [
+        0.1009128199650749,
+        -0.08642080946081424
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.933333333333333,
+      "pan_deg": 14.683518416939654,
+      "tilt_deg": -6.229370373528822,
+      "pan_velocity_deg_s": 0.9652017696771816,
+      "tilt_velocity_deg_s": -0.3408150701877275,
+      "projected_error": [
+        0.09992125485999251,
+        -0.08584790076372925
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 2.966666666666667,
+      "pan_deg": 14.71491976219516,
+      "tilt_deg": -6.240434307123,
+      "pan_velocity_deg_s": 0.9342444694134409,
+      "tilt_velocity_deg_s": -0.328926318547551,
+      "projected_error": [
+        0.0989615785518168,
+        -0.08529507381246113
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.0,
+      "pan_deg": 14.74531389785589,
+      "tilt_deg": -6.251112293505731,
+      "pan_velocity_deg_s": 0.9042825660476878,
+      "tilt_velocity_deg_s": -0.3174541499362446,
+      "projected_error": [
+        0.09803275954747843,
+        -0.0847616179720355
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.033333333333333,
+      "pan_deg": 14.774733213030444,
+      "tilt_deg": -6.261417856073822,
+      "pan_velocity_deg_s": 0.8752838761471151,
+      "tilt_velocity_deg_s": -0.3063838324591885,
+      "projected_error": [
+        0.0971338001605606,
+        -0.08424684820935208
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.066666666666667,
+      "pan_deg": 14.803209049442646,
+      "tilt_deg": -6.2713640400072395,
+      "pan_velocity_deg_s": 0.8472172699782652,
+      "tilt_velocity_deg_s": -0.29570116432018567,
+      "projected_error": [
+        0.0962637353693263,
+        -0.08375010414088858
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.1,
+      "pan_deg": 14.830771735730028,
+      "tilt_deg": -6.280963429475636,
+      "pan_velocity_deg_s": 0.8200526360004646,
+      "tilt_velocity_deg_s": -0.285392454145789,
+      "projected_error": [
+        0.0954216317160143,
+        -0.0832707491177791
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.1333333333333333,
+      "pan_deg": 14.857450620586532,
+      "tilt_deg": -6.290228164206285,
+      "pan_velocity_deg_s": 0.7937608466355153,
+      "tilt_velocity_deg_s": -0.27544450207890103,
+      "projected_error": [
+        0.09460658624570104,
+        -0.08280816934666903
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.1666666666666665,
+      "pan_deg": 14.883274104790942,
+      "tilt_deg": -6.29916995543838,
+      "pan_velocity_deg_s": 0.7683137252614516,
+      "tilt_velocity_deg_s": -0.2658445816093633,
+      "projected_error": [
+        0.09381772548310494,
+        -0.0823617730448354
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.2,
+      "pan_deg": 14.908269672160834,
+      "tilt_deg": -6.307800101287613,
+      "pan_velocity_deg_s": 0.7436840143804241,
+      "tilt_velocity_deg_s": -0.2565804221101458,
+      "projected_error": [
+        0.09305420444579314,
+        -0.08193098962812186
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.2333333333333334,
+      "pan_deg": 14.932463919470269,
+      "tilt_deg": -6.316129501543939,
+      "pan_velocity_deg_s": 0.7198453449139106,
+      "tilt_velocity_deg_s": -0.24764019204980617,
+      "projected_error": [
+        0.09231520569233136,
+        -0.08151526893031592
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.2666666666666666,
+      "pan_deg": 14.955882585367911,
+      "tilt_deg": -6.324168671924479,
+      "pan_velocity_deg_s": 0.6967722065802011,
+      "tilt_velocity_deg_s": -0.23901248285275414,
+      "projected_error": [
+        0.09159993840398638,
+        -0.08111408045265299
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.3,
+      "pan_deg": 14.978550578330763,
+      "tilt_deg": -6.331927757802566,
+      "pan_velocity_deg_s": 0.6744399193114602,
+      "tilt_velocity_deg_s": -0.2306862933805528,
+      "projected_error": [
+        0.09090763749865532,
+        -0.08072691264219564
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.3333333333333335,
+      "pan_deg": 15.000492003687379,
+      "tilt_deg": -6.339416547433108,
+      "pan_velocity_deg_s": 0.6528246056699115,
+      "tilt_velocity_deg_s": -0.2226510150085192,
+      "projected_error": [
+        0.09023756277576722,
+        -0.0803532721978962
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.3666666666666667,
+      "pan_deg": 15.021730189743046,
+      "tilt_deg": -6.346644484693577,
+      "pan_velocity_deg_s": 0.63190316422429,
+      "tilt_velocity_deg_s": -0.21489641727312342,
+      "projected_error": [
+        0.08958899809095307,
+        -0.07999268340320008
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.4,
+      "pan_deg": 15.042287713038224,
+      "tilt_deg": -6.353620681359163,
+      "pan_velocity_deg_s": 0.6116532438497219,
+      "tilt_velocity_deg_s": -0.20741263406677254,
+      "projected_error": [
+        0.08896125055934131,
+        -0.07964468748410491
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.433333333333333,
+      "pan_deg": 15.062186422770255,
+      "tilt_deg": -6.36035392892983,
+      "pan_velocity_deg_s": 0.5920532189157051,
+      "tilt_velocity_deg_s": -0.20019015035776033,
+      "projected_error": [
+        0.08835364978638692,
+        -0.07930884199163593
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.466666666666667,
+      "pan_deg": 15.081447464407303,
+      "tilt_deg": -6.3668527100263494,
+      "pan_velocity_deg_s": 0.5730821653287685,
+      "tilt_velocity_deg_s": -0.1932197894138851,
+      "projected_error": [
+        0.0877655471251918,
+        -0.07898472020774568
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.5,
+      "pan_deg": 15.100091302522301,
+      "tilt_deg": -6.373125209371638,
+      "pan_velocity_deg_s": 0.5547198373974624,
+      "tilt_velocity_deg_s": -0.1864927005095078,
+      "projected_error": [
+        0.08719631495932136,
+        -0.07867191057369215
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.533333333333333,
+      "pan_deg": 15.118137742873719,
+      "tilt_deg": -6.379179324373099,
+      "pan_velocity_deg_s": 0.536946645489185,
+      "tilt_velocity_deg_s": -0.1800003470964947,
+      "projected_error": [
+        0.0866453460101648,
+        -0.07837001613998698
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.566666666666667,
+      "pan_deg": 15.135605953758898,
+      "tilt_deg": -6.38502267532101,
+      "pan_velocity_deg_s": 0.5197436344493339,
+      "tilt_velocity_deg_s": -0.17373449542047978,
+      "projected_error": [
+        0.08611205266792928,
+        -0.07807865403705215
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.6,
+      "pan_deg": 15.15251448666479,
+      "tilt_deg": -6.390662615217432,
+      "pan_velocity_deg_s": 0.5030924627547653,
+      "tilt_velocity_deg_s": -0.16768720356460515,
+      "projected_error": [
+        0.08559586634539774,
+        -0.07779745496575419
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.6333333333333333,
+      "pan_deg": 15.168881296240016,
+      "tilt_deg": -6.396106239249481,
+      "pan_velocity_deg_s": 0.48697538237470017,
+      "tilt_velocity_deg_s": -0.1618508109038102,
+      "projected_error": [
+        0.08509623685361577,
+        -0.0775260627070272
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.6666666666666665,
+      "pan_deg": 15.184723759611257,
+      "tilt_deg": -6.4013603939203225,
+      "pan_velocity_deg_s": 0.4713752193132532,
+      "tilt_velocity_deg_s": -0.15621792795323966,
+      "projected_error": [
+        0.0846126317987108,
+        -0.07726413364982566
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.7,
+      "pan_deg": 15.200058695066204,
+      "tilt_deg": -6.406431685850654,
+      "pan_velocity_deg_s": 0.45627535480888903,
+      "tilt_velocity_deg_s": -0.15078142659536126,
+      "projected_error": [
+        0.08414453599907548,
+        -0.0770113363366843
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.7333333333333334,
+      "pan_deg": 15.214902380124414,
+      "tilt_deg": -6.4113264902629705,
+      "pan_velocity_deg_s": 0.44165970716727115,
+      "tilt_velocity_deg_s": -0.14553443067077745,
+      "projected_error": [
+        0.08369145092218538,
+        -0.07676735102619114
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.7666666666666666,
+      "pan_deg": 15.229270569016753,
+      "tilt_deg": -6.416050959160433,
+      "pan_velocity_deg_s": 0.4275127142046981,
+      "tilt_velocity_deg_s": -0.14047030691847848,
+      "projected_error": [
+        0.08325289414034576,
+        -0.07653186927170913
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.8,
+      "pan_deg": 15.243178509593253,
+      "tilt_deg": -6.420611029211662,
+      "pan_velocity_deg_s": 0.4138193162803687,
+      "tilt_velocity_deg_s": -0.13558265625188468,
+      "projected_error": [
+        0.08282839880469146,
+        -0.07630459351571271
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.8333333333333335,
+      "pan_deg": 15.256640959678606,
+      "tilt_deg": -6.42501242935236,
+      "pan_velocity_deg_s": 0.4005649398965891,
+      "tilt_velocity_deg_s": -0.13086530535763347,
+      "projected_error": [
+        0.08241751313679438,
+        -0.0760852366991301
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.8666666666666667,
+      "pan_deg": 15.269672202893736,
+      "tilt_deg": -6.4292606881142484,
+      "pan_velocity_deg_s": 0.38773548184693934,
+      "tilt_velocity_deg_s": -0.12631229860444582,
+      "projected_error": [
+        0.08201979993725517,
+        -0.07587352188510658
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.9,
+      "pan_deg": 15.282286063961367,
+      "tilt_deg": -6.433361140691365,
+      "pan_velocity_deg_s": 0.37531729389294044,
+      "tilt_velocity_deg_s": -0.12191789025018457,
+      "projected_error": [
+        0.0816348361106812,
+        -0.07566918189663367
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.933333333333333,
+      "pan_deg": 15.294495923512716,
+      "tilt_deg": -6.437318935753409,
+      "pan_velocity_deg_s": 0.3632971679508995,
+      "tilt_velocity_deg_s": -0.11767653693561093,
+      "projected_error": [
+        0.08126221220647797,
+        -0.07547195896750596
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 3.966666666666667,
+      "pan_deg": 15.306314732411984,
+      "tilt_deg": -6.441139042015447,
+      "pan_velocity_deg_s": 0.35166232177100537,
+      "tilt_velocity_deg_s": -0.11358289045361444,
+      "projected_error": [
+        0.08090153197490113,
+        -0.07528160440609313
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.0,
+      "pan_deg": 15.317755025614645,
+      "tilt_deg": -6.444826254572903,
+      "pan_velocity_deg_s": 0.3404003850915632,
+      "tilt_velocity_deg_s": -0.10963179078358719,
+      "projected_error": [
+        0.0805524119378385,
+        -0.07509787827143695
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.033333333333333,
+      "pan_deg": 15.328828935575027,
+      "tilt_deg": -6.448385201010454,
+      "pan_velocity_deg_s": 0.3294993862519951,
+      "tilt_velocity_deg_s": -0.10581825938063262,
+      "projected_error": [
+        0.08021448097381187,
+        -0.07492054906119958
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.066666666666666,
+      "pan_deg": 15.3395482052181,
+      "tilt_deg": -6.451820347293089,
+      "pan_velocity_deg_s": 0.31894773924867215,
+      "tilt_velocity_deg_s": -0.1021374927099219,
+      "projected_error": [
+        0.0798873799167088,
+        -0.07474939341101133
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.1,
+      "pan_deg": 15.349924200489895,
+      "tilt_deg": -6.455136003447304,
+      "pan_velocity_deg_s": 0.30873423121834337,
+      "tilt_velocity_deg_s": -0.09858485601687998,
+      "projected_error": [
+        0.07957076116776877,
+        -0.07458419580478483
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.133333333333334,
+      "pan_deg": 15.359967922500516,
+      "tilt_deg": -6.458336329040068,
+      "pan_velocity_deg_s": 0.298848010334617,
+      "tilt_velocity_deg_s": -0.09515587732427595,
+      "projected_error": [
+        0.07926428832037309,
+        -0.07442474829557871
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.166666666666667,
+      "pan_deg": 15.369690019273143,
+      "tilt_deg": -6.461425338462937,
+      "pan_velocity_deg_s": 0.2892785741030956,
+      "tilt_velocity_deg_s": -0.09184624164754573,
+      "projected_error": [
+        0.07896763579719598,
+        -0.074270850236611
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.2,
+      "pan_deg": 15.379100797112033,
+      "tilt_deg": -6.4644069060283975,
+      "pan_velocity_deg_s": 0.28001575804193474,
+      "tilt_velocity_deg_s": -0.0886517854202046,
+      "projected_error": [
+        0.07868048849929996,
+        -0.0741223080220396
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.233333333333333,
+      "pan_deg": 15.388210231602082,
+      "tilt_deg": -6.467284770885265,
+      "pan_velocity_deg_s": 0.27104972473432937,
+      "tilt_velocity_deg_s": -0.08556849112132345,
+      "projected_error": [
+        0.07840254146676424,
+        -0.07397893483714163
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.266666666666667,
+      "pan_deg": 15.397027978252025,
+      "tilt_deg": -6.470062541759672,
+      "pan_velocity_deg_s": 0.2623709532406299,
+      "tilt_velocity_deg_s": -0.08259248209756787,
+      "projected_error": [
+        0.07813349955045948,
+        -0.07384055041753693
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.3,
+      "pan_deg": 15.405563382793012,
+      "tilt_deg": -6.472743701527992,
+      "pan_velocity_deg_s": 0.2539702288576742,
+      "tilt_velocity_deg_s": -0.07972001757248168,
+      "projected_error": [
+        0.07787307709458785,
+        -0.07370698081712036
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.333333333333333,
+      "pan_deg": 15.413825491143864,
+      "tilt_deg": -6.475331611627749,
+      "pan_velocity_deg_s": 0.24583863321377447,
+      "tilt_velocity_deg_s": -0.07694748783595846,
+      "projected_error": [
+        0.07762099762962694,
+        -0.07357805818437198
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.366666666666666,
+      "pan_deg": 15.42182305905393,
+      "tilt_deg": -6.477829516312388,
+      "pan_velocity_deg_s": 0.23796753468796214,
+      "tilt_velocity_deg_s": -0.07427140960723165,
+      "projected_error": [
+        0.07737699357532674,
+        -0.07345362054673626
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.4,
+      "pan_deg": 15.429564561434082,
+      "tilt_deg": -6.480240546755511,
+      "pan_velocity_deg_s": 0.23034857914260023,
+      "tilt_velocity_deg_s": -0.07168842156491576,
+      "projected_error": [
+        0.07714080595342059,
+        -0.0733335116027685
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.433333333333334,
+      "pan_deg": 15.437058201386117,
+      "tilt_deg": -6.482567725010019,
+      "pan_velocity_deg_s": 0.2229736809588959,
+      "tilt_velocity_deg_s": -0.06919528003783591,
+      "projected_error": [
+        0.07691218410972572,
+        -0.07321758052175925
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.466666666666667,
+      "pan_deg": 15.44431191894035,
+      "tilt_deg": -6.484813967827379,
+      "pan_velocity_deg_s": 0.21583501436507702,
+      "tilt_velocity_deg_s": -0.06678885485073603,
+      "projected_error": [
+        0.07669088544531741,
+        -0.07310568175055907
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.5,
+      "pan_deg": 15.451333399510983,
+      "tilt_deg": -6.486982090342031,
+      "pan_velocity_deg_s": 0.2089250050475798,
+      "tilt_velocity_deg_s": -0.06446612531910832,
+      "projected_error": [
+        0.07647667515647487,
+        -0.07299767482733859
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.533333333333333,
+      "pan_deg": 15.458130082078423,
+      "tilt_deg": -6.48907480962578,
+      "pan_velocity_deg_s": 0.2022363220356494,
+      "tilt_velocity_deg_s": -0.062224176387669916,
+      "projected_error": [
+        0.07626932598310511,
+        -0.07289342420202667
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.566666666666666,
+      "pan_deg": 15.464709167107504,
+      "tilt_deg": -6.49109474811685,
+      "pan_velocity_deg_s": 0.19576186985041477,
+      "tilt_velocity_deg_s": -0.06006019490707891,
+      "projected_error": [
+        0.07606861796536292,
+        -0.07279279906317909
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.6,
+      "pan_deg": 15.47107762421016,
+      "tilt_deg": -6.4930444369280576,
+      "pan_velocity_deg_s": 0.1894947809095187,
+      "tilt_velocity_deg_s": -0.057971466043949704,
+      "projected_error": [
+        0.07587433820819489,
+        -0.07269567317104357
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.633333333333334,
+      "pan_deg": 15.477242199560925,
+      "tilt_deg": -6.4949263190384645,
+      "pan_velocity_deg_s": 0.1834284081787787,
+      "tilt_velocity_deg_s": -0.05595536981916306,
+      "projected_error": [
+        0.07568628065354215,
+        -0.07260192469659103
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.666666666666667,
+      "pan_deg": 15.48320942307326,
+      "tilt_deg": -6.496742752372649,
+      "pan_velocity_deg_s": 0.177556318062975,
+      "tilt_velocity_deg_s": -0.05400937776980651,
+      "projected_error": [
+        0.07550424585995227,
+        -0.07251143606629608
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.7,
+      "pan_deg": 15.488985615344534,
+      "tilt_deg": -6.498496012771622,
+      "pan_velocity_deg_s": 0.1718722835273977,
+      "tilt_velocity_deg_s": -0.05213104973020628,
+      "projected_error": [
+        0.07532804078934928,
+        -0.07242409381245453
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.733333333333333,
+      "pan_deg": 15.494576894377115,
+      "tilt_deg": -6.500188296859247,
+      "pan_velocity_deg_s": 0.16637027744291982,
+      "tilt_velocity_deg_s": -0.05031803072768674,
+      "projected_error": [
+        0.07515747860073041,
+        -0.07233978842883722
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.766666666666667,
+      "pan_deg": 15.499989182082912,
+      "tilt_deg": -6.501821724807888,
+      "pan_velocity_deg_s": 0.16104446614703627,
+      "tilt_velocity_deg_s": -0.04856804798887725,
+      "projected_error": [
+        0.07499237845055816,
+        -0.07225841423148296
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.8,
+      "pan_deg": 15.505228210578355,
+      "tilt_deg": -6.503398343006886,
+      "pan_velocity_deg_s": 0.15588920321376215,
+      "tilt_velocity_deg_s": -0.0468789080526106,
+      "projected_error": [
+        0.07483256529962677,
+        -0.07217986922444654
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.833333333333333,
+      "pan_deg": 15.510299528276624,
+      "tilt_deg": -6.504920126637302,
+      "pan_velocity_deg_s": 0.15089902342552008,
+      "tilt_velocity_deg_s": -0.04524849398532738,
+      "projected_error": [
+        0.07467786972619117,
+        -0.07210405497031779
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.866666666666666,
+      "pan_deg": 15.515208505783708,
+      "tilt_deg": -6.506388982156275,
+      "pan_velocity_deg_s": 0.14606863694035183,
+      "tilt_velocity_deg_s": -0.043674762695522444,
+      "projected_error": [
+        0.07452812774515091,
+        -0.07203087646534162
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.9,
+      "pan_deg": 15.519960341604639,
+      "tilt_deg": -6.5078067496941925,
+      "pan_velocity_deg_s": 0.14139292364814146,
+      "tilt_velocity_deg_s": -0.04215574234344101,
+      "projected_error": [
+        0.07438318063309234,
+        -0.07196024201896999
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.933333333333334,
+      "pan_deg": 15.524560067666084,
+      "tilt_deg": -6.509175205367782,
+      "pan_velocity_deg_s": 0.1368669277094566,
+      "tilt_velocity_deg_s": -0.04068952984269418,
+      "projected_error": [
+        0.07424287475899323,
+        -0.07189206313768536
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 4.966666666666667,
+      "pan_deg": 15.52901255466118,
+      "tilt_deg": -6.510496063512096,
+      "pan_velocity_deg_s": 0.1324858522712091,
+      "tilt_velocity_deg_s": -0.039274288450388266,
+      "projected_error": [
+        0.07410706142040753,
+        -0.07182625441294291
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.0,
+      "pan_deg": 15.533322517222459,
+      "tilt_deg": -6.511770978834257,
+      "pan_velocity_deg_s": 0.12824505435320468,
+      "tilt_velocity_deg_s": -0.03790824544256878,
+      "projected_error": [
+        0.07397559668494938,
+        -0.07176273341307948
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.033333333333333,
+      "pan_deg": 15.537494518928316,
+      "tilt_deg": -6.51300154849176,
+      "pan_velocity_deg_s": 0.12414003990005074,
+      "tilt_velocity_deg_s": -0.03658968987203729,
+      "projected_error": [
+        0.0738483412369016,
+        -0.07170142057904992
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.066666666666666,
+      "pan_deg": 15.541532977148501,
+      "tilt_deg": -6.514189314097972,
+      "pan_velocity_deg_s": 0.12016645899301964,
+      "tilt_velocity_deg_s": -0.035316970405346274,
+      "projected_error": [
+        0.07372516022878357,
+        -0.07164223912384855
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.1,
+      "pan_deg": 15.545442167733786,
+      "tilt_deg": -6.5153357636574185,
+      "pan_velocity_deg_s": 0.11632010121657675,
+      "tilt_velocity_deg_s": -0.03408849323628865,
+      "projected_error": [
+        0.07360592313771401,
+        -0.07158511493548735
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.133333333333334,
+      "pan_deg": 15.549226229554849,
+      "tilt_deg": -6.516442333433343,
+      "pan_velocity_deg_s": 0.11259689117467235,
+      "tilt_velocity_deg_s": -0.032902720073115656,
+      "projected_error": [
+        0.07349050362641478,
+        -0.0715299764834
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.166666666666667,
+      "pan_deg": 15.55288916889526,
+      "tilt_deg": -6.51751040974991,
+      "pan_velocity_deg_s": 0.10899288415163047,
+      "tilt_velocity_deg_s": -0.03175816619676007,
+      "projected_error": [
+        0.07337877940870063,
+        -0.07147675472814918
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.2,
+      "pan_deg": 15.556434863703283,
+      "tilt_deg": -6.518541330731392,
+      "pan_velocity_deg_s": 0.10550426191330287,
+      "tilt_velocity_deg_s": -0.030653398587542263,
+      "projected_error": [
+        0.07327063211931249,
+        -0.0714253830343206
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.233333333333333,
+      "pan_deg": 15.559867067707016,
+      "tilt_deg": -6.519536387980529,
+      "pan_velocity_deg_s": 0.10212732864355259,
+      "tilt_velocity_deg_s": -0.029587034117981716,
+      "projected_error": [
+        0.07316594718795014,
+        -0.07137579708648618
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.266666666666667,
+      "pan_deg": 15.563189414397348,
+      "tilt_deg": -6.5204968281982225,
+      "pan_velocity_deg_s": 0.09885850701187834,
+      "tilt_velocity_deg_s": -0.028557737809248727,
+      "projected_error": [
+        0.07306461371736833,
+        -0.07132793480813014
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.3,
+      "pan_deg": 15.566405420882923,
+      "tilt_deg": -6.5214238547466366,
+      "pan_velocity_deg_s": 0.09569433436789908,
+      "tilt_velocity_deg_s": -0.02756422114900287,
+      "projected_error": [
+        0.07296652436540506,
+        -0.07128173628342857
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.333333333333333,
+      "pan_deg": 15.56951849162129,
+      "tilt_deg": -6.5223186291576845,
+      "pan_velocity_deg_s": 0.09263145905846581,
+      "tilt_velocity_deg_s": -0.026605240468467458,
+      "projected_error": [
+        0.07287157523081238,
+        -0.07123714368178358
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.366666666666666,
+      "pan_deg": 15.572531922030214,
+      "tilt_deg": -6.523182272588831,
+      "pan_velocity_deg_s": 0.0896666368634606,
+      "tilt_velocity_deg_s": -0.025679595376577866,
+      "projected_error": [
+        0.0727796657427673,
+        -0.07119410118501077
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.4,
+      "pan_deg": 15.57544890198301,
+      "tilt_deg": -6.524015867228057,
+      "pan_velocity_deg_s": 0.08679672754655134,
+      "tilt_velocity_deg_s": -0.024786127249224955,
+      "projected_error": [
+        0.07269069855394307,
+        -0.07115255491708912
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.433333333333334,
+      "pan_deg": 15.578272519191652,
+      "tilt_deg": -6.524820457649788,
+      "pan_velocity_deg_s": 0.08401869151695995,
+      "tilt_velocity_deg_s": -0.02392371777155731,
+      "projected_error": [
+        0.07260457943702579,
+        -0.07111245287637732
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.466666666666667,
+      "pan_deg": 15.581005762481244,
+      "tilt_deg": -6.5255970521235,
+      "pan_velocity_deg_s": 0.08132958659880095,
+      "tilt_velocity_deg_s": -0.023091287531462373,
+      "projected_error": [
+        0.07252121718456284,
+        -0.07107374487021316
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.5,
+      "pan_deg": 15.583651524959393,
+      "tilt_deg": -6.526346623876654,
+      "pan_velocity_deg_s": 0.07872656490444296,
+      "tilt_velocity_deg_s": -0.022287794662537552,
+      "projected_error": [
+        0.07244052351203781,
+        -0.07103638245180795
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.533333333333333,
+      "pan_deg": 15.586212607083826,
+      "tilt_deg": -6.5270701123135915,
+      "pan_velocity_deg_s": 0.07620686980850594,
+      "tilt_velocity_deg_s": -0.021512233534552623,
+      "projected_error": [
+        0.07236241296406357,
+        -0.07100031885935665
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.566666666666666,
+      "pan_deg": 15.58869171963156,
+      "tilt_deg": -6.527768424191909,
+      "pan_velocity_deg_s": 0.07376783301928093,
+      "tilt_velocity_deg_s": -0.02076363348996579,
+      "projected_error": [
+        0.07228680282359766,
+        -0.07096550895728346
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.6,
+      "pan_deg": 15.591091486572795,
+      "tilt_deg": -6.528442434757813,
+      "pan_velocity_deg_s": 0.07140687174440215,
+      "tilt_velocity_deg_s": -0.02004105762468839,
+      "projected_error": [
+        0.07221361302407643,
+        -0.07093190917954809
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.633333333333334,
+      "pan_deg": 15.593414447852547,
+      "tilt_deg": -6.529092988841899,
+      "pan_velocity_deg_s": 0.0691214859476311,
+      "tilt_velocity_deg_s": -0.01934360161160126,
+      "projected_error": [
+        0.07214276606437661,
+        -0.07089947747493953
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.666666666666667,
+      "pan_deg": 15.59566306208307,
+      "tilt_deg": -6.529720901916739,
+      "pan_velocity_deg_s": 0.06690925569404062,
+      "tilt_velocity_deg_s": -0.018670392565283647,
+      "projected_error": [
+        0.07207418692651545,
+        -0.07086817325428578
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.7,
+      "pan_deg": 15.597839709149868,
+      "tilt_deg": -6.530326961117608,
+      "pan_velocity_deg_s": 0.06476783858042068,
+      "tilt_velocity_deg_s": -0.01802058794653645,
+      "projected_error": [
+        0.07200780299599287,
+        -0.07083795733951402
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.733333333333333,
+      "pan_deg": 15.599946692734113,
+      "tilt_deg": -6.5309119262276525,
+      "pan_velocity_deg_s": 0.06269496724833677,
+      "tilt_velocity_deg_s": -0.017393374505211744,
+      "projected_error": [
+        0.07194354398469857,
+        -0.07080879191449233
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.766666666666667,
+      "pan_deg": 15.601986242754144,
+      "tilt_deg": -6.531476530628731,
+      "pan_velocity_deg_s": 0.060688446977339605,
+      "tilt_velocity_deg_s": -0.016787967260092997,
+      "projected_error": [
+        0.07188134185629765,
+        -0.07078064047759446
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.8,
+      "pan_deg": 15.603960517728648,
+      "tilt_deg": -6.532021482219151,
+      "pan_velocity_deg_s": 0.05874615335524179,
+      "tilt_velocity_deg_s": -0.01620360851445794,
+      "projected_error": [
+        0.07182113075401247,
+        -0.07075346779592231
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.833333333333333,
+      "pan_deg": 15.605871607064069,
+      "tilt_deg": -6.532547464299433,
+      "pan_velocity_deg_s": 0.05686603002350828,
+      "tilt_velocity_deg_s": -0.015639566906033853,
+      "projected_error": [
+        0.0717628469307287,
+        -0.07072723986113055
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.866666666666666,
+      "pan_deg": 15.607721533268617,
+      "tilt_deg": -6.533055136427239,
+      "pan_velocity_deg_s": 0.05504608649499432,
+      "tilt_velocity_deg_s": -0.01509513649022197,
+      "projected_error": [
+        0.07170642868134493,
+        -0.0707019238467954
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.9,
+      "pan_deg": 15.609512254095312,
+      "tilt_deg": -6.533545135242539,
+      "pan_velocity_deg_s": 0.053284396041858584,
+      "tilt_velocity_deg_s": -0.014569635855356838,
+      "projected_error": [
+        0.0716518162772976,
+        -0.07067748806727403
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.933333333333334,
+      "pan_deg": 15.6112456646163,
+      "tilt_deg": -6.534018075264057,
+      "pan_velocity_deg_s": 0.05157909365124051,
+      "tilt_velocity_deg_s": -0.014062407268846656,
+      "projected_error": [
+        0.07159895190318856,
+        -0.07065390193800129
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 5.966666666666667,
+      "pan_deg": 15.612923599230642,
+      "tilt_deg": -6.534474549657989,
+      "pan_velocity_deg_s": 0.04992837404675251,
+      "tilt_velocity_deg_s": -0.01357281585320183,
+      "projected_error": [
+        0.07154777959544929,
+        -0.07063113593717386
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.0,
+      "pan_deg": 15.614547833607743,
+      "tilt_deg": -6.534915130979982,
+      "pan_velocity_deg_s": 0.04833048977335146,
+      "tilt_velocity_deg_s": -0.0131002487907903,
+      "projected_error": [
+        0.07149824518297392,
+        -0.07060916156877166
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.033333333333333,
+      "pan_deg": 15.616120086568479,
+      "tilt_deg": -6.535340371891292,
+      "pan_velocity_deg_s": 0.04678374934386256,
+      "tilt_velocity_deg_s": -0.012644114556377355,
+      "projected_error": [
+        0.07145029622965976,
+        -0.07058795132687157
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.066666666666666,
+      "pan_deg": 15.617642021905997,
+      "tilt_deg": -6.5357508058500144,
+      "pan_velocity_deg_s": 0.04528651544491939,
+      "tilt_velocity_deg_s": -0.012203842176475868,
+      "projected_error": [
+        0.07140388197879256,
+        -0.07056747866120602
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.1,
+      "pan_deg": 15.619115250148171,
+      "tilt_deg": -6.536146947778298,
+      "pan_velocity_deg_s": 0.043837203200560296,
+      "tilt_velocity_deg_s": -0.01177888051448562,
+      "projected_error": [
+        0.07135895329921749,
+        -0.07054771794392352
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.133333333333334,
+      "pan_deg": 15.620541330263544,
+      "tilt_deg": -6.536529294706324,
+      "pan_velocity_deg_s": 0.042434278491545484,
+      "tilt_velocity_deg_s": -0.01136869758085683,
+      "projected_error": [
+        0.07131546263323796,
+        -0.07052864443750971
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.166666666666667,
+      "pan_deg": 15.621921771312595,
+      "tilt_deg": -6.536898326393904,
+      "pan_velocity_deg_s": 0.041076256328630475,
+      "tilt_velocity_deg_s": -0.01097277986721986,
+      "projected_error": [
+        0.0712733639461875,
+        -0.07051023426382583
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.2,
+      "pan_deg": 15.623258034046094,
+      "tilt_deg": -6.537254505930456,
+      "pan_velocity_deg_s": 0.039761699278056326,
+      "tilt_velocity_deg_s": -0.010590631703831406,
+      "projected_error": [
+        0.07123261267761961,
+        -0.07049246437422833
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.233333333333333,
+      "pan_deg": 15.624551532452212,
+      "tilt_deg": -6.537598280314127,
+      "pan_velocity_deg_s": 0.03848921593756082,
+      "tilt_velocity_deg_s": -0.010221774639350199,
+      "projected_error": [
+        0.07119316569406421,
+        -0.07047531252072992
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.266666666666667,
+      "pan_deg": 15.625803635254055,
+      "tilt_deg": -6.53793008101077,
+      "pan_velocity_deg_s": 0.03725745946132091,
+      "tilt_velocity_deg_s": -0.009865746842248023,
+      "projected_error": [
+        0.07115498124330098,
+        -0.07045875722816457
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.3,
+      "pan_deg": 15.62701566735921,
+      "tilt_deg": -6.5382503244934975,
+      "pan_velocity_deg_s": 0.03606512613219027,
+      "tilt_velocity_deg_s": -0.009522102523119186,
+      "projected_error": [
+        0.07111801891009796,
+        -0.07044277776732523
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.333333333333333,
+      "pan_deg": 15.628188911262848,
+      "tilt_deg": -6.538559412763475,
+      "pan_velocity_deg_s": 0.034910953979775554,
+      "tilt_velocity_deg_s": -0.009190411377079375,
+      "projected_error": [
+        0.07108223957337301,
+        -0.07042735412903421
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.366666666666666,
+      "pan_deg": 15.629324608405845,
+      "tilt_deg": -6.5388577338526135,
+      "pan_velocity_deg_s": 0.033793721442816484,
+      "tilt_velocity_deg_s": -0.008870258045596073,
+      "projected_error": [
+        0.07104760536472743,
+        -0.07041246699912022
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.4,
+      "pan_deg": 15.6304239604894,
+      "tilt_deg": -6.539145662308798,
+      "pan_velocity_deg_s": 0.03271224607455292,
+      "tilt_velocity_deg_s": -0.008561241597078485,
+      "projected_error": [
+        0.0710140796283111,
+        -0.07039809773426416
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.433333333333334,
+      "pan_deg": 15.631488130747535,
+      "tilt_deg": -6.5394235596642325,
+      "pan_velocity_deg_s": 0.03166538328947157,
+      "tilt_velocity_deg_s": -0.008262975025540811,
+      "projected_error": [
+        0.07098162688197354,
+        -0.07038422833868763
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.466666666666667,
+      "pan_deg": 15.63251824517882,
+      "tilt_deg": -6.539691774887543,
+      "pan_velocity_deg_s": 0.030652025150421362,
+      "tilt_velocity_deg_s": -0.007975084766726762,
+      "projected_error": [
+        0.07095021277966303,
+        -0.07037084144165288
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.5,
+      "pan_deg": 15.633515393738628,
+      "tilt_deg": -6.539950644820136,
+      "pan_velocity_deg_s": 0.02967109919450962,
+      "tilt_velocity_deg_s": -0.007697210231081705,
+      "projected_error": [
+        0.07091980407502978,
+        -0.07035792027574546
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.533333333333333,
+      "pan_deg": 15.6344806314932,
+      "tilt_deg": -6.54020049459742,
+      "pan_velocity_deg_s": 0.028721567296720724,
+      "tilt_velocity_deg_s": -0.007429003352979141,
+      "projected_error": [
+        0.07089036858619836,
+        -0.07034544865591348
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.566666666666666,
+      "pan_deg": 15.635414979736751,
+      "tilt_deg": -6.540441638055385,
+      "pan_velocity_deg_s": 0.02780242456988792,
+      "tilt_velocity_deg_s": -0.007170128155616537,
+      "projected_error": [
+        0.07086187516166653,
+        -0.07033341095923622
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.6,
+      "pan_deg": 15.636319427072758,
+      "tilt_deg": -6.54067437812305,
+      "pan_velocity_deg_s": 0.026912698300047173,
+      "tilt_velocity_deg_s": -0.006920260331091675,
+      "projected_error": [
+        0.07083429364730141,
+        -0.07032179210539591
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.633333333333334,
+      "pan_deg": 15.637194930460643,
+      "tilt_deg": -6.540899007201294,
+      "pan_velocity_deg_s": 0.026051446915858766,
+      "tilt_velocity_deg_s": -0.006679086835056645,
+      "projected_error": [
+        0.07080759485439156,
+        -0.07031057753783013
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.666666666666667,
+      "pan_deg": 15.638042416228906,
+      "tilt_deg": -6.541115807528509,
+      "pan_velocity_deg_s": 0.025217758991073716,
+      "tilt_velocity_deg_s": -0.006446305495455551,
+      "projected_error": [
+        0.07078175052872346,
+        -0.07029975320553881
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.7,
+      "pan_deg": 15.638862781055817,
+      "tilt_deg": -6.541325051533563,
+      "pan_velocity_deg_s": 0.024410752279025612,
+      "tilt_velocity_deg_s": -0.0062216246349400504,
+      "projected_error": [
+        0.07075673332064988,
+        -0.07028930554552477
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.733333333333333,
+      "pan_deg": 15.639656892918687,
+      "tilt_deg": -6.5415270021765,
+      "pan_velocity_deg_s": 0.02362957277799431,
+      "tilt_velocity_deg_s": -0.006004762706332097,
+      "projected_error": [
+        0.07073251675611784,
+        -0.07027922146584466
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.766666666666667,
+      "pan_deg": 15.640425592012749,
+      "tilt_deg": -6.541721913277412,
+      "pan_velocity_deg_s": 0.022873393826601574,
+      "tilt_velocity_deg_s": -0.005795447940844708,
+      "projected_error": [
+        0.07070907520862468,
+        -0.07026948832924924
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.8,
+      "pan_deg": 15.641169691640588,
+      "tilt_deg": -6.541910029833878,
+      "pan_velocity_deg_s": 0.02214141522817414,
+      "tilt_velocity_deg_s": -0.005593418008433098,
+      "projected_error": [
+        0.07068638387207357,
+        -0.07026009393739203
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.833333333333333,
+      "pan_deg": 15.641889979073095,
+      "tilt_deg": -6.54209158832739,
+      "pan_velocity_deg_s": 0.021432862403199027,
+      "tilt_velocity_deg_s": -0.0053984196900669955,
+      "projected_error": [
+        0.07066441873449907,
+        -0.07025102651558811
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.866666666666666,
+      "pan_deg": 15.64258721638285,
+      "tilt_deg": -6.542266817019131,
+      "pan_velocity_deg_s": 0.02074698556885796,
+      "tilt_velocity_deg_s": -0.005210208561331106,
+      "projected_error": [
+        0.07064315655263466,
+        -0.07024227469810174
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.9,
+      "pan_deg": 15.643262141250807,
+      "tilt_deg": -6.542435936235485,
+      "pan_velocity_deg_s": 0.020083058945003042,
+      "tilt_velocity_deg_s": -0.005028548686996786,
+      "projected_error": [
+        0.07062257482729505,
+        -0.07023382751394532
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.933333333333334,
+      "pan_deg": 15.64391546774715,
+      "tilt_deg": -6.542599158643627,
+      "pan_velocity_deg_s": 0.019440379985410122,
+      "tilt_velocity_deg_s": -0.004853212326297229,
+      "projected_error": [
+        0.07060265177954775,
+        -0.07022567437317284
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 6.966666666666667,
+      "pan_deg": 15.644547887087137,
+      "tilt_deg": -6.542756689517555,
+      "pan_velocity_deg_s": 0.018818268633815208,
+      "tilt_velocity_deg_s": -0.004683979648352533,
+      "projected_error": [
+        0.07058336632764832,
+        -0.07021780505364854
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.0,
+      "pan_deg": 15.64516006836275,
+      "tilt_deg": -6.542908726994867,
+      "pan_velocity_deg_s": 0.018216066603700714,
+      "tilt_velocity_deg_s": -0.004520638457549466,
+      "projected_error": [
+        0.07056469806471471,
+        -0.07021020968827607
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.033333333333333,
+      "pan_deg": 15.645752659250899,
+      "tilt_deg": -6.5430554623246415,
+      "pan_velocity_deg_s": 0.01763313668118327,
+      "tilt_velocity_deg_s": -0.004362983928407675,
+      "projected_error": [
+        0.07054662723711662,
+        -0.0702028787526711
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.066666666666666,
+      "pan_deg": 15.646326286698956,
+      "tilt_deg": -6.543197080106696,
+      "pan_velocity_deg_s": 0.017068862050234078,
+      "tilt_velocity_deg_s": -0.004210818349729988,
+      "projected_error": [
+        0.07052913472355721,
+        -0.07019580305326231
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.1,
+      "pan_deg": 15.646881557588342,
+      "tilt_deg": -6.54333375852254,
+      "pan_velocity_deg_s": 0.0165226456395575,
+      "tilt_velocity_deg_s": -0.004063950877534207,
+      "projected_error": [
+        0.07051220201482623,
+        -0.07018897371580525
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.133333333333334,
+      "pan_deg": 15.647419059376851,
+      "tilt_deg": -6.5434656695583255,
+      "pan_velocity_deg_s": 0.015993909490334288,
+      "tilt_velocity_deg_s": -0.00392219729669719,
+      "projected_error": [
+        0.07049581119420043,
+        -0.07018238217429651
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.166666666666667,
+      "pan_deg": 15.647939360720418,
+      "tilt_deg": -6.543592979220032,
+      "pan_velocity_deg_s": 0.015482094144266663,
+      "tilt_velocity_deg_s": -0.003785379790780542,
+      "projected_error": [
+        0.07047994491847226,
+        -0.07017602016027134
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.2,
+      "pan_deg": 15.648443012074981,
+      "tilt_deg": -6.5437158477412,
+      "pan_velocity_deg_s": 0.014986658051198197,
+      "tilt_velocity_deg_s": -0.003653326719861855,
+      "projected_error": [
+        0.07046458639958722,
+        -0.07016987969247358
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.233333333333333,
+      "pan_deg": 15.648930546279054,
+      "tilt_deg": -6.54383442978344,
+      "pan_velocity_deg_s": 0.014507076995744978,
+      "tilt_velocity_deg_s": -0.003525872406139605,
+      "projected_error": [
+        0.07044971938686798,
+        -0.07016395306688535
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.266666666666667,
+      "pan_deg": 15.649402479117668,
+      "tilt_deg": -6.543948874629989,
+      "pan_velocity_deg_s": 0.014042843542236911,
+      "tilt_velocity_deg_s": -0.00340285692691326,
+      "projected_error": [
+        0.07043532814980924,
+        -0.07015823284710143
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.3,
+      "pan_deg": 15.649859309868235,
+      "tilt_deg": -6.544059326372543,
+      "pan_velocity_deg_s": 0.013593466497522876,
+      "tilt_velocity_deg_s": -0.003284125914805517,
+      "projected_error": [
+        0.07042139746142322,
+        -0.07015271185503856
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.333333333333333,
+      "pan_deg": 15.650301521828952,
+      "tilt_deg": -6.5441659240916,
+      "pan_velocity_deg_s": 0.013158470390918095,
+      "tilt_velocity_deg_s": -0.003169530364899249,
+      "projected_error": [
+        0.07040791258211841,
+        -0.07014738316196764
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.366666666666666,
+      "pan_deg": 15.65072958283028,
+      "tilt_deg": -6.544268802030551,
+      "pan_velocity_deg_s": 0.012737394970823641,
+      "tilt_velocity_deg_s": -0.0030589264485399756,
+      "projected_error": [
+        0.07039485924409541,
+        -0.07014224007985714
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.4,
+      "pan_deg": 15.65114394573004,
+      "tilt_deg": -6.544368089763718,
+      "pan_velocity_deg_s": 0.012329794717466558,
+      "tilt_velocity_deg_s": -0.0029521753336972946,
+      "projected_error": [
+        0.07038222363624146,
+        -0.07013727615301678
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.433333333333334,
+      "pan_deg": 15.65154504889267,
+      "tilt_deg": -6.544463912358558,
+      "pan_velocity_deg_s": 0.011935238371299508,
+      "tilt_velocity_deg_s": -0.0028491430114206164,
+      "projected_error": [
+        0.07036999238951022,
+        -0.07013248515003127
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.466666666666667,
+      "pan_deg": 15.651933316653134,
+      "tilt_deg": -6.5445563905322475,
+      "pan_velocity_deg_s": 0.01155330847639782,
+      "tilt_velocity_deg_s": -0.002749700128486467,
+      "projected_error": [
+        0.07035815256276831,
+        -0.07012786105597467
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.5,
+      "pan_deg": 15.652309159765974,
+      "tilt_deg": -6.544645640802819,
+      "pan_velocity_deg_s": 0.011183600938609541,
+      "tilt_velocity_deg_s": -0.0026537218256968967,
+      "projected_error": [
+        0.07034669162909682,
+        -0.07012339806489502
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.533333333333333,
+      "pan_deg": 15.65267297583999,
+      "tilt_deg": -6.544731775635054,
+      "pan_velocity_deg_s": 0.010825724597717998,
+      "tilt_velocity_deg_s": -0.002561087581903586,
+      "projected_error": [
+        0.07033559746252917,
+        -0.07011909057255836
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.566666666666666,
+      "pan_deg": 15.653025149759001,
+      "tilt_deg": -6.54481490358131,
+      "pan_velocity_deg_s": 0.010479300813458438,
+      "tilt_velocity_deg_s": -0.0024716810633756553,
+      "projected_error": [
+        0.07032485832521711,
+        -0.07011493316944706
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.6,
+      "pan_deg": 15.65336605408915,
+      "tilt_deg": -6.544895129417461,
+      "pan_velocity_deg_s": 0.010143963064640674,
+      "tilt_velocity_deg_s": -0.0023853899784792277,
+      "projected_error": [
+        0.07031446285500378,
+        -0.07011092063399942
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.633333333333334,
+      "pan_deg": 15.653696049473133,
+      "tilt_deg": -6.5449725542741195,
+      "pan_velocity_deg_s": 0.009819356561237594,
+      "tilt_velocity_deg_s": -0.0023021059372933107,
+      "projected_error": [
+        0.07030440005339837,
+        -0.0701070479260841
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.666666666666667,
+      "pan_deg": 15.654015485011861,
+      "tilt_deg": -6.545047275763297,
+      "pan_velocity_deg_s": 0.009505137868813296,
+      "tilt_velocity_deg_s": -0.002221724316170941,
+      "projected_error": [
+        0.07029465927393325,
+        -0.07010331018070211
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.7,
+      "pan_deg": 15.654324698633847,
+      "tilt_deg": -6.545119388100672,
+      "pan_velocity_deg_s": 0.009200974545009634,
+      "tilt_velocity_deg_s": -0.002144144127006249,
+      "projected_error": [
+        0.0702852302108954,
+        -0.07009970270190577
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.733333333333333,
+      "pan_deg": 15.654624017452816,
+      "tilt_deg": -6.545188982223611,
+      "pan_velocity_deg_s": 0.008906544787686124,
+      "tilt_velocity_deg_s": -0.002069267890975833,
+      "projected_error": [
+        0.07027610288841822,
+        -0.07009622095693045
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.766666666666667,
+      "pan_deg": 15.654913758113842,
+      "tilt_deg": -6.545256145905095,
+      "pan_velocity_deg_s": 0.008621537094272158,
+      "tilt_velocity_deg_s": -0.001997001516744315,
+      "projected_error": [
+        0.07026726764992246,
+        -0.0700928605705288
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.8,
+      "pan_deg": 15.655194227128405,
+      "tilt_deg": -6.545320963863683,
+      "pan_velocity_deg_s": 0.008345649932106894,
+      "tilt_velocity_deg_s": -0.001927254182830533,
+      "projected_error": [
+        0.07025871514789536,
+        -0.07008961731950165
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.833333333333333,
+      "pan_deg": 15.655465721198725,
+      "tilt_deg": -6.545383517869668,
+      "pan_velocity_deg_s": 0.008078591419272052,
+      "tilt_velocity_deg_s": -0.0018599382240779916,
+      "projected_error": [
+        0.07025043633399759,
+        -0.07008648712741959
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.866666666666666,
+      "pan_deg": 15.655728527531723,
+      "tilt_deg": -6.545443886847539,
+      "pan_velocity_deg_s": 0.007820079015684905,
+      "tilt_velocity_deg_s": -0.0017949690220833076,
+      "projected_error": [
+        0.07024242244948628,
+        -0.07008346605952692
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.9,
+      "pan_deg": 15.655982924142918,
+      "tilt_deg": -6.54550214697489,
+      "pan_velocity_deg_s": 0.007569839224032842,
+      "tilt_velocity_deg_s": -0.0017322648994134442,
+      "projected_error": [
+        0.07023466501594516,
+        -0.07008055031782272
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.933333333333334,
+      "pan_deg": 15.656229180150607,
+      "tilt_deg": -6.545558371777894,
+      "pan_velocity_deg_s": 0.00732760730034897,
+      "tilt_velocity_deg_s": -0.0016717470174729522,
+      "projected_error": [
+        0.07022715582631082,
+        -0.07007773623631236
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 7.966666666666667,
+      "pan_deg": 15.65646755606062,
+      "tilt_deg": -6.545612632223455,
+      "pan_velocity_deg_s": 0.007093126973798989,
+      "tilt_velocity_deg_s": -0.0016133392779460107,
+      "projected_error": [
+        0.07021988693618778,
+        -0.07007502027642451
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    },
+    {
+      "time": 8.0,
+      "pan_deg": 15.656698304041965,
+      "tilt_deg": -6.545664996808177,
+      "pan_velocity_deg_s": 0.006866150175461758,
+      "tilt_velocity_deg_s": -0.0015569682276718024,
+      "projected_error": [
+        0.07021285065543938,
+        -0.07007239902258662
+      ],
+      "reason": "TRACKING",
+      "visible": true
+    }
+  ],
+  "limitations": "Synthetic geometry only; no UGREEN calibration or real servo/motor performance is established"
+}
