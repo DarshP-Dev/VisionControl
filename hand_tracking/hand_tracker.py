@@ -46,6 +46,7 @@ from .tracking_utils import (
 
 LOGGER = logging.getLogger("hand_tracking")
 WINDOW = "VisionControl - Hand Tracking"
+REFRAME_WINDOW = "VisionControl - Digital Auto-Frame"
 
 
 def positive_int(value):
@@ -98,6 +99,13 @@ def parse_args(argv=None):
     parser.add_argument("--face-centering-activation", type=float, default=.12, help="normalized half-frame activation threshold for both axes (default .12)")
     parser.add_argument("--face-centering-deactivation", type=float, default=.07, help="normalized half-frame deactivation threshold for both axes (default .07)")
     parser.add_argument("--face-centering-debug", action="store_true", help="requires --face-centering; draw inner and outer dead-zone boundaries")
+    parser.add_argument("--digital-reframe", action="store_true", help="output-only following crop; implies face centering/tracking/detection")
+    parser.add_argument("--reframe-preview", action=argparse.BooleanOptionalAction, default=True, help="secondary crop window when reframing is enabled; --no-reframe-preview calculates only")
+    parser.add_argument("--reframe-scale", type=positive_float, default=2/3, help="source width/height fraction in (0,1], default 2/3")
+    parser.add_argument("--reframe-follow-tau", type=float, default=.2, help="viewport response seconds, 0 bypasses EMA; speed limit still applies")
+    parser.add_argument("--reframe-max-speed", type=positive_float, default=600., help="Euclidean source pixels/second (default 600)")
+    parser.add_argument("--reframe-dead-zone", type=positive_float, default=.10, help="crop half-size activation fraction; deactivation is 60% of this (default .10)")
+    parser.add_argument("--reframe-debug", action="store_true", help="requires --digital-reframe; outline crop on original preview")
     parser.add_argument("--inference-resolution", type=inference_resolution, default=None,
                         help="full (default), 1280x720, 960x540, 640x360 or WIDTHxHEIGHT bounds; "
                              "preserves aspect ratio, never upscales")
@@ -167,6 +175,13 @@ def parse_args(argv=None):
     parser.add_argument("--swipe-pose", choices=("open-palm", "open-palm-or-fist", "pointing"), default=None)
     control_cli.add_arguments(parser)
     args = parser.parse_args(argv)
+    args.face_centering = args.face_centering or args.digital_reframe
+    if args.reframe_scale > 1 or args.reframe_dead_zone > 1:
+        parser.error("--reframe-scale and --reframe-dead-zone must be within (0,1]")
+    if not math.isfinite(args.reframe_follow_tau) or args.reframe_follow_tau < 0:
+        parser.error("--reframe-follow-tau must be finite and nonnegative")
+    if args.reframe_debug and not args.digital_reframe:
+        parser.error("--reframe-debug requires --digital-reframe")
     args.face_tracking = args.face_tracking or args.face_centering
     args.face_detection = args.face_detection or args.face_only or args.face_tracking
     if (not all(math.isfinite(v) for v in (args.face_centering_activation, args.face_centering_deactivation))
@@ -263,7 +278,7 @@ def create_landmarker(model_path, max_hands=2):
 
 
 def process_frames(cap, landmarker, mp, args=None, report=None, controller=None, *,
-                   preview_window=None, profile_enabled=None, capture_source=None, face_detector=None):
+                   preview_window=None, profile_enabled=None, capture_source=None, face_detector=None, reframe_window=None):
     args = args if args is not None else parse_args([])
     if args.face_detection != (face_detector is not None):
         raise ValueError("Enabled face detection requires its owning detector; disabled mode cannot run one")
@@ -279,7 +294,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             configured_controller = control_cli.create_controller(args, resources)
             return process_frames(cap, landmarker, mp, args, report, configured_controller,
                                   preview_window=preview_window, profile_enabled=profile_enabled, capture_source=capture_source,
-                                  face_detector=face_detector)
+                                  face_detector=face_detector, reframe_window=reframe_window)
     start = time.perf_counter()
     timestamps = FrameTimestamp(start)
     captured_timestamps = CaptureTimestamp(capture_source.origin) if capture_source is not None else None
@@ -324,6 +339,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
     face_tracker = None
     face_centering = None
     expired_centering_previews = 0
+    reframer = reframe_renderer = auxiliary = None
+    auxiliary_closed = False
+    auxiliary_states = Counter()
+    auxiliary_rendered = auxiliary_skipped = 0
     if face_detector is not None:
         from face_tracking.face_models import FaceFrame
         from face_tracking.preview import draw_faces
@@ -337,6 +356,16 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 from face_tracking.centering_preview import draw_centering
                 zone = DeadZone(args.face_centering_activation, args.face_centering_deactivation)
                 face_centering = FaceCentering(CenteringConfig(horizontal=zone, vertical=zone))
+                if args.digital_reframe:
+                    from face_tracking.digital_reframing import DigitalReframer, ReframeConfig
+                    reframer = DigitalReframer(ReframeConfig(scale=args.reframe_scale, follow_tau=args.reframe_follow_tau,
+                        max_speed=args.reframe_max_speed, horizontal=DeadZone(args.reframe_dead_zone,args.reframe_dead_zone*.6),
+                        vertical=DeadZone(args.reframe_dead_zone,args.reframe_dead_zone*.6)))
+                    if not args.headless and (args.reframe_preview or args.reframe_debug):
+                        from face_tracking.reframing_preview import ReframeRenderer, draw_viewport
+                        if args.reframe_preview:
+                            auxiliary = reframe_window or PreviewWindow(REFRAME_WINDOW)
+                            reframe_renderer = ReframeRenderer()
     gesture_counts = Counter()
     gesture_image_size = None
     gesture_debug = GestureDebug() if args.gesture_debug else None
@@ -359,6 +388,18 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
     previous_frame_end = start
     warmup_origin = start if capture_source is None else None
     last_polled_state = "headless" if args.headless else "visible_unknown"
+    def auxiliary_state():
+        nonlocal auxiliary, reframe_renderer, auxiliary_closed
+        if auxiliary is None:
+            return "closed" if auxiliary_closed else "headless" if args.headless else "disabled"
+        state = auxiliary.state()
+        if state == "closed":
+            auxiliary_closed = True
+            auxiliary = None
+            reframe_renderer.close()
+            reframe_renderer = None
+        return state
+
     def poll_capture_wait(stage="capture_wait_gui"):
         nonlocal show_help, status, last_polled_state
         if window is None:
@@ -366,6 +407,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
         before = time.perf_counter()
         waiting_key = gui.read_key()
         state = window.state()
+        if auxiliary is not None:
+            auxiliary_state()
         last_polled_state = state
         if profiling:
             timeline.record(state=state, main_cpu=time.thread_time())
@@ -556,6 +599,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 timings.add(gui.api, after_events - before_events)
                 timings.add("gui_events", after_events - before_events)
                 preview_state = window.state()
+                if auxiliary is not None:
+                    auxiliary_state()
                 if profiling:
                     timeline.record(state=preview_state, timings={"gui_events": after_events-before_events})
                 timings.add("preview_state", time.perf_counter() - after_events)
@@ -582,6 +627,7 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
             face_observation = None
             face_tracks = None
             centering_result = None
+            viewport = None
             render_state = preview_state
             if face_detector is not None:
                 before_face = time.perf_counter()
@@ -603,6 +649,9 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                                                        now=time.perf_counter(), profile=timings)
                     if face_centering is not None:
                         centering_result = face_centering.update(face_tracks, now=time.perf_counter(), profile=timings)
+                        if reframer is not None:
+                            viewport = reframer.update(centering_result, source_size=(frame.shape[1],frame.shape[0]),
+                                                       now=time.perf_counter(), profile=timings)
                 if poll_capture_wait("face_gui_events"):
                     return 0
                 render_state = last_polled_state
@@ -644,6 +693,10 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                         expired_centering_previews += int(draw_centering(preview, centering_result, now=before_centering_overlay,
                             config=face_centering.config, debug=args.face_centering_debug))
                         timings.add("face_centering_overlay", time.perf_counter()-before_centering_overlay)
+                if viewport is not None and args.reframe_debug:
+                    before_crop_outline = time.perf_counter()
+                    draw_viewport(preview,viewport)
+                    timings.add("reframe_debug_overlay",time.perf_counter()-before_crop_outline)
                 before_display = time.perf_counter()
                 timings.add("preview_rendering", before_display - before_preview)
                 if profiling:
@@ -658,6 +711,22 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                     if measuring:
                         skipped_previews += 1
                     timings.add("gui_total", after_events - before_events)
+            if reframer is not None and not args.headless:
+                crop_state = auxiliary_state()
+                auxiliary_states[crop_state] += 1
+                if auxiliary is not None and auxiliary.should_render(crop_state):
+                    before_crop_preview = time.perf_counter()
+                    cropped_preview = reframe_renderer.render(frame,viewport,now=before_crop_preview,profile=timings)
+                    before_crop_display = time.perf_counter()
+                    cv2.imshow(REFRAME_WINDOW,cropped_preview)
+                    end = time.perf_counter()
+                    timings.add("reframe_imshow",end-before_crop_display)
+                    timings.add("reframe_preview_total",end-before_crop_preview)
+                    auxiliary_rendered += 1
+                    del cropped_preview
+                else:
+                    auxiliary_skipped += 1
+                    end = time.perf_counter()
             timings.add("processing", end - after_read)
             timings.add("end_to_end", end - before_read)
             timings.add("frame_interval", end - previous_frame_end)
@@ -727,6 +796,8 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
         if controller is not None:
             controller.move_observer = None
             controller.disarm("Tracking shutdown")
+        if reframe_renderer is not None:
+            reframe_renderer.close()
         timeline.finish()
         cpu_end = time.process_time()
         cpu_wall_seconds = (max(0.0, time.perf_counter() - measurement_start)
@@ -768,6 +839,11 @@ def process_frames(cap, landmarker, mp, args=None, report=None, controller=None,
                 "face_tracking": face_tracker.metadata() if face_tracker is not None else {"enabled": False},
                 "face_centering": {**face_centering.metadata(), "preview_freshness_suppressions": expired_centering_previews}
                                   if face_centering is not None else {"enabled": False},
+                "digital_reframing": {**reframer.metadata(), "secondary_preview": {
+                    "requested": args.reframe_preview and not args.headless, "closed": auxiliary_closed,
+                    "rendered_frames": auxiliary_rendered, "skipped_frames": auxiliary_skipped,
+                    "frames_by_state": dict(auxiliary_states), "close_policy": "disable auxiliary preview only"}}
+                    if reframer is not None else {"enabled": False},
                 "face_detection": {"enabled": face_detector is not None,
                     "mode": "face_only" if args.face_only else "combined" if face_detector is not None else "disabled",
                     "observed_face_count_frames": dict(face_counts) if face_counts is not None else {},
@@ -964,13 +1040,20 @@ def run(args, report=None):
                 cv2.namedWindow(WINDOW, cv2.WINDOW_AUTOSIZE)
                 resources.callback(cv2.destroyAllWindows)
                 options_window = create_preview_window(WINDOW)
+                if args.digital_reframe and args.reframe_preview:
+                    cv2.namedWindow(REFRAME_WINDOW, cv2.WINDOW_AUTOSIZE)
+                    options_reframe_window = create_preview_window(REFRAME_WINDOW)
+                else:
+                    options_reframe_window = None
             else:
                 options_window = None
+                options_reframe_window = None
             options = {"controller": controller} if controller is not None else {}
             return process_frames(cap, landmarker, mp, args=args, report=report,
                                   preview_window=options_window,
                                   profile_enabled=bool(args.benchmark or args.report or args.performance_profile),
                                   capture_source=capture_source, **options,
+                                  **({"reframe_window": options_reframe_window} if options_reframe_window is not None else {}),
                                   **({"face_detector": face_detector} if face_detector is not None else {}))
     except CaptureError as exc:
         report.update(status="error", error=str(exc))

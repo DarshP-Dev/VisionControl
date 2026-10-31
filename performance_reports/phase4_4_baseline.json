@@ -1,0 +1,4075 @@
+{
+  "phase": "4.3",
+  "kind": "synthetic_host_only",
+  "created_utc": "2026-10-31T05:28:12.014896+00:00",
+  "python": "3.13.16",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "limitations": "No neural inference, capture, HighGUI or input. Two-hand host is EMA/static classification. Timings include opt-in profiling. Synthetic observation ages are zero; these are not sensor ages. Working sets share a process and allocator.",
+  "source_sha256": {
+    "centering.py": "8d07287bb6105433d215a5fb0b65b18ff930da4ddd8c265a7306b508bd402505",
+    "centering_geometry.py": "0e3af1579f209e924db1f17db6e938925472741ed606e3723af7cc23c26e7010",
+    "centering_preview.py": "f30c73977f90d87f53d9d4ea231a1e19a8963a7c4b8f16b628b79a0851f56814",
+    "benchmark_centering.py": "6df4cf1e179d4c44877ac3c6575caa92e1b465adc0977110fb3db810282adf97",
+    "face_tracker.py": "ce62c89b7794c8bd62c24ea5633b7f1e2db35890cff780c92ee86ec844b8f679"
+  },
+  "cases": [
+    {
+      "repeat": 0,
+      "faces": 1,
+      "hands": 0,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.016146300302352756,
+          "max_ms": 0.5603000026894733,
+          "p50_ms": 0.01340000017080456,
+          "p95_ms": 0.021705005201511078,
+          "p99_ms": 0.04673699178965759
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.016252600340521894,
+          "max_ms": 1.0310000070603564,
+          "p50_ms": 0.012199991033412516,
+          "p95_ms": 0.020799998310394585,
+          "p99_ms": 0.16033299820264799
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.06148870017204899,
+          "max_ms": 1.0802000033436343,
+          "p50_ms": 0.05129999772179872,
+          "p95_ms": 0.08270000398624688,
+          "p99_ms": 0.24592900808784157
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00013310002395883203,
+          "max_ms": 0.000700005330145359,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.08258180001575965,
+          "max_ms": 1.1052999907406047,
+          "p50_ms": 0.07059999916236848,
+          "p95_ms": 0.11572499352041629,
+          "p99_ms": 0.3083750039513687
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.08280920005927328,
+          "max_ms": 1.1055999930249527,
+          "p50_ms": 0.07080000068526715,
+          "p95_ms": 0.11611999652814117,
+          "p99_ms": 0.30867300607496856
+        }
+      },
+      "synthetic_host_iterations_per_second": 11831.687149946349,
+      "resources": {
+        "process_cpu_seconds": 0.09375,
+        "process_wall_seconds": 0.08451880000939127,
+        "process_cpu_percent_of_one_core": 110.92206703074702,
+        "process_cpu_ms_per_frame": 0.09375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 48095232,
+        "peak_working_set_bytes_process_lifetime": 48095232
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 0,
+      "faces": 1,
+      "hands": 0,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.017382799967890605,
+          "max_ms": 0.7549000001745299,
+          "p50_ms": 0.01410000550094992,
+          "p95_ms": 0.021900006686337292,
+          "p99_ms": 0.03371799466549417
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.017117500101448968,
+          "max_ms": 0.7462999928975478,
+          "p50_ms": 0.012499993317760527,
+          "p95_ms": 0.02099999983329326,
+          "p99_ms": 0.1682359987171365
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.06338080014393199,
+          "max_ms": 0.8473000052617863,
+          "p50_ms": 0.05299999611452222,
+          "p95_ms": 0.08690499307704157,
+          "p99_ms": 0.2850410019163973
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04304039981798269,
+          "max_ms": 0.7975999906193465,
+          "p50_ms": 0.03819999983534217,
+          "p95_ms": 0.05822999228257683,
+          "p99_ms": 0.09220198917319067
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00014560010458808392,
+          "max_ms": 0.0006999907782301307,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.08467949992336798,
+          "max_ms": 0.8718000026419759,
+          "p50_ms": 0.07294999522855505,
+          "p95_ms": 0.11873500116053033,
+          "p99_ms": 0.3086380060994996
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.13130430033197626,
+          "max_ms": 0.9491999953752384,
+          "p50_ms": 0.1142999972216785,
+          "p95_ms": 0.19492499995976684,
+          "p99_ms": 0.4332830097700934
+        }
+      },
+      "synthetic_host_iterations_per_second": 7516.813232425401,
+      "resources": {
+        "process_cpu_seconds": 0.140625,
+        "process_wall_seconds": 0.13303509999241214,
+        "process_cpu_percent_of_one_core": 105.7051860809822,
+        "process_cpu_ms_per_frame": 0.140625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 48472064,
+        "peak_working_set_bytes_process_lifetime": 48472064
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 0,
+      "faces": 1,
+      "hands": 2,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.02319310011807829,
+          "max_ms": 0.8869000012055039,
+          "p50_ms": 0.01930000144056976,
+          "p95_ms": 0.03930500752176158,
+          "p99_ms": 0.061018998821964474
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.014771900197956711,
+          "max_ms": 0.03999999898951501,
+          "p50_ms": 0.013200013199821115,
+          "p95_ms": 0.023900007363408804,
+          "p99_ms": 0.02890500181820243
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0753373999032192,
+          "max_ms": 0.9879999997792765,
+          "p50_ms": 0.06380000559147447,
+          "p95_ms": 0.12289999067434111,
+          "p99_ms": 0.17658000433584659
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7035141000087606,
+          "max_ms": 2.2212999901967123,
+          "p50_ms": 0.6192500004544854,
+          "p95_ms": 1.2188150067231613,
+          "p99_ms": 1.7816970028798096
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.10607060007168911,
+          "max_ms": 1.0593999904813245,
+          "p50_ms": 0.08969999908003956,
+          "p95_ms": 0.1742250024108216,
+          "p99_ms": 0.27318399865180243
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.8097023000009358,
+          "max_ms": 2.488599988282658,
+          "p50_ms": 0.712349996319972,
+          "p95_ms": 1.4502299949526782,
+          "p99_ms": 1.9465299916919319
+        }
+      },
+      "synthetic_host_iterations_per_second": 1231.236721868836,
+      "resources": {
+        "process_cpu_seconds": 0.765625,
+        "process_wall_seconds": 0.8121915000083391,
+        "process_cpu_percent_of_one_core": 94.26656151808275,
+        "process_cpu_ms_per_frame": 0.765625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 50388992,
+        "peak_working_set_bytes_process_lifetime": 50388992
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 0,
+      "faces": 1,
+      "hands": 2,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.01978699966275599,
+          "max_ms": 0.12430000060703605,
+          "p50_ms": 0.018000006093643606,
+          "p95_ms": 0.028214996564201997,
+          "p99_ms": 0.04062200358021071
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0140769998106407,
+          "max_ms": 0.09840000711847097,
+          "p50_ms": 0.01309999788645655,
+          "p95_ms": 0.019805004558293142,
+          "p99_ms": 0.029322990303626263
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.06590149969269987,
+          "max_ms": 0.30139999580569565,
+          "p50_ms": 0.060699996538460255,
+          "p95_ms": 0.09236000405508088,
+          "p99_ms": 0.12283998919883739
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04688319988781586,
+          "max_ms": 0.8420000085607171,
+          "p50_ms": 0.04230000195093453,
+          "p95_ms": 0.06421500802389345,
+          "p99_ms": 0.11064599806559268
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.6413745000609197,
+          "max_ms": 1.7336000018985942,
+          "p50_ms": 0.5935499939369038,
+          "p95_ms": 0.8981700077129054,
+          "p99_ms": 1.2708790139004122
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0927234995906474,
+          "max_ms": 0.4322000022511929,
+          "p50_ms": 0.08490000618621707,
+          "p95_ms": 0.13290499337017536,
+          "p99_ms": 0.17000799925881438
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7845362998632481,
+          "max_ms": 1.9287999894004315,
+          "p50_ms": 0.7320500008063391,
+          "p95_ms": 1.1613899943768045,
+          "p99_ms": 1.4925799988850483
+        }
+      },
+      "synthetic_host_iterations_per_second": 1271.307430355649,
+      "resources": {
+        "process_cpu_seconds": 0.78125,
+        "process_wall_seconds": 0.7865918000024976,
+        "process_cpu_percent_of_one_core": 99.3208929965351,
+        "process_cpu_ms_per_frame": 0.78125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51159040,
+        "peak_working_set_bytes_process_lifetime": 51159040
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 0,
+      "faces": 2,
+      "hands": 0,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05941300005360972,
+          "max_ms": 15.802300011273474,
+          "p50_ms": 0.03060000017285347,
+          "p95_ms": 0.07064499877742479,
+          "p99_ms": 0.40450900662108286
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.02800549981475342,
+          "max_ms": 0.3614999877754599,
+          "p50_ms": 0.024200009647756815,
+          "p95_ms": 0.04231000202707945,
+          "p99_ms": 0.06267299570026792
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.13294259989925195,
+          "max_ms": 15.990400002920069,
+          "p50_ms": 0.09669999417383224,
+          "p95_ms": 0.20373000807012429,
+          "p99_ms": 0.47540299347019715
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00014789984561502934,
+          "max_ms": 0.0009999930625781417,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.16991510007937904,
+          "max_ms": 16.032400002586655,
+          "p50_ms": 0.1294999965466559,
+          "p95_ms": 0.27070999567513354,
+          "p99_ms": 0.5529979892889967
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.17016799983684905,
+          "max_ms": 16.032799991080537,
+          "p50_ms": 0.1297999988310039,
+          "p95_ms": 0.27110999799333513,
+          "p99_ms": 0.5532979915733447
+        }
+      },
+      "synthetic_host_iterations_per_second": 5817.704554669243,
+      "resources": {
+        "process_cpu_seconds": 0.171875,
+        "process_wall_seconds": 0.17188910000550095,
+        "process_cpu_percent_of_one_core": 99.99179703337762,
+        "process_cpu_ms_per_frame": 0.171875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51171328,
+        "peak_working_set_bytes_process_lifetime": 51171328
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 0,
+      "faces": 2,
+      "hands": 0,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04282360021898057,
+          "max_ms": 0.6671000010101125,
+          "p50_ms": 0.031799994758330286,
+          "p95_ms": 0.06301499961409716,
+          "p99_ms": 0.3199380048317833
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.031716399811557494,
+          "max_ms": 1.1777000036090612,
+          "p50_ms": 0.024600012693554163,
+          "p95_ms": 0.04159999734838493,
+          "p99_ms": 0.07565700128907252
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.12096049996034708,
+          "max_ms": 1.2738999939756468,
+          "p50_ms": 0.0985000078799203,
+          "p95_ms": 0.214885002787923,
+          "p99_ms": 0.5055560065375174
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04379119962686673,
+          "max_ms": 0.23039999359752983,
+          "p50_ms": 0.03959999594371766,
+          "p95_ms": 0.0647099979687482,
+          "p99_ms": 0.10819899383932342
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00015850002819206566,
+          "max_ms": 0.0022000021999701858,
+          "p50_ms": 0.00019998697098344564,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000400003045797348
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.15733670006738976,
+          "max_ms": 1.3227000017650425,
+          "p50_ms": 0.13240000407677144,
+          "p95_ms": 0.2901449945056807,
+          "p99_ms": 0.5569660059700253
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.20441199981723912,
+          "max_ms": 1.403400005074218,
+          "p50_ms": 0.17585000023245811,
+          "p95_ms": 0.37893500048085066,
+          "p99_ms": 0.6068600052094549
+        }
+      },
+      "synthetic_host_iterations_per_second": 4848.966806578011,
+      "resources": {
+        "process_cpu_seconds": 0.203125,
+        "process_wall_seconds": 0.20622949999233242,
+        "process_cpu_percent_of_one_core": 98.49463825861584,
+        "process_cpu_ms_per_frame": 0.203125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51171328,
+        "peak_working_set_bytes_process_lifetime": 51171328
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 0,
+      "faces": 2,
+      "hands": 2,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.040927599955466576,
+          "max_ms": 0.8520999981556088,
+          "p50_ms": 0.03599999763537198,
+          "p95_ms": 0.055204998352564864,
+          "p99_ms": 0.09581000107573336
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.028906600462505594,
+          "max_ms": 0.9528999944450334,
+          "p50_ms": 0.02510000194888562,
+          "p95_ms": 0.037709996104240404,
+          "p99_ms": 0.04853300546528769
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.12020499973732512,
+          "max_ms": 1.0833999986061826,
+          "p50_ms": 0.10649999603629112,
+          "p95_ms": 0.1625050004804507,
+          "p99_ms": 0.36536800209432835
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.6723022000078345,
+          "max_ms": 1.91939999058377,
+          "p50_ms": 0.6071500029065646,
+          "p95_ms": 0.9958849994291084,
+          "p99_ms": 1.5547909907763822
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.1623028001486091,
+          "max_ms": 1.12749999971129,
+          "p50_ms": 0.14379999629454687,
+          "p95_ms": 0.22408998920582227,
+          "p99_ms": 0.5108370019297578
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.8347204002784565,
+          "max_ms": 2.189499995438382,
+          "p50_ms": 0.7611999899381772,
+          "p95_ms": 1.2639699983992605,
+          "p99_ms": 1.7616639967309309
+        }
+      },
+      "synthetic_host_iterations_per_second": 1195.0453896124545,
+      "resources": {
+        "process_cpu_seconds": 0.8125,
+        "process_wall_seconds": 0.8367883000028087,
+        "process_cpu_percent_of_one_core": 97.09743790601193,
+        "process_cpu_ms_per_frame": 0.8125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51183616,
+        "peak_working_set_bytes_process_lifetime": 51183616
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 0,
+      "faces": 2,
+      "hands": 2,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04130569996777922,
+          "max_ms": 0.7707000040682033,
+          "p50_ms": 0.036600002204068005,
+          "p95_ms": 0.05770500210928731,
+          "p99_ms": 0.0926260065170936
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.028051099681761116,
+          "max_ms": 0.6454999966081232,
+          "p50_ms": 0.02520000998629257,
+          "p95_ms": 0.036124998587183633,
+          "p99_ms": 0.05300799617543816
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.11958059968310408,
+          "max_ms": 0.9725999989314005,
+          "p50_ms": 0.1079499998013489,
+          "p95_ms": 0.16434999924967994,
+          "p99_ms": 0.2455149899469686
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04937339983007405,
+          "max_ms": 0.8377000049222261,
+          "p50_ms": 0.04329999501351267,
+          "p95_ms": 0.06521000177599488,
+          "p99_ms": 0.10414399235742162
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.6896552998805419,
+          "max_ms": 13.500100001692772,
+          "p50_ms": 0.6063500040909275,
+          "p95_ms": 1.056574993708636,
+          "p99_ms": 1.696111006604042
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.15994350012624636,
+          "max_ms": 1.013699991744943,
+          "p50_ms": 0.14560000272467732,
+          "p95_ms": 0.22009998865542002,
+          "p99_ms": 0.3374790080124512
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.9025503999146167,
+          "max_ms": 13.758300003246404,
+          "p50_ms": 0.8095500015770085,
+          "p95_ms": 1.5071999943756962,
+          "p99_ms": 1.9691140051872935
+        }
+      },
+      "synthetic_host_iterations_per_second": 1104.4252885470946,
+      "resources": {
+        "process_cpu_seconds": 0.84375,
+        "process_wall_seconds": 0.9054483000072651,
+        "process_cpu_percent_of_one_core": 93.1858837211611,
+        "process_cpu_ms_per_frame": 0.84375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51200000,
+        "peak_working_set_bytes_process_lifetime": 51200000
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 0,
+      "faces": 4,
+      "hands": 0,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.15235500027483795,
+          "max_ms": 1.5806000010343269,
+          "p50_ms": 0.10579999070614576,
+          "p95_ms": 0.5771450130851008,
+          "p99_ms": 1.0629969873116352
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05580080091021955,
+          "max_ms": 1.139200001489371,
+          "p50_ms": 0.04650000482797623,
+          "p95_ms": 0.06496501373476343,
+          "p99_ms": 0.2244620061537716
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.2846593000431312,
+          "max_ms": 1.7234000115422532,
+          "p50_ms": 0.2241000038338825,
+          "p95_ms": 0.7532150004408321,
+          "p99_ms": 1.2197010032832623
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.000147900078445673,
+          "max_ms": 0.001100008375942707,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.0003010021464433512
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.348866199987242,
+          "max_ms": 2.288299991050735,
+          "p50_ms": 0.280100000964012,
+          "p95_ms": 0.8596349944127719,
+          "p99_ms": 1.335488996555796
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.3491233001113869,
+          "max_ms": 2.288599993335083,
+          "p50_ms": 0.28030000248691067,
+          "p95_ms": 0.859839995973743,
+          "p99_ms": 1.335691998101538
+        }
+      },
+      "synthetic_host_iterations_per_second": 2849.8919179238774,
+      "resources": {
+        "process_cpu_seconds": 0.3125,
+        "process_wall_seconds": 0.3508904999907827,
+        "process_cpu_percent_of_one_core": 89.05912243512117,
+        "process_cpu_ms_per_frame": 0.3125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51306496,
+        "peak_working_set_bytes_process_lifetime": 51306496
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 0,
+      "faces": 4,
+      "hands": 0,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.14658869999402668,
+          "max_ms": 1.570199994603172,
+          "p50_ms": 0.10489999840501696,
+          "p95_ms": 0.536539994209306,
+          "p99_ms": 0.9018259975709951
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05787799970130436,
+          "max_ms": 0.8245000062743202,
+          "p50_ms": 0.046299988753162324,
+          "p95_ms": 0.06548497476615003,
+          "p99_ms": 0.5469769875344354
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.2807664998981636,
+          "max_ms": 1.71050000062678,
+          "p50_ms": 0.22270000772550702,
+          "p95_ms": 0.7291199923201929,
+          "p99_ms": 1.0949589950905643
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04380120043060742,
+          "max_ms": 0.8145000028889626,
+          "p50_ms": 0.03989999822806567,
+          "p95_ms": 0.05272000780678352,
+          "p99_ms": 0.08430500165559351
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00015359999088104814,
+          "max_ms": 0.000600004568696022,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000400003045797348
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.34025080043647904,
+          "max_ms": 1.76830000418704,
+          "p50_ms": 0.27779999072663486,
+          "p95_ms": 0.807485005498165,
+          "p99_ms": 1.1674600093101613
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.3872612998384284,
+          "max_ms": 1.8247999978484586,
+          "p50_ms": 0.3216499972040765,
+          "p95_ms": 0.8674099932250094,
+          "p99_ms": 1.231916003453079
+        }
+      },
+      "synthetic_host_iterations_per_second": 2570.3425649243854,
+      "resources": {
+        "process_cpu_seconds": 0.390625,
+        "process_wall_seconds": 0.38905320000776555,
+        "process_cpu_percent_of_one_core": 100.4040064423588,
+        "process_cpu_ms_per_frame": 0.390625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 0,
+      "faces": 4,
+      "hands": 2,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.12531089990807232,
+          "max_ms": 1.1110999912489206,
+          "p50_ms": 0.11320000339765102,
+          "p95_ms": 0.16193499614018944,
+          "p99_ms": 0.2933250030037011
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05305479996604845,
+          "max_ms": 0.7233000069390982,
+          "p50_ms": 0.047999987145885825,
+          "p95_ms": 0.07310498913284391,
+          "p99_ms": 0.10456700983922922
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.26100409975333605,
+          "max_ms": 1.3177000073483214,
+          "p50_ms": 0.2364999963901937,
+          "p95_ms": 0.3243099949031602,
+          "p99_ms": 0.9371249907417223
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7067496001400286,
+          "max_ms": 1.9437000009929761,
+          "p50_ms": 0.6343500062939711,
+          "p95_ms": 1.129204998142086,
+          "p99_ms": 1.6632040035619866
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.32680129996151663,
+          "max_ms": 1.3838999875588343,
+          "p50_ms": 0.2971499998238869,
+          "p95_ms": 0.4164200101513413,
+          "p99_ms": 1.0272690019337454
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 1.0336689000105252,
+          "max_ms": 2.3222000017995015,
+          "p50_ms": 0.9411499995621853,
+          "p95_ms": 1.6478300021844914,
+          "p99_ms": 2.0254589959222358
+        }
+      },
+      "synthetic_host_iterations_per_second": 965.4856267223702,
+      "resources": {
+        "process_cpu_seconds": 1.0,
+        "process_wall_seconds": 1.0357481999963056,
+        "process_cpu_percent_of_one_core": 96.54856267223703,
+        "process_cpu_ms_per_frame": 1.0
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 0,
+      "faces": 4,
+      "hands": 2,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.1294438997429097,
+          "max_ms": 0.5044999998062849,
+          "p50_ms": 0.11765000090235844,
+          "p95_ms": 0.2023999986704439,
+          "p99_ms": 0.3027240003575564
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05455449987493921,
+          "max_ms": 0.34220000088680536,
+          "p50_ms": 0.04890000127488747,
+          "p95_ms": 0.08651000243844464,
+          "p99_ms": 0.15730497558251955
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.2666763005836401,
+          "max_ms": 0.9071000094991177,
+          "p50_ms": 0.24265000683953986,
+          "p95_ms": 0.4133599904889706,
+          "p99_ms": 0.6491180093144067
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.051761799928499386,
+          "max_ms": 0.3141000051982701,
+          "p50_ms": 0.04490000719670206,
+          "p95_ms": 0.08106499153655017,
+          "p99_ms": 0.1687380038492847
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7430077999597415,
+          "max_ms": 15.388600004371256,
+          "p50_ms": 0.6467499915743247,
+          "p95_ms": 1.2325049960054453,
+          "p99_ms": 1.5061499974399335
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.3342264999519102,
+          "max_ms": 1.1009000008925796,
+          "p50_ms": 0.304599991068244,
+          "p95_ms": 0.5260600031760987,
+          "p99_ms": 0.751382001035381
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 1.1329421998671023,
+          "max_ms": 15.815399994608015,
+          "p50_ms": 1.006149992463179,
+          "p95_ms": 1.7677549985819494,
+          "p99_ms": 2.1064090091385865
+        }
+      },
+      "synthetic_host_iterations_per_second": 880.8336068271476,
+      "resources": {
+        "process_cpu_seconds": 1.140625,
+        "process_wall_seconds": 1.135288200006471,
+        "process_cpu_percent_of_one_core": 100.47008327872152,
+        "process_cpu_ms_per_frame": 1.140625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 1,
+      "hands": 0,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.016740600010962225,
+          "max_ms": 0.15220000932458788,
+          "p50_ms": 0.014600009308196604,
+          "p95_ms": 0.02330500210518948,
+          "p99_ms": 0.038102999096736305
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.019340900267707184,
+          "max_ms": 0.8333999867318198,
+          "p50_ms": 0.012899996363557875,
+          "p95_ms": 0.021400002879090607,
+          "p99_ms": 0.2364119955745991
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.06733159987197723,
+          "max_ms": 0.8920999971451238,
+          "p50_ms": 0.054499992984347045,
+          "p95_ms": 0.0892099953489378,
+          "p99_ms": 0.28965800767764444
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04494159994646907,
+          "max_ms": 0.2569999924162403,
+          "p50_ms": 0.039099992136470973,
+          "p95_ms": 0.06250499573070556,
+          "p99_ms": 0.09452999205677767
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0001525999396108091,
+          "max_ms": 0.000500003807246685,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.09115689994359855,
+          "max_ms": 0.923599989619106,
+          "p50_ms": 0.07550000009359792,
+          "p95_ms": 0.12510999222286046,
+          "p99_ms": 0.3257059918541927
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.13940239993098658,
+          "max_ms": 0.9837999969022349,
+          "p50_ms": 0.11839999933727086,
+          "p95_ms": 0.20483000189415176,
+          "p99_ms": 0.3872210081317461
+        }
+      },
+      "synthetic_host_iterations_per_second": 7080.979498373184,
+      "resources": {
+        "process_cpu_seconds": 0.140625,
+        "process_wall_seconds": 0.14122339998721145,
+        "process_cpu_percent_of_one_core": 99.5762741958729,
+        "process_cpu_ms_per_frame": 0.140625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 1,
+      "hands": 0,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.016407499977503903,
+          "max_ms": 0.8460000099148601,
+          "p50_ms": 0.013549994037020952,
+          "p95_ms": 0.020405009126989164,
+          "p99_ms": 0.0317259940493386
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.017548299903864972,
+          "max_ms": 0.6641999934799969,
+          "p50_ms": 0.012400007108226418,
+          "p95_ms": 0.01930500147864222,
+          "p99_ms": 0.1727520053100306
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.06304860003001522,
+          "max_ms": 1.0692999931052327,
+          "p50_ms": 0.051700000767596066,
+          "p95_ms": 0.08093000433291306,
+          "p99_ms": 0.2557900115789379
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00013869977556169033,
+          "max_ms": 0.0016999983927235007,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.08583740014000796,
+          "max_ms": 1.1069999891333282,
+          "p50_ms": 0.07160000677686185,
+          "p95_ms": 0.1132150035118684,
+          "p99_ms": 0.28561100640217774
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.08607649986515753,
+          "max_ms": 1.1072999914176762,
+          "p50_ms": 0.07185000140452757,
+          "p95_ms": 0.11352000510669312,
+          "p99_ms": 0.2858110079250764
+        }
+      },
+      "synthetic_host_iterations_per_second": 11389.988656146243,
+      "resources": {
+        "process_cpu_seconds": 0.078125,
+        "process_wall_seconds": 0.08779639999556821,
+        "process_cpu_percent_of_one_core": 88.98428637614252,
+        "process_cpu_ms_per_frame": 0.078125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 1,
+      "faces": 1,
+      "hands": 2,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.023521600043750368,
+          "max_ms": 0.1475000026402995,
+          "p50_ms": 0.019099999917671084,
+          "p95_ms": 0.04440500342752784,
+          "p99_ms": 0.08990600050310604
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.015072600013809279,
+          "max_ms": 0.09519999730400741,
+          "p50_ms": 0.01340000017080456,
+          "p95_ms": 0.022509996779263013,
+          "p99_ms": 0.03297100309282534
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.07504759976291098,
+          "max_ms": 0.571299999137409,
+          "p50_ms": 0.06349999603116885,
+          "p95_ms": 0.13270999188534915,
+          "p99_ms": 0.23786200545146116
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05306400009430945,
+          "max_ms": 0.5625000048894435,
+          "p50_ms": 0.043799998820759356,
+          "p95_ms": 0.08922999550122765,
+          "p99_ms": 0.1903109939303249
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7009600999008399,
+          "max_ms": 1.8812999915098771,
+          "p50_ms": 0.6263499963097274,
+          "p95_ms": 1.1652750101347917,
+          "p99_ms": 1.527713005489204
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.10528570000315085,
+          "max_ms": 0.6682000093860552,
+          "p50_ms": 0.08895000064512715,
+          "p95_ms": 0.19268499672762102,
+          "p99_ms": 0.3514329981408082
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.8633646999514895,
+          "max_ms": 2.6400999922771007,
+          "p50_ms": 0.7652499989490025,
+          "p95_ms": 1.4262200034863781,
+          "p99_ms": 1.9388419920869635
+        }
+      },
+      "synthetic_host_iterations_per_second": 1154.960601986305,
+      "resources": {
+        "process_cpu_seconds": 0.875,
+        "process_wall_seconds": 0.8658303999982309,
+        "process_cpu_percent_of_one_core": 101.05905267380169,
+        "process_cpu_ms_per_frame": 0.875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 1,
+      "hands": 2,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.026301699821488,
+          "max_ms": 0.235699990298599,
+          "p50_ms": 0.020899999071843922,
+          "p95_ms": 0.05149999924469739,
+          "p99_ms": 0.08182399702491237
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.017199200141476467,
+          "max_ms": 1.0765000042738393,
+          "p50_ms": 0.013699987903237343,
+          "p95_ms": 0.02619999650050886,
+          "p99_ms": 0.03790199771174229
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0831293000082951,
+          "max_ms": 1.195799995912239,
+          "p50_ms": 0.06730000313837081,
+          "p95_ms": 0.14920500034349968,
+          "p99_ms": 0.2414830045017879
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7572343001666013,
+          "max_ms": 2.676799995242618,
+          "p50_ms": 0.6513499974971637,
+          "p95_ms": 1.2683200067840512,
+          "p99_ms": 1.6041719885834023
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.11910329974489287,
+          "max_ms": 1.701200002571568,
+          "p50_ms": 0.09535000572213903,
+          "p95_ms": 0.2236050000647083,
+          "p99_ms": 0.35651799335028045
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.8764717997401021,
+          "max_ms": 2.969299996038899,
+          "p50_ms": 0.7487000038963743,
+          "p95_ms": 1.4798300042457413,
+          "p99_ms": 1.9785800024692433
+        }
+      },
+      "synthetic_host_iterations_per_second": 1137.5530256148936,
+      "resources": {
+        "process_cpu_seconds": 0.84375,
+        "process_wall_seconds": 0.8790798999980325,
+        "process_cpu_percent_of_one_core": 95.98103653625665,
+        "process_cpu_ms_per_frame": 0.84375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 1,
+      "faces": 2,
+      "hands": 0,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.040898500141338445,
+          "max_ms": 0.5433000042103231,
+          "p50_ms": 0.031199990189634264,
+          "p95_ms": 0.05784000313724388,
+          "p99_ms": 0.28414599510142574
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.02866899987566285,
+          "max_ms": 0.2972999936901033,
+          "p50_ms": 0.024599998141638935,
+          "p95_ms": 0.041199994302587584,
+          "p99_ms": 0.11924101825570665
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.11564220007858239,
+          "max_ms": 0.6896999984746799,
+          "p50_ms": 0.09790000331122428,
+          "p95_ms": 0.20170999196125175,
+          "p99_ms": 0.3865069891617168
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04502180009149015,
+          "max_ms": 0.417799994465895,
+          "p50_ms": 0.03959999594371766,
+          "p95_ms": 0.06502000032924113,
+          "p99_ms": 0.16928599332459265
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0001554999762447551,
+          "max_ms": 0.0042000028770416975,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.00030100229196250347
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.15205339970998466,
+          "max_ms": 0.7440999906975776,
+          "p50_ms": 0.13139999646227807,
+          "p95_ms": 0.26534500721027093,
+          "p99_ms": 0.43866599065950107
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.20023609977215528,
+          "max_ms": 0.8301999914692715,
+          "p50_ms": 0.1748000067891553,
+          "p95_ms": 0.34389500870020073,
+          "p99_ms": 0.5573950088000855
+        }
+      },
+      "synthetic_host_iterations_per_second": 4949.909391967764,
+      "resources": {
+        "process_cpu_seconds": 0.203125,
+        "process_wall_seconds": 0.20202389999758452,
+        "process_cpu_percent_of_one_core": 100.54503452434521,
+        "process_cpu_ms_per_frame": 0.203125
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 2,
+      "hands": 0,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04551230036304332,
+          "max_ms": 2.937700002803467,
+          "p50_ms": 0.030399998649954796,
+          "p95_ms": 0.07482498767785725,
+          "p99_ms": 0.3178469899285119
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.02916389964229893,
+          "max_ms": 0.4191000043647364,
+          "p50_ms": 0.024299995857290924,
+          "p95_ms": 0.044925007387064377,
+          "p99_ms": 0.10115699857124122
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.12112239985435735,
+          "max_ms": 3.1165999971562997,
+          "p50_ms": 0.09649999992689118,
+          "p95_ms": 0.2294499994604847,
+          "p99_ms": 0.4390889943169893
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.000150399879203178,
+          "max_ms": 0.001200009137392044,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.00040100305341184047
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.1600909999688156,
+          "max_ms": 3.195400000549853,
+          "p50_ms": 0.1297999988310039,
+          "p95_ms": 0.3113349972409194,
+          "p99_ms": 0.5254169988620561
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.16037689983204473,
+          "max_ms": 3.195700002834201,
+          "p50_ms": 0.13000000035390258,
+          "p95_ms": 0.31162999948719494,
+          "p99_ms": 0.5256190004001837
+        }
+      },
+      "synthetic_host_iterations_per_second": 6166.684241506588,
+      "resources": {
+        "process_cpu_seconds": 0.171875,
+        "process_wall_seconds": 0.16216170000552665,
+        "process_cpu_percent_of_one_core": 105.98988540089448,
+        "process_cpu_ms_per_frame": 0.171875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 1,
+      "faces": 2,
+      "hands": 2,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04598419964895584,
+          "max_ms": 0.31769998895470053,
+          "p50_ms": 0.03890000516548753,
+          "p95_ms": 0.075014989124611,
+          "p99_ms": 0.1497420041414442
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.02975220036751125,
+          "max_ms": 0.23309998505283147,
+          "p50_ms": 0.025800000003073364,
+          "p95_ms": 0.0450450075732078,
+          "p99_ms": 0.07973399493494059
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.13105570001062006,
+          "max_ms": 1.051200000802055,
+          "p50_ms": 0.11244999768678099,
+          "p95_ms": 0.20746999289258378,
+          "p99_ms": 0.4290290069184266
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05280959994706791,
+          "max_ms": 0.2029999886872247,
+          "p50_ms": 0.04570001328829676,
+          "p95_ms": 0.08940999687183647,
+          "p99_ms": 0.12352999459835698
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7375637999357423,
+          "max_ms": 13.509399999747984,
+          "p50_ms": 0.6415000025299378,
+          "p95_ms": 1.2056499974278267,
+          "p99_ms": 1.5266419973340817
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.17696970037650317,
+          "max_ms": 1.1187999916728586,
+          "p50_ms": 0.15160000475589186,
+          "p95_ms": 0.2857099927496164,
+          "p99_ms": 0.5355170015536712
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.9714631999377161,
+          "max_ms": 13.840600004186854,
+          "p50_ms": 0.8465999999316409,
+          "p95_ms": 1.563615002669394,
+          "p99_ms": 1.927386992610991
+        }
+      },
+      "synthetic_host_iterations_per_second": 1026.6352297219607,
+      "resources": {
+        "process_cpu_seconds": 0.90625,
+        "process_wall_seconds": 0.9740558000048622,
+        "process_cpu_percent_of_one_core": 93.03881769355269,
+        "process_cpu_ms_per_frame": 0.90625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 2,
+      "hands": 2,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.047215300204697996,
+          "max_ms": 0.7724000024609268,
+          "p50_ms": 0.04020000051241368,
+          "p95_ms": 0.0761250114010181,
+          "p99_ms": 0.11730800557415932
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.03009820012084674,
+          "max_ms": 0.6029000069247559,
+          "p50_ms": 0.026000008801929653,
+          "p95_ms": 0.044725005136569934,
+          "p99_ms": 0.05570400215219706
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.13439339990145527,
+          "max_ms": 1.0916999890469015,
+          "p50_ms": 0.1144499983638525,
+          "p95_ms": 0.20891000458505005,
+          "p99_ms": 0.35165899680578105
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7557247999648098,
+          "max_ms": 2.776199995423667,
+          "p50_ms": 0.6507500074803829,
+          "p95_ms": 1.2464899889891967,
+          "p99_ms": 1.8104950044653376
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.18427349982084706,
+          "max_ms": 1.1592999944696203,
+          "p50_ms": 0.15529998927377164,
+          "p95_ms": 0.29672000309801655,
+          "p99_ms": 0.5301970055734272
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.9401279999001417,
+          "max_ms": 2.9814999870723113,
+          "p50_ms": 0.8083499997155741,
+          "p95_ms": 1.5284300097846426,
+          "p99_ms": 2.047852992545813
+        }
+      },
+      "synthetic_host_iterations_per_second": 1060.5710135629681,
+      "resources": {
+        "process_cpu_seconds": 0.90625,
+        "process_wall_seconds": 0.9428882999927737,
+        "process_cpu_percent_of_one_core": 96.114248104144,
+        "process_cpu_ms_per_frame": 0.90625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51322880,
+        "peak_working_set_bytes_process_lifetime": 51322880
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 1,
+      "faces": 4,
+      "hands": 0,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.1687223002227256,
+          "max_ms": 3.680599998915568,
+          "p50_ms": 0.11169999925186858,
+          "p95_ms": 0.5123099988850297,
+          "p99_ms": 1.1785649998637353
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.06507810059702024,
+          "max_ms": 1.7112999921664596,
+          "p50_ms": 0.04750001971842721,
+          "p95_ms": 0.0909200076421257,
+          "p99_ms": 0.5353849848324895
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.3135505996760912,
+          "max_ms": 3.9961000002222136,
+          "p50_ms": 0.23209999199025333,
+          "p95_ms": 0.7131100006517953,
+          "p99_ms": 1.642668003623839
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04781529989850242,
+          "max_ms": 0.7642999989911914,
+          "p50_ms": 0.04050000279676169,
+          "p95_ms": 0.0798049964942038,
+          "p99_ms": 0.10532200147281398
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00018269990687258542,
+          "max_ms": 0.0021999876480549574,
+          "p50_ms": 0.000200001522898674,
+          "p95_ms": 0.000300002284348011,
+          "p99_ms": 0.000700005330145359
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.37970079986553174,
+          "max_ms": 4.11000000895001,
+          "p50_ms": 0.2889499955927022,
+          "p95_ms": 0.8021600078791377,
+          "p99_ms": 1.6992179973749437
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.43116069996904116,
+          "max_ms": 4.499599992414005,
+          "p50_ms": 0.33409999741706997,
+          "p95_ms": 0.8598450069257517,
+          "p99_ms": 1.7697809972742102
+        }
+      },
+      "synthetic_host_iterations_per_second": 2308.4889139058505,
+      "resources": {
+        "process_cpu_seconds": 0.421875,
+        "process_wall_seconds": 0.4331838000071002,
+        "process_cpu_percent_of_one_core": 97.38937605540308,
+        "process_cpu_ms_per_frame": 0.421875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51388416,
+        "peak_working_set_bytes_process_lifetime": 51388416
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 4,
+      "hands": 0,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.15668089996324852,
+          "max_ms": 11.90389999828767,
+          "p50_ms": 0.10409999958937988,
+          "p95_ms": 0.3175300043949378,
+          "p99_ms": 0.8678389929991671
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05624370038276538,
+          "max_ms": 0.9390000050188974,
+          "p50_ms": 0.046200002543628216,
+          "p95_ms": 0.07623002529726361,
+          "p99_ms": 0.2698069943289728
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.29003180014842656,
+          "max_ms": 12.059400003636256,
+          "p50_ms": 0.22194999473867938,
+          "p95_ms": 0.7297150084923484,
+          "p99_ms": 1.136297991761239
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00015360000543296337,
+          "max_ms": 0.0016999983927235007,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.3499097999447258,
+          "max_ms": 12.118099999497645,
+          "p50_ms": 0.2766500037978403,
+          "p95_ms": 0.7836599987058431,
+          "p99_ms": 1.1908549991494508
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.3501766998815583,
+          "max_ms": 12.118400001781993,
+          "p50_ms": 0.27689999842550606,
+          "p95_ms": 0.7838649995392185,
+          "p99_ms": 1.1911550014337988
+        }
+      },
+      "synthetic_host_iterations_per_second": 2835.6679387047634,
+      "resources": {
+        "process_cpu_seconds": 0.34375,
+        "process_wall_seconds": 0.35265060000529047,
+        "process_cpu_percent_of_one_core": 97.47608539297623,
+        "process_cpu_ms_per_frame": 0.34375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51388416,
+        "peak_working_set_bytes_process_lifetime": 51388416
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 1,
+      "faces": 4,
+      "hands": 2,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.12669959985942114,
+          "max_ms": 0.5345999961718917,
+          "p50_ms": 0.11639999866019934,
+          "p95_ms": 0.18000000272877514,
+          "p99_ms": 0.3301699954317881
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05291099922033027,
+          "max_ms": 0.24330001906491816,
+          "p50_ms": 0.04850000550504774,
+          "p95_ms": 0.07625498474226328,
+          "p99_ms": 0.11737100547179573
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.258765400343691,
+          "max_ms": 0.8134999952744693,
+          "p50_ms": 0.24009999469853938,
+          "p95_ms": 0.3666049975436181,
+          "p99_ms": 0.6389070046134293
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05003830032364931,
+          "max_ms": 0.8837999921524897,
+          "p50_ms": 0.044200001866556704,
+          "p95_ms": 0.07080000068526715,
+          "p99_ms": 0.10403899170341897
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7256602001143619,
+          "max_ms": 13.223800007835962,
+          "p50_ms": 0.643899998976849,
+          "p95_ms": 1.1661500029731542,
+          "p99_ms": 1.4053729889565145
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.32503649992577266,
+          "max_ms": 1.119499997003004,
+          "p50_ms": 0.3010500076925382,
+          "p95_ms": 0.46648500137962395,
+          "p99_ms": 0.7190690025163348
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 1.1046784002246568,
+          "max_ms": 13.629699999000877,
+          "p50_ms": 0.9982000046875328,
+          "p95_ms": 1.6281200114462988,
+          "p99_ms": 1.964420996373519
+        }
+      },
+      "synthetic_host_iterations_per_second": 902.9417118586432,
+      "resources": {
+        "process_cpu_seconds": 1.109375,
+        "process_wall_seconds": 1.1074912000040058,
+        "process_cpu_percent_of_one_core": 100.17009615931823,
+        "process_cpu_ms_per_frame": 1.109375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51388416,
+        "peak_working_set_bytes_process_lifetime": 51388416
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 1,
+      "faces": 4,
+      "hands": 2,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.1286830002645729,
+          "max_ms": 0.8726000087335706,
+          "p50_ms": 0.11609999637585133,
+          "p95_ms": 0.17983000070671548,
+          "p99_ms": 0.36268700991058705
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.053931999471387826,
+          "max_ms": 0.3117000014754012,
+          "p50_ms": 0.04880000778939575,
+          "p95_ms": 0.07830498507246375,
+          "p99_ms": 0.11596699507208535
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.2630741999455495,
+          "max_ms": 1.0821000032592565,
+          "p50_ms": 0.24035000387812033,
+          "p95_ms": 0.3798749959969427,
+          "p99_ms": 0.6855779956094921
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7160491001413902,
+          "max_ms": 1.8435999954817817,
+          "p50_ms": 0.647400003799703,
+          "p95_ms": 1.1501300083182284,
+          "p99_ms": 1.3961199931509327
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.33059319990570657,
+          "max_ms": 1.1463999981060624,
+          "p50_ms": 0.3029000072274357,
+          "p95_ms": 0.464025011024205,
+          "p99_ms": 0.8050530032778623
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 1.0467593000357738,
+          "max_ms": 2.21130000136327,
+          "p50_ms": 0.9572499984642491,
+          "p95_ms": 1.5483050017792266,
+          "p99_ms": 1.8137509861844592
+        }
+      },
+      "synthetic_host_iterations_per_second": 953.2870290049422,
+      "resources": {
+        "process_cpu_seconds": 1.0,
+        "process_wall_seconds": 1.0490019999997457,
+        "process_cpu_percent_of_one_core": 95.32870290049422,
+        "process_cpu_ms_per_frame": 1.0
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51388416,
+        "peak_working_set_bytes_process_lifetime": 51388416
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 2,
+      "faces": 1,
+      "hands": 0,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.016631899910862558,
+          "max_ms": 0.2820999943651259,
+          "p50_ms": 0.013700002455152571,
+          "p95_ms": 0.020799998310394585,
+          "p99_ms": 0.107959990709787
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.027594199797022156,
+          "max_ms": 12.865500000771135,
+          "p50_ms": 0.012450000212993473,
+          "p95_ms": 0.01910999999381601,
+          "p99_ms": 0.05155099934199821
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.07236659996851813,
+          "max_ms": 12.917499989271164,
+          "p50_ms": 0.05230000533629209,
+          "p95_ms": 0.08030500030145049,
+          "p99_ms": 0.24991599668283015
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00013159993977751583,
+          "max_ms": 0.0017999991541728377,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.09396719979122281,
+          "max_ms": 12.944700007210486,
+          "p50_ms": 0.07249999907799065,
+          "p95_ms": 0.1131100027123466,
+          "p99_ms": 0.2824019966647029
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.09419399965554476,
+          "max_ms": 12.945000009494834,
+          "p50_ms": 0.07270000060088933,
+          "p95_ms": 0.11341500503476708,
+          "p99_ms": 0.2827009989414364
+        }
+      },
+      "synthetic_host_iterations_per_second": 10433.697503603094,
+      "resources": {
+        "process_cpu_seconds": 0.09375,
+        "process_wall_seconds": 0.0958433000050718,
+        "process_cpu_percent_of_one_core": 97.815914096279,
+        "process_cpu_ms_per_frame": 0.09375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51388416,
+        "peak_working_set_bytes_process_lifetime": 51388416
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 2,
+      "faces": 1,
+      "hands": 0,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.015280499923392199,
+          "max_ms": 0.10050000855699182,
+          "p50_ms": 0.014099998224992305,
+          "p95_ms": 0.021405002917163067,
+          "p99_ms": 0.037803996820002794
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.017597199883311987,
+          "max_ms": 0.4457000031834468,
+          "p50_ms": 0.012699994840659201,
+          "p95_ms": 0.020305008365539827,
+          "p99_ms": 0.21022001281380634
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.061258400077349506,
+          "max_ms": 0.48940000124275684,
+          "p50_ms": 0.05339999916031957,
+          "p95_ms": 0.08371999720111487,
+          "p99_ms": 0.25239999944460556
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.042085300214239396,
+          "max_ms": 0.385499995900318,
+          "p50_ms": 0.0388999906135723,
+          "p95_ms": 0.05619999210466631,
+          "p99_ms": 0.09337199735455208
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00014439976075664163,
+          "max_ms": 0.0013999961083754897,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.08410709990130272,
+          "max_ms": 0.9412999934284016,
+          "p50_ms": 0.07409999670926481,
+          "p95_ms": 0.11870500165969133,
+          "p99_ms": 0.3041170010692439
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.1298321997455787,
+          "max_ms": 1.0416000004624948,
+          "p50_ms": 0.11609999637585133,
+          "p95_ms": 0.18353999985265543,
+          "p99_ms": 0.4024890081200282
+        }
+      },
+      "synthetic_host_iterations_per_second": 7599.21728010083,
+      "resources": {
+        "process_cpu_seconds": 0.140625,
+        "process_wall_seconds": 0.13159250000899192,
+        "process_cpu_percent_of_one_core": 106.86399300141792,
+        "process_cpu_ms_per_frame": 0.140625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51388416,
+        "peak_working_set_bytes_process_lifetime": 51388416
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 2,
+      "faces": 1,
+      "hands": 2,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.019640100435935892,
+          "max_ms": 0.1967999996850267,
+          "p50_ms": 0.017700003809295595,
+          "p95_ms": 0.02670999965630471,
+          "p99_ms": 0.0485180053510703
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.013922499681939371,
+          "max_ms": 0.11040001118090004,
+          "p50_ms": 0.012999997125007212,
+          "p95_ms": 0.019104999955743544,
+          "p99_ms": 0.02840199798811227
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0651813998556463,
+          "max_ms": 0.3372000064700842,
+          "p50_ms": 0.05990000499878079,
+          "p95_ms": 0.08610000077169389,
+          "p99_ms": 0.14546900041750616
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.6407591999450233,
+          "max_ms": 1.563400001032278,
+          "p50_ms": 0.5959499976597726,
+          "p95_ms": 0.8663550033816135,
+          "p99_ms": 1.315417003497714
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.09229879987833556,
+          "max_ms": 0.45960000716149807,
+          "p50_ms": 0.08410000009462237,
+          "p95_ms": 0.12581001137732525,
+          "p99_ms": 0.2935100083413999
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7331682997464668,
+          "max_ms": 1.6744000022299588,
+          "p50_ms": 0.6849499914096668,
+          "p95_ms": 1.0343950016249435,
+          "p99_ms": 1.459120992658427
+        }
+      },
+      "synthetic_host_iterations_per_second": 1360.3630210271363,
+      "resources": {
+        "process_cpu_seconds": 0.734375,
+        "process_wall_seconds": 0.7350979000038933,
+        "process_cpu_percent_of_one_core": 99.90165935668031,
+        "process_cpu_ms_per_frame": 0.734375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51388416,
+        "peak_working_set_bytes_process_lifetime": 51388416
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 2,
+      "faces": 1,
+      "hands": 2,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.020914699736749753,
+          "max_ms": 0.19929998961742967,
+          "p50_ms": 0.018499995348975062,
+          "p95_ms": 0.03160499400109984,
+          "p99_ms": 0.049601999344304204
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.014254399851779453,
+          "max_ms": 0.1373999984934926,
+          "p50_ms": 0.01309999788645655,
+          "p95_ms": 0.020799998310394585,
+          "p99_ms": 0.0283059972571209
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.06870469998102635,
+          "max_ms": 0.8558999979868531,
+          "p50_ms": 0.06150000263005495,
+          "p95_ms": 0.0990999978967011,
+          "p99_ms": 0.1467470110219437
+        },
+        "face_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0489704001811333,
+          "max_ms": 0.7711999933235347,
+          "p50_ms": 0.04270000499673188,
+          "p95_ms": 0.0668049993691966,
+          "p99_ms": 0.1063319944660179
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.6726861002825899,
+          "max_ms": 1.9054000003961846,
+          "p50_ms": 0.6105999927967787,
+          "p95_ms": 1.0761849960545071,
+          "p99_ms": 1.5993110107956452
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0973862998362165,
+          "max_ms": 0.8865999989211559,
+          "p50_ms": 0.08610000077169389,
+          "p95_ms": 0.14444000771618445,
+          "p99_ms": 0.24319900228874738
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.8233948001579847,
+          "max_ms": 2.322700005606748,
+          "p50_ms": 0.749550003092736,
+          "p95_ms": 1.3486600058968174,
+          "p99_ms": 1.8051140078750905
+        }
+      },
+      "synthetic_host_iterations_per_second": 1211.1684262840256,
+      "resources": {
+        "process_cpu_seconds": 0.765625,
+        "process_wall_seconds": 0.8256490000057966,
+        "process_cpu_percent_of_one_core": 92.7300826373707,
+        "process_cpu_ms_per_frame": 0.765625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51408896,
+        "peak_working_set_bytes_process_lifetime": 51408896
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 2,
+      "faces": 2,
+      "hands": 0,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.03884499994455837,
+          "max_ms": 0.37090000114403665,
+          "p50_ms": 0.02920000406447798,
+          "p95_ms": 0.055069995869416494,
+          "p99_ms": 0.2829170004406478
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.02667650043440517,
+          "max_ms": 0.32389999250881374,
+          "p50_ms": 0.02379999205004424,
+          "p95_ms": 0.03650498765637167,
+          "p99_ms": 0.07383100877632384
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.10948099986126181,
+          "max_ms": 0.6551999977091327,
+          "p50_ms": 0.09380000119563192,
+          "p95_ms": 0.1961300084076356,
+          "p99_ms": 0.39671999402344227
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00013799982843920588,
+          "max_ms": 0.001100008375942707,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.00020100153051316646
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.14371709995612036,
+          "max_ms": 0.7326000049943104,
+          "p50_ms": 0.12539999443106353,
+          "p95_ms": 0.24724500326556131,
+          "p99_ms": 0.4458320030244066
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.14395739980682265,
+          "max_ms": 0.7328000065172091,
+          "p50_ms": 0.1255999959539622,
+          "p95_ms": 0.24763999244896673,
+          "p99_ms": 0.44613199090235856
+        }
+      },
+      "synthetic_host_iterations_per_second": 6869.618083750491,
+      "resources": {
+        "process_cpu_seconds": 0.140625,
+        "process_wall_seconds": 0.14556849999644328,
+        "process_cpu_percent_of_one_core": 96.60400430274127,
+        "process_cpu_ms_per_frame": 0.140625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51408896,
+        "peak_working_set_bytes_process_lifetime": 51408896
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 2,
+      "faces": 2,
+      "hands": 0,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05144380019919481,
+          "max_ms": 13.619199991808273,
+          "p50_ms": 0.030099996365606785,
+          "p95_ms": 0.04940999788232146,
+          "p99_ms": 0.2565370030060876
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.027821799551020376,
+          "max_ms": 0.49369999032933265,
+          "p50_ms": 0.024199995095841587,
+          "p95_ms": 0.03890000516548753,
+          "p99_ms": 0.0741820095572618
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.12538819979818072,
+          "max_ms": 13.72550000087358,
+          "p50_ms": 0.09580000187270343,
+          "p95_ms": 0.17578999904799267,
+          "p99_ms": 0.41276999851106655
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04190370008291211,
+          "max_ms": 0.23020000662654638,
+          "p50_ms": 0.03890000516548753,
+          "p95_ms": 0.058604995138011866,
+          "p99_ms": 0.1049919983779545
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00015529988741036505,
+          "max_ms": 0.004899993655271828,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.16165030020056292,
+          "max_ms": 13.763399998424575,
+          "p50_ms": 0.1281000004382804,
+          "p95_ms": 0.23974000505404536,
+          "p99_ms": 0.5288360040867693
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.20679240008757915,
+          "max_ms": 13.82779999403283,
+          "p50_ms": 0.1703000016277656,
+          "p95_ms": 0.3212749994418116,
+          "p99_ms": 0.6052009917038954
+        }
+      },
+      "synthetic_host_iterations_per_second": 4794.879835602715,
+      "resources": {
+        "process_cpu_seconds": 0.21875,
+        "process_wall_seconds": 0.20855579999624752,
+        "process_cpu_percent_of_one_core": 104.8879964038094,
+        "process_cpu_ms_per_frame": 0.21875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51408896,
+        "peak_working_set_bytes_process_lifetime": 51408896
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 2,
+      "faces": 2,
+      "hands": 2,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.03963760001352057,
+          "max_ms": 0.3073999978369102,
+          "p50_ms": 0.03579999611247331,
+          "p95_ms": 0.055005010653985664,
+          "p99_ms": 0.0956569859408773
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.027795700225397013,
+          "max_ms": 0.24199999461416155,
+          "p50_ms": 0.025000008463393897,
+          "p95_ms": 0.039505009044660255,
+          "p99_ms": 0.07723099071881723
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.11561799998162314,
+          "max_ms": 0.5822999955853447,
+          "p50_ms": 0.10599999222904444,
+          "p95_ms": 0.15592000709148113,
+          "p99_ms": 0.2994040088378823
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.655958699862822,
+          "max_ms": 1.7261000029975548,
+          "p50_ms": 0.6051499949535355,
+          "p95_ms": 0.959650001459522,
+          "p99_ms": 1.3312440029403654
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.15853270000661723,
+          "max_ms": 1.1181000008946285,
+          "p50_ms": 0.14350000128615648,
+          "p95_ms": 0.21848000251338792,
+          "p99_ms": 0.4499419915373437
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.8146120000455994,
+          "max_ms": 1.9207000004826114,
+          "p50_ms": 0.7577499927720055,
+          "p95_ms": 1.2017950117297005,
+          "p99_ms": 1.6227030014852062
+        }
+      },
+      "synthetic_host_iterations_per_second": 1224.554522356874,
+      "resources": {
+        "process_cpu_seconds": 0.796875,
+        "process_wall_seconds": 0.8166235000098823,
+        "process_cpu_percent_of_one_core": 97.58168850031339,
+        "process_cpu_ms_per_frame": 0.796875
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51408896,
+        "peak_working_set_bytes_process_lifetime": 51408896
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 2,
+      "faces": 2,
+      "hands": 2,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.040051499629043974,
+          "max_ms": 0.2792000013869256,
+          "p50_ms": 0.036299999919719994,
+          "p95_ms": 0.05290500994306057,
+          "p99_ms": 0.11197599349543445
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.02762149962654803,
+          "max_ms": 0.32419999479316175,
+          "p50_ms": 0.02510000194888562,
+          "p95_ms": 0.03793001233134416,
+          "p99_ms": 0.06551400394528172
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.11588439991464838,
+          "max_ms": 0.5666000070050359,
+          "p50_ms": 0.10660000407369807,
+          "p95_ms": 0.16059001354733474,
+          "p99_ms": 0.3204380093666259
+        },
+        "face_observation_age": {
+          "count": 2000,
+          "percentile_samples": 2000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04661019980267156,
+          "max_ms": 0.29350000841077417,
+          "p50_ms": 0.04260000423528254,
+          "p95_ms": 0.06583999202121046,
+          "p99_ms": 0.09356999900774092
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.6625975002680207,
+          "max_ms": 2.0339000038802624,
+          "p50_ms": 0.6125499930931255,
+          "p95_ms": 0.9499100007815287,
+          "p99_ms": 1.4105589964310632
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.15647259981778916,
+          "max_ms": 0.8114000083878636,
+          "p50_ms": 0.14400000509340316,
+          "p95_ms": 0.2084799998556262,
+          "p99_ms": 0.45096099915099325
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.8694332001323346,
+          "max_ms": 2.3490000021411106,
+          "p50_ms": 0.8111999995890073,
+          "p95_ms": 1.2471200032450718,
+          "p99_ms": 1.6485500056296583
+        }
+      },
+      "synthetic_host_iterations_per_second": 1147.3647784670366,
+      "resources": {
+        "process_cpu_seconds": 0.84375,
+        "process_wall_seconds": 0.8715624000033131,
+        "process_cpu_percent_of_one_core": 96.8089031831562,
+        "process_cpu_ms_per_frame": 0.84375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51408896,
+        "peak_working_set_bytes_process_lifetime": 51408896
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 2,
+      "faces": 4,
+      "hands": 0,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.15056920018105302,
+          "max_ms": 10.559600006672554,
+          "p50_ms": 0.10400000610388815,
+          "p95_ms": 0.400629993964685,
+          "p99_ms": 0.7975640028598716
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05606559979787562,
+          "max_ms": 1.3648999884026125,
+          "p50_ms": 0.04590001481119543,
+          "p95_ms": 0.07211999618448314,
+          "p99_ms": 0.29493198468116977
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.28206369967665523,
+          "max_ms": 10.70080000499729,
+          "p50_ms": 0.22080000053392723,
+          "p95_ms": 0.7072349995723923,
+          "p99_ms": 1.0062950036081013
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00014900005771778524,
+          "max_ms": 0.000900006853044033,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000300002284348011
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.3424325997912092,
+          "max_ms": 10.760100005427375,
+          "p50_ms": 0.27614999271463603,
+          "p95_ms": 0.7732299927738493,
+          "p99_ms": 1.1662619996059216
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.34270019990799483,
+          "max_ms": 10.760499993921258,
+          "p50_ms": 0.27635000878944993,
+          "p95_ms": 0.773429994296748,
+          "p99_ms": 1.1666609880921892
+        }
+      },
+      "synthetic_host_iterations_per_second": 2903.774151373553,
+      "resources": {
+        "process_cpu_seconds": 0.34375,
+        "process_wall_seconds": 0.344379400004982,
+        "process_cpu_percent_of_one_core": 99.81723645346588,
+        "process_cpu_ms_per_frame": 0.34375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51470336,
+        "peak_working_set_bytes_process_lifetime": 51470336
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 2,
+      "faces": 4,
+      "hands": 0,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.14224269981787074,
+          "max_ms": 1.4348999975482002,
+          "p50_ms": 0.10519999341340736,
+          "p95_ms": 0.37023499608039856,
+          "p99_ms": 0.7962089931243097
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.06011899969598744,
+          "max_ms": 1.2184999650344253,
+          "p50_ms": 0.046499983000103384,
+          "p95_ms": 0.07650000115972944,
+          "p99_ms": 0.5690219673851971
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.27655179996509105,
+          "max_ms": 1.5996000001905486,
+          "p50_ms": 0.22360000002663583,
+          "p95_ms": 0.7016000010480637,
+          "p99_ms": 0.9616590001678557
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04365780008083675,
+          "max_ms": 0.2686000079847872,
+          "p50_ms": 0.03989999822806567,
+          "p95_ms": 0.06030500735505484,
+          "p99_ms": 0.11391900858143343
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.00015820006956346333,
+          "max_ms": 0.002900007530115545,
+          "p50_ms": 0.000100000761449337,
+          "p95_ms": 0.000200001522898674,
+          "p99_ms": 0.000400003045797348
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.33635709997906815,
+          "max_ms": 1.6875999863259494,
+          "p50_ms": 0.2787000121315941,
+          "p95_ms": 0.7584199971461202,
+          "p99_ms": 1.056263995124027
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.3832900002162205,
+          "max_ms": 1.7357999895466492,
+          "p50_ms": 0.3222999948775396,
+          "p95_ms": 0.8051300021179484,
+          "p99_ms": 1.1099699967599006
+        }
+      },
+      "synthetic_host_iterations_per_second": 2596.6188906647817,
+      "resources": {
+        "process_cpu_seconds": 0.375,
+        "process_wall_seconds": 0.3851161999918986,
+        "process_cpu_percent_of_one_core": 97.37320839992931,
+        "process_cpu_ms_per_frame": 0.375
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51470336,
+        "peak_working_set_bytes_process_lifetime": 51470336
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    },
+    {
+      "repeat": 2,
+      "faces": 4,
+      "hands": 2,
+      "centering": false,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.1264544002187904,
+          "max_ms": 0.47289999201893806,
+          "p50_ms": 0.11694999557221308,
+          "p95_ms": 0.18207000321126537,
+          "p99_ms": 0.27893299906281754
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0542944005865138,
+          "max_ms": 0.77860000601504,
+          "p50_ms": 0.04880000778939575,
+          "p95_ms": 0.07840997204766607,
+          "p99_ms": 0.12782501275069078
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.26167649994022213,
+          "max_ms": 1.009399988106452,
+          "p50_ms": 0.24120000307448208,
+          "p95_ms": 0.3749900017282924,
+          "p99_ms": 0.5806959971960167
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7361828003049595,
+          "max_ms": 13.630600005853921,
+          "p50_ms": 0.6454999966081232,
+          "p95_ms": 1.170510001975344,
+          "p99_ms": 1.647844009421532
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.3285743996530073,
+          "max_ms": 1.0821000032592565,
+          "p50_ms": 0.3025999976671301,
+          "p95_ms": 0.47005999877001153,
+          "p99_ms": 0.6862100010039285
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 1.0648749999672873,
+          "max_ms": 13.96050000039395,
+          "p50_ms": 0.9517500002402812,
+          "p95_ms": 1.5930349931295493,
+          "p99_ms": 1.9868460021098135
+        }
+      },
+      "synthetic_host_iterations_per_second": 937.1950894241716,
+      "resources": {
+        "process_cpu_seconds": 1.0,
+        "process_wall_seconds": 1.0670137000124669,
+        "process_cpu_percent_of_one_core": 93.71950894241715,
+        "process_cpu_ms_per_frame": 1.0
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51519488,
+        "peak_working_set_bytes_process_lifetime": 51519488
+      },
+      "centering_metadata": null
+    },
+    {
+      "repeat": 2,
+      "faces": 4,
+      "hands": 2,
+      "centering": true,
+      "frames": 1000,
+      "warmup_frames": 100,
+      "timings": {
+        "face_association": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.12574749946361408,
+          "max_ms": 0.6935999990673736,
+          "p50_ms": 0.11605000327108428,
+          "p95_ms": 0.1864499936345964,
+          "p99_ms": 0.30075600501731964
+        },
+        "face_smoothing": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.05289790018287022,
+          "max_ms": 0.2792000013869256,
+          "p50_ms": 0.0484000047435984,
+          "p95_ms": 0.07583999540656802,
+          "p99_ms": 0.12142502178903666
+        },
+        "face_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.25766950033721514,
+          "max_ms": 0.8968999900389463,
+          "p50_ms": 0.23940000392030925,
+          "p95_ms": 0.3688199991302098,
+          "p99_ms": 0.5755479868093969
+        },
+        "face_observation_age": {
+          "count": 4000,
+          "percentile_samples": 4000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "face_centering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.04963069994118996,
+          "max_ms": 0.2908000024035573,
+          "p50_ms": 0.044399996113497764,
+          "p95_ms": 0.07160500608733855,
+          "p99_ms": 0.14302599753136744
+        },
+        "centering_observation_age": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.0,
+          "max_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0
+        },
+        "hand_host": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.7046099000581307,
+          "max_ms": 1.8973999976878986,
+          "p50_ms": 0.640650003333576,
+          "p95_ms": 1.1089100029494148,
+          "p99_ms": 1.4445099979639053
+        },
+        "face_adapter_tracking": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.3230424001812935,
+          "max_ms": 0.9606999956304207,
+          "p50_ms": 0.3004000027431175,
+          "p95_ms": 0.453590003598947,
+          "p99_ms": 0.6935959975817239
+        },
+        "host_total": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 1.0810123999253847,
+          "max_ms": 2.3600999993504956,
+          "p50_ms": 0.9980000031646341,
+          "p95_ms": 1.5448099889908917,
+          "p99_ms": 1.8727529988973401
+        }
+      },
+      "synthetic_host_iterations_per_second": 923.2107460233428,
+      "resources": {
+        "process_cpu_seconds": 1.0625,
+        "process_wall_seconds": 1.0831763000023784,
+        "process_cpu_percent_of_one_core": 98.09114176498018,
+        "process_cpu_ms_per_frame": 1.0625
+      },
+      "memory_snapshot": {
+        "available": true,
+        "working_set_bytes_at_exit": 51585024,
+        "peak_working_set_bytes_process_lifetime": 51585024
+      },
+      "centering_metadata": {
+        "enabled": true,
+        "config": {
+          "horizontal": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "vertical": {
+            "activation": 0.12,
+            "deactivation": 0.07
+          },
+          "target": [
+            0.5,
+            0.5
+          ],
+          "max_observation_age": 0.25
+        },
+        "states": {
+          "WAITING_FOR_TARGET": 2,
+          "CORRECTION_NEEDED": 1098
+        },
+        "transitions": {
+          "WAITING_FOR_TARGET->CORRECTION_NEEDED": 1
+        },
+        "counters": {
+          "direction_reversals": 0
+        },
+        "counter_scope": "whole session including warmup; one calculation per consumed face frame",
+        "units": "original image pixels; normalized half-frame errors; unitless demand, not degrees/speed",
+        "output": "read-only recommendations; no camera, motor or desktop input"
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "faces": 1,
+      "hands": 0,
+      "before_mean_ms_median_run": 0.08607649986515753,
+      "after_mean_ms_median_run": 0.13130430033197626,
+      "added_ms": 0.045227800466818735,
+      "change_percent": 52.543726264044174
+    },
+    {
+      "faces": 1,
+      "hands": 2,
+      "before_mean_ms_median_run": 0.8097023000009358,
+      "after_mean_ms_median_run": 0.8233948001579847,
+      "added_ms": 0.013692500157048926,
+      "change_percent": 1.6910536325552172
+    },
+    {
+      "faces": 2,
+      "hands": 0,
+      "before_mean_ms_median_run": 0.16037689983204473,
+      "after_mean_ms_median_run": 0.20441199981723912,
+      "added_ms": 0.04403509998519439,
+      "change_percent": 27.4572585149796
+    },
+    {
+      "faces": 2,
+      "hands": 2,
+      "before_mean_ms_median_run": 0.8347204002784565,
+      "after_mean_ms_median_run": 0.9025503999146167,
+      "added_ms": 0.06782999963616021,
+      "change_percent": 8.126074265530425
+    },
+    {
+      "faces": 4,
+      "hands": 0,
+      "before_mean_ms_median_run": 0.3491233001113869,
+      "after_mean_ms_median_run": 0.3872612998384284,
+      "added_ms": 0.03813799972704146,
+      "change_percent": 10.923934241820476
+    },
+    {
+      "faces": 4,
+      "hands": 2,
+      "before_mean_ms_median_run": 1.0467593000357738,
+      "after_mean_ms_median_run": 1.1046784002246568,
+      "added_ms": 0.05791910018888302,
+      "change_percent": 5.533182288125227
+    }
+  ],
+  "memory_probe": {
+    "frames": 10000,
+    "retained_python_bytes_delta": 440,
+    "peak_python_traced_bytes": 125208,
+    "state_keys": 1,
+    "transition_keys": 0,
+    "limitations": "Python only; includes immutable input assembly, fixed geometry, no inference/native camera memory"
+  },
+  "render_probe": [
+    {
+      "centering_overlay": false,
+      "canvas_size": [
+        640,
+        360
+      ],
+      "frames": 1000,
+      "timings": {
+        "synthetic_face_rendering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.057636199897387996,
+          "max_ms": 0.2945000014733523,
+          "p50_ms": 0.05420000525191426,
+          "p95_ms": 0.0703199970303103,
+          "p99_ms": 0.11105900121037843
+        }
+      }
+    },
+    {
+      "centering_overlay": true,
+      "canvas_size": [
+        640,
+        360
+      ],
+      "frames": 1000,
+      "timings": {
+        "synthetic_face_rendering": {
+          "count": 1000,
+          "percentile_samples": 1000,
+          "mean_ms": 0.14358880014333408,
+          "max_ms": 0.46660000225529075,
+          "p50_ms": 0.13210000179242343,
+          "p95_ms": 0.20392499573063103,
+          "p99_ms": 0.337303007254377
+        }
+      }
+    }
+  ]
+}

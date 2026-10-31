@@ -19,6 +19,15 @@ without the hand model, or `--face-centering` for combined tracking. Optional
 `--face-centering-debug` draws the inner/outer dead zones. See
 [PHASE_4_3.md](../PHASE_4_3.md) for geometry, thresholds, benchmarks and acceptance.
 
+Phase 4.4 adds output-only `--digital-reframe`, automatically enabling face
+centering/tracking/detection. Use `--face-only --digital-reframe` for two face-only
+previews, or `--digital-reframe` with the existing hand path. The crop follows the
+locked smoothed face; all analysis/control coordinates remain in the original
+frame. `--no-reframe-preview` calculates without the crop window; `--reframe-debug`
+outlines the viewport on the original preview. Closing the crop window disables
+only that preview. See [PHASE_4_4.md](../PHASE_4_4.md) for motion, lifecycle,
+benchmarks and exact owner acceptance commands.
+
 Phase 3.10 adds an opt-in [latest-frame capture experiment](../PHASE_3_10.md):
 `--capture-pipeline latest-thread`. Default `sync` is preserved. One owning camera
 thread replaces a single pending snapshot; inference, gestures, controllers and

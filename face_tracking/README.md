@@ -1,4 +1,4 @@
-# Face detection, tracking and centering — Phases 4.1–4.3
+# Face detection, tracking, centering and digital framing — Phases 4.1–4.4
 
 Optional MediaPipe BlazeFace **detection**, using the existing camera owner and
 application loop. Optional Phase 4.2 spatial tracking adds temporary IDs and a
@@ -8,6 +8,8 @@ See [PHASE_4_2.md](../PHASE_4_2.md) for temporal tracking, synthetic measurement
 and pending physical acceptance.
 Phase 4.3 adds optional, read-only centering recommendations. See
 [PHASE_4_3.md](../PHASE_4_3.md) for calculations, measurements and owner acceptance.
+Phase 4.4 adds output-only digital following. See
+[PHASE_4_4.md](../PHASE_4_4.md) for geometry, dual-window behavior and acceptance.
 
 ```powershell
 Set-Location C:\Users\Darsh\VisionControl
@@ -18,6 +20,8 @@ Set-Location C:\Users\Darsh\VisionControl
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-tracking
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-only --face-centering --face-centering-debug
 .\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-centering
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --face-only --digital-reframe --reframe-debug
+.\.venv\Scripts\python.exe -m hand_tracking.hand_tracker --digital-reframe
 ```
 
 The hand-only command is unchanged. `--face-only` skips the hand model and rejects
@@ -109,6 +113,36 @@ Headless/minimized modes share the existing processing and capture ownership.
 Existing report opt-ins include `face_centering`, `centering_observation_age`,
 `face_centering_overlay` timings and bounded state/transition/stale counters.
 Reports store numeric summaries, not face coordinates or camera frames.
+
+## Digital reframing (opt-in)
+
+`--digital-reframe` enables centering, persistent tracking and detection, and adds
+the `VisionControl - Digital Auto-Frame` window. All inference/gesture/control
+coordinates still use the full original capture. The output crop uses the locked
+smoothed face center, with its own viewport-relative dead zone; it does not
+integrate the original-frame pan/tilt demand. No camera is moved or reopened.
+
+Defaults: `--reframe-scale` 2/3 (1280×720 from 1920×1080),
+`--reframe-follow-tau .2`, `--reframe-max-speed 600` source pixels/second,
+`--reframe-dead-zone .10` of crop half-size (inner threshold .06).
+`--reframe-debug` outlines the crop on the original preview. The renderer uses a
+read-only NumPy slice and a separate reusable display buffer, preserving source
+pixels and crop aspect. Full-resolution output is not upscaled for processing.
+
+`--no-reframe-preview` retains calculations without the auxiliary window.
+Headless benchmarking performs calculations only. Minimized windows independently
+skip their drawing while capture/tracking/reframing continue. Auxiliary X closes
+only that preview for the rest of the session; original X or Q ends the session
+with existing safety/resource cleanup. Restart to reopen the auxiliary preview.
+No additional event pump, GUI framework or system-wide virtual webcam is created.
+
+`DigitalReframer.update(CenteringResult, source_size=(W,H), now=host_time,
+profile=optional)` returns immutable `ReframeResult` and `CropRectangle` metadata.
+Loss, uncertainty, expiry, stale/invalid observations hold the crop without a new
+target. Current video pixels remain live in the held viewport. Recovery/new IDs
+restart timing and resume gradually. `fresh_at(now)` rechecks stored-result age.
+Configurable fixed composition and independent axis thresholds are API-only;
+no automatic zoom, composition rules, motor or ownership features are included.
 
 ## Model provenance and license
 
