@@ -1,0 +1,27 @@
+Item,Quantity,Specification,Status and sizing condition
+Camera,1,UGREEN owner webcam 82x46x45 including clip,User dimensions; actual insert and optical datum unmeasured
+Servo,2,Miuzei MG90S units received; body approx22.8x12.2x28.5,Body approximately confirmed; tabs/shaft and installed mating plane remain unverified
+Stock servo horn,2 required,Supplied double-arm selected for both first-fit candidates,Outer pair radius14.5mm approximate; wing2mm and hubOD6mm; full outline and second horn require fit test; cross alternative needs measurement
+Servo centre screw,2 required,Matching supplied retaining screw for each servo,Already supplied; identify actual thread/head/length and seating; no additional generic centre screw recommended
+Servo tab fastener,4 required by CAD,Use supplied mounting hardware only if compatible with the actual joint,Sizes/thread unmeasured; do not self-tap resin; compatible measured through-bolts/nuts may be needed if supplied coarse screws cannot retain this joint
+Pan horn fastener,2 required by current pattern,Two verified horn-compatible attachment screws; size and length pending pilot/engagement measurement,May not be included; outer pairR14.5; printed grip7mm; provisional printed clearance2.3 is NOT stock bore; remove old M2x12 assumption
+Tilt horn fastener,2 required by current pattern,Two verified horn-compatible attachment screws; size and length pending,Printed grip3.8mm after rear5.5x2.2 head recess; assumed head4.5x2; no servo-side nuts validated; use supplied screws only if suitable
+Adapter to cradle fastener,2,M3 x14 pan head with0.5mm washers and M3 nuts,10mm resin stack; audit headOD6 x3mm and nutOD envelope6.4 x2.4mm; tail clears revised flange by0.5mm; verify actual hardware
+Base to pedestal fastener,4,M3 x 14 pan head with washers and captive M3 nuts,4mm flange plus base roof/nut stack; adjust with washer as needed
+Fork to rotor fastener,4,M3 x 12 pan head with washers and M3 nuts,8mm resin stack; verify remaining thread engagement
+Removable plate fastener,4,M3 x 12 90-degree flat head with M3 nuts,8mm resin stack; countersink 6.5mm x1.7mm is provisional
+Cover fastener,2,M3 x 22 90-degree flat head with top washers and M3 nuts,3mm cover +14mm base; underside heads MUST be flush above feet
+Cable saddle fastener,2,M3 x 16 pan head with washers and M3 nuts,12mm resin stack; check below rotor clearance
+Passive pivot,1,5mm shoulder bolt approx20mm shoulder with M4 threaded tip,Must match measured cradle-gap-bushing-washer stack; do not tighten through rotating resin
+Pivot bushing,1,Plain bushing ID5 OD8 length8 mm,Measure actual stock; slip seat8.2 placeholder; capture axially with washers
+Pivot washers and nut,1 set,5mm-ID bearing washers and M4 locking nut,Set axial end play; no crushing or binding
+Pan thrust washer,1,PTFE ring ID44.5 OD50 thickness2 mm,Revised for43.5mm journal/44mm bore; procure or cut after actual axial stack measurement; avoid shaft carrying gravity load
+Camera insert screw,1 owner-selected,Owner drills blank plate and installs verified matching screw,Confirm actual thread/depth and underside head/washer footprint fits centred24x20mm cradle opening
+Camera washer pad,1,Thin removable non-slip pad and suitable washer,Measure thickness in screw engagement and optical height stack
+Rubber feet,4,12mm diameter x5mm thick adhesive feet,1mm recess; verify actual grip and cover clearance
+Ballast,1 lot,Target250g secured metal stock,Fit around nut traps; 43x92x10mm pockets with nut/foot bosses; physically verify secured stock fits
+Cable straps,2,Soft reusable hook-and-loop straps,One loose rotor saddle tie and one desk-side strain relief; no tight jacket bend
+Printed components,12 unique,12 unique designs:10 assembly parts and2 coupons,Use output_measured_fit; first print ServoFitCoupon +PanHornCoupon +TiltHornAdapter; full assembly held pending axial fit
+Servo supply,1 planned,Separate regulated5V DC supply sized for both servos startup current,Planned external power; current capacity/connector/fusing to be selected from measured loads; do not power servo motors from Pico3V3 or GPIO
+PWM controller,1 if not already available,Raspberry Pi Pico with two assigned PWM outputs,Future controller connection; common ground with servo supply; verify servo signal acceptance of3.3V; no live-control code added
+Power/signal wiring,1 set,Suitable distribution leads and reachable servo-power disconnect,Verify pinout/polarity; shared signal ground; keep5V off Pico GPIO; no unplanned positive-rail ties

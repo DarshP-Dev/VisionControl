@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297"><rect width="420" height="297" fill="white"/><g font-family="sans-serif" font-size="4"><text x="10" y="10">Cradle — PROVISIONAL; mm; projection scale 1:1 at 100% print</text><text x="220" y="230">Envelope X 98.00 / Y 52.00 / Z 46.00 mm</text><text x="220" y="240">Hole coordinates: drawings/interface_schedule.csv</text><text x="220" y="250">Fit coupon and physical interface verification required</text><g transform="translate(105,100) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path id= "1" d=" M 19 -49 L 19 49 " />
+<path id= "2" d=" M 23 -49 L 19 -49 " />
+<path id= "3" d=" M 19 -49 L -23 -49 " />
+<path id= "4" d=" M 23 -49 L 23 49 " />
+<path id= "5" d=" M 23 49 L 19 49 " />
+<path id= "6" d=" M 19 -45 L -23 -45 " />
+<path id= "7" d=" M -23 -49 L -23 -45 " />
+<path id= "8" d=" M 19 49 L -23 49 " />
+<path id= "9" d=" M -23 45 L -23 49 " />
+<path id= "10" d=" M 19 45 L -23 45 " />
+</g>
+</g><text x="80" y="170">FRONT</text><g transform="translate(280,100) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path id= "1" d=" M -49 -26 L -49 -14 " />
+<path id= "2" d=" M -49 -26 L 49 -26 " />
+<path id= "3" d=" M 49 -26 L 49 -14 " />
+<path id= "4" d=" M -49 14 L -49 26 " />
+<path id= "5" d=" M -49 26 L 49 26 " />
+<path id= "6" d=" M 49 14 L 49 26 " />
+<circle cx ="-34" cy ="-18" r ="1.7" /><circle cx ="34" cy ="-18" r ="1.7" /><path id= "9" d=" M 12 -10 L -12 -10 " />
+<path id= "10" d=" M 12 -10 L 12 10 " />
+<path id= "11" d=" M 12 10 L -12 10 " />
+<path id= "12" d=" M -12 -10 L -12 10 " />
+<circle cx ="-34" cy ="18" r ="1.7" /><circle cx ="34" cy ="18" r ="1.7" /><path id= "15" d=" M -49 -14 L -49 14 " />
+<path id= "16" d=" M -49 -14 L -45 -14 " />
+<path id= "17" d=" M 49 -14 L 49 14 " />
+<path id= "18" d=" M -45 -14 L -45 14 " />
+<path id= "19" d=" M 45 -14 L 49 -14 " />
+<path id= "20" d=" M -49 14 L -45 14 " />
+<path id= "21" d=" M 45 -14 L 45 14 " />
+<path id= "22" d=" M 45 14 L 49 14 " />
+</g>
+</g><text x="255" y="170">TOP</text><g transform="translate(105,245) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path id= "1" d=" M -19 26 L -19 14 " />
+<path id= "2" d=" M -19 -14 L -19 -26 " />
+<path id= "3" d=" M -23 26 L -19 26 " />
+<path id= "4" d=" M -19 -14 L 23 -14 " />
+<path id= "5" d=" M -23 -26 L -19 -26 " />
+<path id= "6" d=" M 23 14 L 23 -14 " />
+<path id= "7" d=" M -23 26 L -23 -26 " />
+<path id= "8" d=" M -19 14 L 23 14 " />
+<circle cx ="9" cy ="-9" r ="1.7" /><circle cx ="9" cy ="0" r ="3.5" /><circle cx ="9" cy ="9" r ="1.7" /><circle cx ="9" cy ="0" r ="2.65" /></g>
+</g><text x="80" y="315">SIDE</text></g></svg>

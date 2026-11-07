@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-07",
+  "review": "actual_accessory_photo_and_CAD_interface_comparison",
+  "photo_name": "ChatGPT Image Nov 7, 2026, 03_31_23 PM.jpg",
+  "photo_sha256": "0cdab7863475627c94ece48eef6d188094c0eb60834eab0e706e1450dd27bdd0",
+  "accessory_photo_available": true,
+  "visual_identifications": {
+    "double_arm": "visible",
+    "cross_four_arm": "visible with overlap; unequal arm lengths apparent",
+    "single_arm": "apparent; partly obscured",
+    "pointed_coarse_thread_screws": "visible; exact function and size unverified",
+    "short_blunt_screw": "candidate centre retainer; unverified"
+  },
+  "preferred_horns": {
+    "pan": "supplied straight double-arm subject to fit",
+    "tilt": "supplied straight double-arm from second kit subject to availability/fit"
+  },
+  "exact_dimensions_verified": false,
+  "dimensional_incompatibility_confirmed": false,
+  "compatible_fit_confirmed": false,
+  "geometry_changed": false,
+  "prior_validated_source_hashes_match": {
+    "generate_freecad.py": true,
+    "mount_geometry.py": true,
+    "verify_exports.py": true,
+    "render_cad.FCMacro": true,
+    "parameters.json": true
+  },
+  "coupon_regenerated": false,
+  "cad_sweep_rerun": false,
+  "reason": "Photo establishes accessory styles but no measured mismatch justifies changing CAD",
+  "next_input": "Exact measurements in SERVO_MEASUREMENTS.md"
+}

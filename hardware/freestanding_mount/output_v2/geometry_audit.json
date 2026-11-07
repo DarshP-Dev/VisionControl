@@ -1,0 +1,2034 @@
+{
+  "status": "KERNEL_EXECUTED_PROVISIONAL",
+  "freecad_version": [
+    "1",
+    "1",
+    "4",
+    "20260928 (Git shallow)",
+    "Unknown",
+    "2026/09/28 13:46:34",
+    "(HEAD detached at 4fd3bf320)",
+    "4fd3bf320d9566a27e60069fc8387448aaa3a094"
+  ],
+  "parts": {
+    "Base": {
+      "volume_ml": 79.24811268134471,
+      "estimated_mass_g": 91.13532958354641,
+      "bbox_mm": [
+        110.0,
+        100.0,
+        14.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "BallastCover": {
+      "volume_ml": 23.677039058756225,
+      "estimated_mass_g": 27.22859491756966,
+      "bbox_mm": [
+        92.0,
+        88.0,
+        3.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "Pedestal": {
+      "volume_ml": 48.572866459679396,
+      "estimated_mass_g": 55.8587964286313,
+      "bbox_mm": [
+        72.0,
+        58.0,
+        60.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "PanRotor": {
+      "volume_ml": 31.852009607828506,
+      "estimated_mass_g": 36.62981104900278,
+      "bbox_mm": [
+        116.0,
+        116.0,
+        14.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "LeftFork": {
+      "volume_ml": 11.877132717113236,
+      "estimated_mass_g": 13.65870262468022,
+      "bbox_mm": [
+        18.0,
+        40.0,
+        74.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "RightFork": {
+      "volume_ml": 14.13703968715963,
+      "estimated_mass_g": 16.257595640233575,
+      "bbox_mm": [
+        18.0,
+        40.0,
+        76.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "Cradle": {
+      "volume_ml": 27.33928013373077,
+      "estimated_mass_g": 31.440172153790385,
+      "bbox_mm": [
+        98.0,
+        52.0,
+        46.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "CameraPlate": {
+      "volume_ml": 18.501333632137083,
+      "estimated_mass_g": 21.276533676957644,
+      "bbox_mm": [
+        90.0,
+        52.0,
+        4.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "TiltHornAdapter": {
+      "volume_ml": 3.304798391943783,
+      "estimated_mass_g": 3.8005181507353503,
+      "bbox_mm": [
+        6.0,
+        28.0,
+        28.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "CableSaddle": {
+      "volume_ml": 1.6088173936802972,
+      "estimated_mass_g": 1.8501400027323416,
+      "bbox_mm": [
+        24.0,
+        10.0,
+        8.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "ServoFitCoupon": {
+      "volume_ml": 3.379881949725019,
+      "estimated_mass_g": 3.886864242183772,
+      "bbox_mm": [
+        44.0,
+        26.2,
+        4.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    }
+  },
+  "drawing_errors": [],
+  "warning": "No mechanical certification. Collision sampling omits cable, screws and detailed clip/servo/horn geometry.",
+  "sampled_collisions": [
+    {
+      "pan": -60.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -60.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -55.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -50.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -45.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -40.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -35.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -30.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -25.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -20.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -15.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -10.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": -5.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 0.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 5.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 10.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 15.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 20.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 25.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 30.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 35.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 40.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 45.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 50.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 55.0,
+      "tilt": 35.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": -35.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": -30.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": -25.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": -20.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": -15.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": -10.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": -5.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": 0.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": 5.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": 10.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": 15.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": 20.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": 25.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": 30.0,
+      "intersections": []
+    },
+    {
+      "pan": 60.0,
+      "tilt": 35.0,
+      "intersections": []
+    }
+  ],
+  "critical_minimum_clearance_mm": {
+    "Pedestal/PanRotor": 0.0,
+    "PanRotor/Cradle": 6.874147237625067,
+    "LeftFork/Cradle": 2.874147237625067,
+    "RightFork/Cradle": 2.874147237625067
+  },
+  "collision_free_at_samples": true,
+  "printed_volume_ml": 260.1184297633736
+}

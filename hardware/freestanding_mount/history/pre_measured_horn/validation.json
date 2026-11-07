@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-07",
+  "status": "CAD_EXECUTED_AND_EXPORTS_READ_BACK",
+  "physical_validation": false,
+  "freecad_version": [
+    "1",
+    "1",
+    "4",
+    "20260928 (Git shallow)",
+    "Unknown",
+    "2026/09/28 13:46:34",
+    "(HEAD detached at 4fd3bf320)",
+    "4fd3bf320d9566a27e60069fc8387448aaa3a094"
+  ],
+  "unit_checks_passed": 7,
+  "single_solids": 11,
+  "closed_stl_readbacks": 11,
+  "valid_step_readbacks": 11,
+  "fcstd_reopen_passed": 2,
+  "sampled_poses": 375,
+  "intersections_above_0_01_mm3": 0,
+  "gui_parameter_pose_assertion_passed": true,
+  "view_inspection": [
+    "isometric",
+    "side",
+    "exploded",
+    "extreme",
+    "PanRotor drawing"
+  ],
+  "source_sha256_at_final_review": {
+    "generate_freecad.py": "b44779cd5dca4a87b323bc6f3ed62f04fb0dca0132aef01f9fdbd95adb57ceb4",
+    "mount_geometry.py": "1e247953340538a3ee943b5f0cb74cf53be88432c85ecb755a540091ff20b45b",
+    "verify_exports.py": "6461c6c04f87bd216fcd782a1b090fc714b473d3bfdf12898aa84f2ccaaaa861",
+    "render_cad.FCMacro": "71499cc47cbbd830f7c7040dabcc43e13641f4456fff728d994e4c3b8755e3ad",
+    "parameters.json": "dfe6f4cef8c1525674a4300d3c42c199afa19a04cdf7801ad1c69127239cf395"
+  },
+  "resin": {
+    "baseline_assembly_ml": 332.9055603217978,
+    "revised_assembly_ml": 258.56275235122405,
+    "reduction_percent": 22.331500831260207,
+    "coupon_ml": 3.379881949725019
+  }
+}

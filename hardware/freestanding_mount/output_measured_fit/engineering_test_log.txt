@@ -1,0 +1,12 @@
+test_ballast_meets_assumed_moment_equation (test_engineering.EngineeringChecks.test_ballast_meets_assumed_moment_equation) ... ok
+test_camera_interface_stays_blank (test_engineering.EngineeringChecks.test_camera_interface_stays_blank) ... ok
+test_floor_corner_formula (test_engineering.EngineeringChecks.test_floor_corner_formula) ... ok
+test_height_and_cover_clearance (test_engineering.EngineeringChecks.test_height_and_cover_clearance) ... ok
+test_python_syntax_only (test_engineering.EngineeringChecks.test_python_syntax_only) ... ok
+test_torque_units_and_cable_sensitivity (test_engineering.EngineeringChecks.test_torque_units_and_cable_sensitivity) ... ok
+test_wider_support_reduces_required_ballast (test_engineering.EngineeringChecks.test_wider_support_reduces_required_ballast) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.020s
+
+OK

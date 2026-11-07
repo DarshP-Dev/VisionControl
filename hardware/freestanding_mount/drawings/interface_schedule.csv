@@ -1,0 +1,17 @@
+component,interface,coordinates_mm,hole_mm,status
+Base/Pedestal,4 mounting screws,X +/-31.0; Y +/-8.0,3.4,M3; nut AF5.8 depth2.6
+Base/Cover,2 cover screws,X0; Y +/-40,3.4,M3
+Rotor/Forks,4 screws,X +/-50.0; Y +/-12.0,3.4,M3
+Cradle/Plate,4 screws,X +/-34.0; Y +/-18.0,3.4,M3; plate countersink6.5x1.7 provisional
+Cradle/Adapter,2 screws,Y +/-9; Z128,3.4,M3; along X
+Pan horn,2 screws,X +/-14.5; Y0,2.3,Measured approximate radius; 2.3mm printed clearance PROVISIONAL; not horn bore size
+Tilt horn,2 screws,Y0; Z128 +/-14.5,2.3,Measured approximate radius; 2.3mm printed clearance PROVISIONAL; not horn bore size
+Pan servo tabs,2 holes,X5.3 +/-14; Y0,2.3,UNVERIFIED
+Tilt servo tabs,2 holes,Y0; Z128+5.3 +/-14,2.3,UNVERIFIED
+Camera insert,disabled,X0; Y0,none,6.35 major/1.27 pitch placeholder ONLY
+Left pivot,shoulder bolt,Y0; Z128,5.3,"5mm shoulder, M4 threaded tip; measure grip"
+Left bushing seat,plain bushing,Y0; Z128,8.2,8.2 slip seat; axial capture with washers
+Tilt adapter head recess,2 counterbores,Y0; Z128 +/-14.5,5.5,Depth2.2 from inner face X49; screw-head allowance only
+Pan bearing,journal and bore,OD43.5; cavityID37; length5.5,44,3.25 wall;0.5 diametral clearance;3.5 bearing engagement
+Right fork,screw tail relief,axisX; centreY0Z128,22,1mm deep from inner flange faceX58;3mm remaining flange
+Tilt adapter,stepped envelope,OD40 x4 plusOD36 x2,none,total6mm; rear head recesses reduce attachment grip to3.8mm

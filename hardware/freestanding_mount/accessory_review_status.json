@@ -1,0 +1,9 @@
+{
+  "date": "2026-11-07",
+  "photo_inspected": true,
+  "selection": "Supplied double-arm for both first-fit candidates using measured approximate outer pair; cross option needs its own measurements.",
+  "physical_fit_verified": false,
+  "details": "SERVO_ACCESSORY_REVIEW.md",
+  "measurement_provenance": "measurement_status.json",
+  "current_output": "output_measured_fit"
+}

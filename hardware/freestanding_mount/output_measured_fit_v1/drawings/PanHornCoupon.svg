@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297"><rect width="420" height="297" fill="white"/><g font-family="sans-serif" font-size="4"><text x="10" y="10">PanHornCoupon — PROVISIONAL; mm; projection scale 1:1 at 100% print</text><text x="220" y="230">Envelope X 43.50 / Y 43.50 / Z 11.00 mm</text><text x="220" y="240">Hole coordinates: drawings/interface_schedule.csv</text><text x="220" y="250">Fit coupon and physical interface verification required</text><g transform="translate(105,100) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path id= "1" d=" M -1.5 -21.75 L -5.5 -21.75 " />
+<path id= "2" d=" M 5.5 -21.75 L -1.5 -21.75 " />
+</g>
+<g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path d="M-5.5, -21.75 L-5.5, -21.2047  L-5.5, -19.5961  L-5.5, -17.0048  L-5.5, -13.5609  L-5.5, -9.43697  L-5.5, -4.83983  L-5.5, -3.55271e-15  L-5.5, 4.83983  L-5.5, 9.43697  L-5.5, 13.5609  L-5.5, 17.0048  L-5.5, 19.5961  L-5.5, 21.2047  L-5.5, 21.75 " /><path id= "2" d=" M -1.5 21.75 L -5.5 21.75 " />
+<path d="M-1.5, -21.75 L-1.5, -21.2047  L-1.5, -19.5961  L-1.5, -17.0048  L-1.5, -13.5609  L-1.5, -9.43697  L-1.5, -4.83983  L-1.5, -3.55271e-15  L-1.5, 4.83983  L-1.5, 9.43697  L-1.5, 13.5609  L-1.5, 17.0048  L-1.5, 19.5961  L-1.5, 21.2047  L-1.5, 21.75 " /><path id= "4" d=" M 5.5 21.75 L -1.5 21.75 " />
+<path d="M5.5, -21.75 L5.5, -21.2047  L5.5, -19.5961  L5.5, -17.0048  L5.5, -13.5609  L5.5, -9.43697  L5.5, -4.83983  L5.5, -3.55271e-15  L5.5, 4.83983  L5.5, 9.43697  L5.5, 13.5609  L5.5, 17.0048  L5.5, 19.5961  L5.5, 21.2047  L5.5, 21.75 " /></g>
+</g><text x="80" y="170">FRONT</text><g transform="translate(280,100) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<circle cx ="0" cy ="0" r ="21.75" /><circle cx ="-14.5" cy ="1.77574e-15" r ="1.15" /><circle cx ="0" cy ="0" r ="3.5" /><circle cx ="14.5" cy ="0" r ="1.15" /></g>
+</g><text x="255" y="170">TOP</text><g transform="translate(105,205) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path id= "1" d=" M 1.5 -21.75 L 5.5 -21.75 " />
+<path id= "2" d=" M 1.5 21.75 L 5.5 21.75 " />
+<path id= "3" d=" M -5.5 -21.75 L 1.5 -21.75 " />
+<path id= "4" d=" M -5.5 21.75 L 1.5 21.75 " />
+</g>
+<g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path d="M5.5, 0 L5.5, -2.43523  L5.5, -4.83983  L5.5, -7.18357  L5.5, -9.43697  L5.5, -11.5717  L5.5, -13.5609  L5.5, -15.3796  L5.5, -17.0048  L5.5, -18.4163  L5.5, -19.5961  L5.5, -20.5295  L5.5, -21.2047  L5.5, -21.6132  L5.5, -21.75 " /><path d="M5.5, 21.75 L5.5, 21.6132  L5.5, 21.2047  L5.5, 20.5295  L5.5, 19.5961  L5.5, 18.4163  L5.5, 17.0048  L5.5, 15.3796  L5.5, 13.5609  L5.5, 11.5717  L5.5, 9.43697  L5.5, 7.18357  L5.5, 4.83983  L5.5, 2.43523  L5.5, 5.32907e-15 " /><path d="M1.5, 0 L1.5, -2.43523  L1.5, -4.83983  L1.5, -7.18357  L1.5, -9.43697  L1.5, -11.5717  L1.5, -13.5609  L1.5, -15.3796  L1.5, -17.0048  L1.5, -18.4163  L1.5, -19.5961  L1.5, -20.5295  L1.5, -21.2047  L1.5, -21.6132  L1.5, -21.75 " /><path d="M1.5, 21.75 L1.5, 21.6132  L1.5, 21.2047  L1.5, 20.5295  L1.5, 19.5961  L1.5, 18.4163  L1.5, 17.0048  L1.5, 15.3796  L1.5, 13.5609  L1.5, 11.5717  L1.5, 9.43697  L1.5, 7.18357  L1.5, 4.83983  L1.5, 2.43523  L1.5, 5.32907e-15 " /><path d="M-5.5, 0 L-5.5, -2.43523  L-5.5, -4.83983  L-5.5, -7.18357  L-5.5, -9.43697  L-5.5, -11.5717  L-5.5, -13.5609  L-5.5, -15.3796  L-5.5, -17.0048  L-5.5, -18.4163  L-5.5, -19.5961  L-5.5, -20.5295  L-5.5, -21.2047  L-5.5, -21.6132  L-5.5, -21.75 " /><path d="M-5.5, 21.75 L-5.5, 21.6132  L-5.5, 21.2047  L-5.5, 20.5295  L-5.5, 19.5961  L-5.5, 18.4163  L-5.5, 17.0048  L-5.5, 15.3796  L-5.5, 13.5609  L-5.5, 11.5717  L-5.5, 9.43697  L-5.5, 7.18357  L-5.5, 4.83983  L-5.5, 2.43523  L-5.5, 5.32907e-15 " /></g>
+</g><text x="80" y="275">SIDE</text></g></svg>

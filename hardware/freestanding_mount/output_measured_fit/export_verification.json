@@ -1,0 +1,223 @@
+{
+  "freecad_version": [
+    "1",
+    "1",
+    "4",
+    "20260928 (Git shallow)",
+    "Unknown",
+    "2026/09/28 13:46:34",
+    "(HEAD detached at 4fd3bf320)",
+    "4fd3bf320d9566a27e60069fc8387448aaa3a094"
+  ],
+  "exports": {
+    "Base": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 1.8917489796876907e-10,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.011134169062439619,
+      "stl_facets": 3612
+    },
+    "BallastCover": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 7.639755494892597e-11,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.00708592875404651,
+      "stl_facets": 1072
+    },
+    "Pedestal": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 7.275957614183426e-12,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.030995460315974846,
+      "stl_facets": 1806
+    },
+    "PanRotor": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 1.7425918485969305e-09,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.12493211922564089,
+      "stl_facets": 3472
+    },
+    "LeftFork": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 1.8189894035458565e-12,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.006585185114678567,
+      "stl_facets": 888
+    },
+    "RightFork": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 1.6370904631912708e-11,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.04822720956596318,
+      "stl_facets": 1242
+    },
+    "Cradle": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 2.1827872842550278e-11,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.004976324404162386,
+      "stl_facets": 2144
+    },
+    "CameraPlate": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 1.4551915228366852e-11,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.005913639847025001,
+      "stl_facets": 1668
+    },
+    "TiltHornAdapter": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 0.0,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.2528848677913659,
+      "stl_facets": 1852
+    },
+    "CableSaddle": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 2.2737367544323206e-13,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.04783143103906658,
+      "stl_facets": 536
+    },
+    "ServoFitCoupon": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 4.547473508864641e-13,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.00254647512503529,
+      "stl_facets": 448
+    },
+    "PanHornCoupon": {
+      "step_valid": true,
+      "step_solids": 1,
+      "step_volume_error_mm3": 2.000888343900442e-11,
+      "stl_closed": true,
+      "stl_volume_error_percent": 0.24057539244600365,
+      "stl_facets": 1136
+    }
+  },
+  "documents": {
+    "VisionControl_Assembly.FCStd": {
+      "opened": true,
+      "valid_shapes": 19,
+      "parameter_recompute_roundtrip": true
+    },
+    "exploded_mount.FCStd": {
+      "opened": true,
+      "valid_shapes": 10
+    }
+  },
+  "physical_validation": false,
+  "mass_stability_screen": {
+    "resin_density_assumption_g_ml": 1.15,
+    "fixed_g_excluding_fasteners": 186.60880952840023,
+    "moving_g_excluding_fasteners": 234.82332840058453,
+    "tilt_printed_g": 60.29098550174737,
+    "tip_ratio_250g_25mm_moving_com_offset_0_5N_pull": 2.1678087530496506,
+    "required_ballast_g_for_ratio2": 198.02484782625854,
+    "notes": "Computed CAD resin mass plus specified camera/servo masses. Fasteners, washer and bushing omitted; COM uncertainty is an assumed 25mm moving-group offset."
+  },
+  "motion_centres": [
+    {
+      "pan": -60,
+      "tilt": -35,
+      "estimated_com_with_250g_mm": [
+        0.32395348848620964,
+        2.4052521748623024,
+        47.334074017643765
+      ],
+      "note": "Envelope camera COM; no measured balance or cable; add4mm for desk-height datum"
+    },
+    {
+      "pan": -60,
+      "tilt": 0,
+      "estimated_com_with_250g_mm": [
+        1.3281294968490707,
+        1.8254908861202404,
+        46.96847795328518
+      ],
+      "note": "Envelope camera COM; no measured balance or cable; add4mm for desk-height datum"
+    },
+    {
+      "pan": -60,
+      "tilt": 35,
+      "estimated_com_with_250g_mm": [
+        2.332305505211932,
+        1.2457295973781788,
+        47.334074017643765
+      ],
+      "note": "Envelope camera COM; no measured balance or cable; add4mm for desk-height datum"
+    },
+    {
+      "pan": 0,
+      "tilt": -35,
+      "estimated_com_with_250g_mm": [
+        2.2930738274500246,
+        1.005364298440277,
+        47.33407401764376
+      ],
+      "note": "Envelope camera COM; no measured balance or cable; add4mm for desk-height datum"
+    },
+    {
+      "pan": 0,
+      "tilt": 0,
+      "estimated_com_with_250g_mm": [
+        2.2930738274500246,
+        -0.15415827904384857,
+        46.96847795328518
+      ],
+      "note": "Envelope camera COM; no measured balance or cable; add4mm for desk-height datum"
+    },
+    {
+      "pan": 0,
+      "tilt": 35,
+      "estimated_com_with_250g_mm": [
+        2.2930738274500246,
+        -1.313680856527975,
+        47.334074017643765
+      ],
+      "note": "Envelope camera COM; no measured balance or cable; add4mm for desk-height datum"
+    },
+    {
+      "pan": 60,
+      "tilt": -35,
+      "estimated_com_with_250g_mm": [
+        2.0652955335006054,
+        -1.3998878764220273,
+        47.334074017643765
+      ],
+      "note": "Envelope camera COM; no measured balance or cable; add4mm for desk-height datum"
+    },
+    {
+      "pan": 60,
+      "tilt": 0,
+      "estimated_com_with_250g_mm": [
+        1.0611195251377443,
+        -1.9796491651640884,
+        46.96847795328518
+      ],
+      "note": "Envelope camera COM; no measured balance or cable; add4mm for desk-height datum"
+    },
+    {
+      "pan": 60,
+      "tilt": 35,
+      "estimated_com_with_250g_mm": [
+        0.056943516774884746,
+        -2.5594104539061506,
+        47.334074017643765
+      ],
+      "note": "Envelope camera COM; no measured balance or cable; add4mm for desk-height datum"
+    }
+  ]
+}

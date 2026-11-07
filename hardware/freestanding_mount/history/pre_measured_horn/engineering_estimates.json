@@ -1,0 +1,44 @@
+{
+  "status": "ARITHMETIC_ONLY_NOT_CAD_VALIDATED",
+  "assumed_units": "mm, g; report torque N m",
+  "optical_height_desk_mm": 140.0,
+  "camera_clip_full_envelope_sweep_radius_mm": 32.89756829919196,
+  "cradle_floor_corner_min_z_mm": 86.87414723762507,
+  "nominal_gravity_peak_Nm": 0.00602591611707733,
+  "additional_com_uncertainty_Nm": 0.023727189675,
+  "startup_inertia_Nm": 0.00028845352381112223,
+  "assumed_usb_torque_Nm": 0.008,
+  "conservative_sum_Nm": 0.03804155931588845,
+  "advertised_stall_Nm": 0.196133,
+  "planning_screen_25pct_stall_Nm": 0.04903325,
+  "note_stall": "25% is an assumed screening budget, NOT a manufacturer continuous rating.",
+  "stability": {
+    "support_half_span_m": 0.042,
+    "offset_moment_Nm": 0.073549875,
+    "external_moment_Nm": 0.07,
+    "no_ballast_tip_margin": 1.434620893957588,
+    "required_ballast_g": 197.04826146883315,
+    "tip_margin_with_250g": 2.151931340936382,
+    "gross_pocket_capacity_ml": 38.304,
+    "ideal_solid_steel_capacity_g": 300.6864,
+    "note": "Assumed 0.5 N equivalent lateral load includes cable pull/startup/disturbance. No sliding test. Pocket hardware reduces capacity."
+  },
+  "rough_resin_ml_by_part": {
+    "Base": 115.696,
+    "BallastCover": 24.288,
+    "Pedestal": 77.98145175425633,
+    "PanRotor": 49.3061186008467,
+    "ForkPair": 35.04,
+    "Cradle": 30.688,
+    "CameraPlate": 18.72,
+    "TiltHornAdapter": 3.6945129606215965,
+    "CableSaddle": 1.92,
+    "ServoFitCoupon": 3.4131199999999997
+  },
+  "rough_resin_total_ml": 360.7472033157246,
+  "planning_resin_with_supports_ml": [
+    450.9340041446558,
+    523.0834448078007
+  ],
+  "note_resin": "Gross primitive estimates, overlaps partly double-counted; exact Boolean volumes only after FreeCAD. Density assumed 1.15 g/ml."
+}

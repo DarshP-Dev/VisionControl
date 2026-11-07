@@ -1,0 +1,24 @@
+Item,Quantity,Specification,Status and sizing condition
+Camera,1,UGREEN owner webcam 82x46x45 including clip,User dimensions; actual insert and optical datum unmeasured
+Servo,2,Miuzei MG90S units received,Owner confirms arrival; actual body/tab/shaft measurements remain pending
+Stock servo horn,2 required,Prefer supplied straight double-arm on each axis if available in both kits,Photo shows double-arm and cross; apparent single-arm partly obscured; actual pattern/outline/hub dimensions pending
+Servo centre screw,2 required,Matching supplied centre-retention screw after positive identification,Shorter apparently blunt screw visible as candidate; count/thread/head/length/function not established from photo
+Servo tab fastener,4 required by CAD,Use suitable supplied tab mounting screws after verification,Pointed coarse-thread screws visible; do not assume M2 machine thread or nut compatibility; actual sizes and roles pending
+Pan horn fastener,2 required by current pattern,Use compatible included attachment screws if suitable; M2 x12 remains conditional,Opposed holes radius8mm; printed grip7mm; verify horn engagement and entire outline inside30mm journal bore
+Tilt horn fastener,2 required by current pattern,Use compatible included attachment screws if suitable; M2 x12 remains conditional,Printed grip6mm; opposed horn pair along localZ; check hub and clearance to separate M3 holes along localY
+Adapter to cradle fastener,2,M3 x 14 pan head with washers and M3 nuts,10mm resin stack; check actual protrusion through full tilt travel
+Base to pedestal fastener,4,M3 x 14 pan head with washers and captive M3 nuts,4mm flange plus base roof/nut stack; adjust with washer as needed
+Fork to rotor fastener,4,M3 x 12 pan head with washers and M3 nuts,8mm resin stack; verify remaining thread engagement
+Removable plate fastener,4,M3 x 12 90-degree flat head with M3 nuts,8mm resin stack; countersink 6.5mm x1.7mm is provisional
+Cover fastener,2,M3 x 22 90-degree flat head with top washers and M3 nuts,3mm cover +14mm base; underside heads MUST be flush above feet
+Cable saddle fastener,2,M3 x 16 pan head with washers and M3 nuts,12mm resin stack; check below rotor clearance
+Passive pivot,1,5mm shoulder bolt approx20mm shoulder with M4 threaded tip,Must match measured cradle-gap-bushing-washer stack; do not tighten through rotating resin
+Pivot bushing,1,Plain bushing ID5 OD8 length8 mm,Measure actual stock; slip seat8.2 placeholder; capture axially with washers
+Pivot washers and nut,1 set,5mm-ID bearing washers and M4 locking nut,Set axial end play; no crushing or binding
+Pan thrust washer,1,PTFE ring ID40.5 OD50 thickness2 mm,Adjust thickness after horn/shaft height measurement; check creep and friction
+Camera insert screw,1 owner-selected,Owner drills blank plate and installs verified matching screw,Confirm actual thread/depth and underside head/washer footprint fits centred24x20mm cradle opening
+Camera washer pad,1,Thin removable non-slip pad and suitable washer,Measure thickness in screw engagement and optical height stack
+Rubber feet,4,12mm diameter x5mm thick adhesive feet,1mm recess; verify actual grip and cover clearance
+Ballast,1 lot,Target250g secured metal stock,Fit around nut traps; 43x92x10mm pockets with nut/foot bosses; physically verify secured stock fits
+Cable straps,2,Soft reusable hook-and-loop straps,One loose rotor saddle tie and one desk-side strain relief; no tight jacket bend
+Printed components,11 unique,Existing validated geometry and provisional servo coupon retained,Photo review found no proven dimensional mismatch; actual supplied-hardware fit still requires measurements

@@ -1,0 +1,2 @@
+# FreeCAD's automatic save backups; keep the named CAD revisions instead.
+*.FCBak

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297"><rect width="420" height="297" fill="white"/><g font-family="sans-serif" font-size="4"><text x="10" y="10">TiltHornAdapter — PROVISIONAL; mm; projection scale 1:1 at 100% print</text><text x="220" y="230">Envelope X 6.00 / Y 40.00 / Z 40.00 mm</text><text x="220" y="240">Hole coordinates: drawings/interface_schedule.csv</text><text x="220" y="250">Fit coupon and physical interface verification required</text><g transform="translate(105,100) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path id= "1" d=" M 20 -3 L 20 1 " />
+<path id= "2" d=" M 18 1 L 18 3 " />
+</g>
+<g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path d="M-20, 1 L-19.4986, 1  L-18.0194, 1  L-15.6366, 1  L-12.4698, 1  L-8.67767, 1  L-4.45042, 1  L0, 1  L4.45042, 1  L8.67767, 1  L12.4698, 1  L15.6366, 1  L18.0194, 1  L19.4986, 1  L20, 1 " /><path id= "2" d=" M -20 -3 L -20 1 " />
+<path d="M-20, -3 L-19.4986, -3  L-18.0194, -3  L-15.6366, -3  L-12.4698, -3  L-8.67767, -3  L-4.45042, -3  L0, -3  L4.45042, -3  L8.67767, -3  L12.4698, -3  L15.6366, -3  L18.0194, -3  L19.4986, -3  L20, -3 " /><path d="M-18, 3 L-17.5487, 3  L-16.2174, 3  L-14.073, 3  L-11.2228, 3  L-7.80991, 3  L-4.00538, 3  L0, 3  L4.00538, 3  L7.80991, 3  L11.2228, 3  L14.073, 3  L16.2174, 3  L17.5487, 3  L18, 3 " /><path id= "5" d=" M -18 1 L -18 3 " />
+</g>
+</g><text x="80" y="170">FRONT</text><g transform="translate(280,100) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path id= "1" d=" M -3 -20 L 1 -20 " />
+<path id= "2" d=" M -3 20 L 1 20 " />
+<path id= "3" d=" M 1 -18 L 3 -18 " />
+<path id= "4" d=" M 1 18 L 3 18 " />
+</g>
+<g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path d="M1, 0 L1, -2.23929  L1, -4.45042  L1, -6.60558  L1, -8.67767  L1, -10.6406  L1, -12.4698  L1, -14.1421  L1, -15.6366  L1, -16.9345  L1, -18.0194  L1, -18.8777  L1, -19.4986  L1, -19.8742  L1, -20 " /><path d="M1, 20 L1, 19.8742  L1, 19.4986  L1, 18.8777  L1, 18.0194  L1, 16.9345  L1, 15.6366  L1, 14.1421  L1, 12.4698  L1, 10.6406  L1, 8.67767  L1, 6.60558  L1, 4.45042  L1, 2.23929  L1, 4.88498e-15 " /><path d="M-3, 0 L-3, -2.23929  L-3, -4.45042  L-3, -6.60558  L-3, -8.67767  L-3, -10.6406  L-3, -12.4698  L-3, -14.1421  L-3, -15.6366  L-3, -16.9345  L-3, -18.0194  L-3, -18.8777  L-3, -19.4986  L-3, -19.8742  L-3, -20 " /><path d="M-3, 20 L-3, 19.8742  L-3, 19.4986  L-3, 18.8777  L-3, 18.0194  L-3, 16.9345  L-3, 15.6366  L-3, 14.1421  L-3, 12.4698  L-3, 10.6406  L-3, 8.67767  L-3, 6.60558  L-3, 4.45042  L-3, 2.23929  L-3, 4.88498e-15 " /><path d="M3, 0 L3, -2.01536  L3, -4.00538  L3, -5.94502  L3, -7.80991  L3, -9.57658  L3, -11.2228  L3, -12.7279  L3, -14.073  L3, -15.241  L3, -16.2174  L3, -16.9899  L3, -17.5487  L3, -17.8868  L3, -18 " /><path d="M3, 18 L3, 17.8868  L3, 17.5487  L3, 16.9899  L3, 16.2174  L3, 15.241  L3, 14.073  L3, 12.7279  L3, 11.2228  L3, 9.57658  L3, 7.80991  L3, 5.94502  L3, 4.00538  L3, 2.01536  L3, 4.44089e-15 " /></g>
+</g><text x="255" y="170">TOP</text><g transform="translate(105,205) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<circle cx ="0" cy ="0" r ="20" /><circle cx ="0" cy ="0" r ="18" /><circle cx ="0" cy ="-9" r ="1.7" /><circle cx ="0" cy ="0" r ="3.5" /><circle cx ="0" cy ="9" r ="1.7" /><circle cx ="-14.5" cy ="-1.77574e-15" r ="1.15" /><circle cx ="14.5" cy ="0" r ="1.15" /></g>
+</g><text x="80" y="275">SIDE</text></g></svg>

@@ -1,0 +1,468 @@
+{
+  "status": "KERNEL_EXECUTED_PROVISIONAL",
+  "freecad_version": [
+    "1",
+    "1",
+    "4",
+    "20260928 (Git shallow)",
+    "Unknown",
+    "2026/09/28 13:46:34",
+    "(HEAD detached at 4fd3bf320)",
+    "4fd3bf320d9566a27e60069fc8387448aaa3a094"
+  ],
+  "parts": {
+    "Base": {
+      "volume_ml": 114.51859327123023,
+      "estimated_mass_g": 131.69638226191475,
+      "bbox_mm": [
+        110.0,
+        100.0,
+        14.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "BallastCover": {
+      "volume_ml": 23.677039058756225,
+      "estimated_mass_g": 27.22859491756966,
+      "bbox_mm": [
+        92.0,
+        88.0,
+        3.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "Pedestal": {
+      "volume_ml": 67.45286645967936,
+      "estimated_mass_g": 77.57079642863125,
+      "bbox_mm": [
+        72.0,
+        58.0,
+        60.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "PanRotor": {
+      "volume_ml": 48.76065957636717,
+      "estimated_mass_g": 56.074758512822235,
+      "bbox_mm": [
+        116.0,
+        116.0,
+        14.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "LeftFork": {
+      "volume_ml": 12.741132717113235,
+      "estimated_mass_g": 14.65230262468022,
+      "bbox_mm": [
+        18.0,
+        40.0,
+        74.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "RightFork": {
+      "volume_ml": 15.001039687159638,
+      "estimated_mass_g": 17.251195640233583,
+      "bbox_mm": [
+        18.0,
+        40.0,
+        76.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "Cradle": {
+      "volume_ml": 27.33928013373077,
+      "estimated_mass_g": 31.440172153790385,
+      "bbox_mm": [
+        98.0,
+        52.0,
+        46.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "CameraPlate": {
+      "volume_ml": 18.501333632137083,
+      "estimated_mass_g": 21.276533676957644,
+      "bbox_mm": [
+        90.0,
+        52.0,
+        4.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "TiltHornAdapter": {
+      "volume_ml": 3.304798391943783,
+      "estimated_mass_g": 3.8005181507353503,
+      "bbox_mm": [
+        6.0,
+        28.0,
+        28.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "CableSaddle": {
+      "volume_ml": 1.6088173936802972,
+      "estimated_mass_g": 1.8501400027323416,
+      "bbox_mm": [
+        24.0,
+        10.0,
+        8.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    },
+    "ServoFitCoupon": {
+      "volume_ml": 3.379881949725019,
+      "estimated_mass_g": 3.886864242183772,
+      "bbox_mm": [
+        44.0,
+        26.2,
+        4.0
+      ],
+      "fits_bare_build_volume_some_orientation": true,
+      "solid_count": 1,
+      "valid": true
+    }
+  },
+  "drawing_errors": [],
+  "warning": "No mechanical certification. Collision sampling omits cable, screws and detailed clip/servo/horn geometry.",
+  "sampled_collisions": [
+    {
+      "pan": -60.0,
+      "tilt": -35.0,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.7421791381606
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.13512593719409
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.13512593719359
+        }
+      ]
+    },
+    {
+      "pan": -60.0,
+      "tilt": -17.5,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.7421791381606
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.0157477593958
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.0157477593961
+        }
+      ]
+    },
+    {
+      "pan": -60.0,
+      "tilt": 0,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.7421791381606
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 144.0
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 144.00000000000003
+        }
+      ]
+    },
+    {
+      "pan": -60.0,
+      "tilt": 17.5,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.7421791381606
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.01574775939622
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.0157477593959
+        }
+      ]
+    },
+    {
+      "pan": -60.0,
+      "tilt": 35.0,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.7421791381606
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.135125937194
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.13512593719419
+        }
+      ]
+    },
+    {
+      "pan": 0,
+      "tilt": -35.0,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.742179138160282
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.13512593719376
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.13512593719378
+        }
+      ]
+    },
+    {
+      "pan": 0,
+      "tilt": -17.5,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.742179138160282
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.01574775939588
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.01574775939594
+        }
+      ]
+    },
+    {
+      "pan": 0,
+      "tilt": 0,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.742179138160282
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 144.0
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 144.0
+        }
+      ]
+    },
+    {
+      "pan": 0,
+      "tilt": 17.5,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.742179138160282
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.01574775939608
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.01574775939605
+        }
+      ]
+    },
+    {
+      "pan": 0,
+      "tilt": 35.0,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.742179138160282
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.13512593719409
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.13512593719406
+        }
+      ]
+    },
+    {
+      "pan": 60.0,
+      "tilt": -35.0,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.742179138160663
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.13512593719379
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.1351259371941
+        }
+      ]
+    },
+    {
+      "pan": 60.0,
+      "tilt": -17.5,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.742179138160663
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.01574775939605
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.01574775939582
+        }
+      ]
+    },
+    {
+      "pan": 60.0,
+      "tilt": 0,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.742179138160663
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.99999999999997
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 144.00000000000006
+        }
+      ]
+    },
+    {
+      "pan": 60.0,
+      "tilt": 17.5,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.742179138160663
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.01574775939596
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 143.01574775939605
+        }
+      ]
+    },
+    {
+      "pan": 60.0,
+      "tilt": 35.0,
+      "intersections": [
+        {
+          "a": "Pedestal",
+          "b": "PanRotor",
+          "intersection_mm3": 4.742179138160663
+        },
+        {
+          "a": "LeftFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.13512593719429
+        },
+        {
+          "a": "RightFork",
+          "b": "Cradle",
+          "intersection_mm3": 110.13512593719385
+        }
+      ]
+    }
+  ],
+  "collision_free_at_samples": false,
+  "printed_volume_ml": 332.9055603217978
+}

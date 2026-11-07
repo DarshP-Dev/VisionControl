@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-06",
+  "freecad_execution": "NOT AVAILABLE: checked PATH, Program Files, per-user Programs, WinGet package directory, uninstall registry",
+  "solid_geometry_validation": "NOT EXECUTED",
+  "FCStd_STL_STEP_exports": "NOT GENERATED",
+  "independent_checks": "7 unittest checks passed; Python AST syntax, arithmetic and assumptions only",
+  "schematic_review": "Two schematic PNGs visually inspected; not CAD renders",
+  "bom_rows": 23,
+  "source_sha256": {
+    "engineering.py": "1a1a928c53a5bc9967b4dd5bc72de47240e12f96e482d0f81c6e5899edd12463",
+    "engineering_estimates.json": "16fe584523766f5bec8853b47d2c9a2f48d6e67b192ef108e6cb5dad9502376f",
+    "generate_freecad.py": "2016e22f0afea27dedf54243c609c82031c2d9dd1670b57f0599e97f1a52c37c",
+    "mount_geometry.py": "ae59d931d7a8856980cce5d19e3b234e2edfede1fae93c9bcfce15643c7c264f",
+    "parameters.json": "562b75470ff2e76fbdc31cd2e5d8a74b6c6bbc5a1152ebba93e4ece4c01bca60",
+    "test_engineering.py": "21d5d5397c00c6b14dd0439197a50646bd3e3207e2813a2907f2e5b6878baccb"
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "status": "KERNEL_CHECKED_ASSUMED_HARDWARE_BUDGETS_ONLY",
+  "physical_fit_verified": false,
+  "neutral_budget_intersections": [
+    {
+      "hardware_budget": "tilt_adapter_M3_shafts",
+      "part": "RightFork",
+      "intersection_mm3": 7.068583470577027
+    }
+  ],
+  "full_360deg_tilt_head_sweeps": [
+    {
+      "budget": "tilt_attachment_heads",
+      "part": "RightFork",
+      "intersection_mm3": 0.0,
+      "clearance_mm": 3.5920050111323545
+    },
+    {
+      "budget": "tilt_attachment_heads",
+      "part": "LeftFork",
+      "intersection_mm3": 0,
+      "clearance_mm": 97.10202109122137
+    },
+    {
+      "budget": "tilt_attachment_heads",
+      "part": "PanRotor",
+      "intersection_mm3": 0,
+      "clearance_mm": 31.250000000000014
+    },
+    {
+      "budget": "tilt_attachment_heads",
+      "part": "TiltServoEnvelope",
+      "intersection_mm3": 0,
+      "clearance_mm": 10.799999999999997
+    },
+    {
+      "budget": "tilt_adapter_M3_heads",
+      "part": "RightFork",
+      "intersection_mm3": 0.0,
+      "clearance_mm": 11.800423721205945
+    },
+    {
+      "budget": "tilt_adapter_M3_heads",
+      "part": "LeftFork",
+      "intersection_mm3": 0,
+      "clearance_mm": 91.29211356957401
+    },
+    {
+      "budget": "tilt_adapter_M3_heads",
+      "part": "PanRotor",
+      "intersection_mm3": 0,
+      "clearance_mm": 36.000000000000014
+    },
+    {
+      "budget": "tilt_adapter_M3_heads",
+      "part": "TiltServoEnvelope",
+      "intersection_mm3": 0,
+      "clearance_mm": 17.5
+    },
+    {
+      "budget": "tilt_adapter_M3_nut_budgets",
+      "part": "RightFork",
+      "intersection_mm3": 0.0,
+      "clearance_mm": 0.6000000000000014
+    },
+    {
+      "budget": "tilt_adapter_M3_nut_budgets",
+      "part": "LeftFork",
+      "intersection_mm3": 0,
+      "clearance_mm": 103.98192150561557
+    },
+    {
+      "budget": "tilt_adapter_M3_nut_budgets",
+      "part": "PanRotor",
+      "intersection_mm3": 0,
+      "clearance_mm": 35.80000000000001
+    },
+    {
+      "budget": "tilt_adapter_M3_nut_budgets",
+      "part": "TiltServoEnvelope",
+      "intersection_mm3": 0,
+      "clearance_mm": 4.600000000000001
+    },
+    {
+      "budget": "tilt_adapter_M3_shafts",
+      "part": "RightFork",
+      "intersection_mm3": 58.63650980878971,
+      "clearance_mm": 0.0
+    },
+    {
+      "budget": "tilt_adapter_M3_shafts",
+      "part": "LeftFork",
+      "intersection_mm3": 0,
+      "clearance_mm": 94.62821989237672
+    },
+    {
+      "budget": "tilt_adapter_M3_shafts",
+      "part": "PanRotor",
+      "intersection_mm3": 0,
+      "clearance_mm": 37.5
+    },
+    {
+      "budget": "tilt_adapter_M3_shafts",
+      "part": "TiltServoEnvelope",
+      "intersection_mm3": 0,
+      "clearance_mm": 3.5
+    }
+  ],
+  "pan_tab_head_to_rotor_clearance_mm": 0.5,
+  "driver_path_intersections_without_camera": [],
+  "unchanged_component_symmetric_difference_mm3": {
+    "Base": 0.0,
+    "BallastCover": 0.0,
+    "LeftFork": 0.0,
+    "Cradle": 0.0,
+    "CameraPlate": 0.0,
+    "CableSaddle": 0.0,
+    "ServoFitCoupon": 0.0
+  },
+  "dimensions": {
+    "camera_plate_thickness_mm": 4.0,
+    "horn_hole_radius_mm": 14.5,
+    "journal_wall_mm": 3.25,
+    "journal_bearing_axial_overlap_mm": 3.5,
+    "hub_to_access_radial_budget_mm": 0.5,
+    "horn_to_pan_cavity_radial_budget_mm": 0.5,
+    "tilt_horn_to_fork_radial_budget_mm": 1.0,
+    "tilt_effective_attachment_grip_mm": 3.8
+  },
+  "installed_height": {
+    "user_body_bottom_to_highest_point_mm": 34.0,
+    "cad_body_bottom_to_wing_mating_face_mm": 35.5,
+    "difference_mm": 1.5,
+    "resolved": false,
+    "reason": "Highest point is not established as wing mating face. Hub and retaining-head stack remain unmeasured; no final axial fit release."
+  },
+  "torque_screen": {
+    "nominal_gravity_peak_Nm": 0.0076348763829446305,
+    "additional_com_uncertainty_Nm": 0.023034494819560665,
+    "startup_inertia_Nm": 0.0002700845488306428,
+    "assumed_usb_torque_Nm": 0.008,
+    "conservative_sum_Nm": 0.038939455751335936,
+    "planning_screen_25pct_stall_Nm": 0.04903325,
+    "note_stall": "25% is an assumed screening budget, NOT a manufacturer continuous rating."
+  },
+  "tilt_printed_mass_g": 60.2909855017474,
+  "limitations": [
+    "Screw heads are assumed clearance budgets; supplied thread, length, engagement and washer sizes unknown.",
+    "No real horn outline, hub projection, cable or screw-tip solid. No strength/creep/FEA certification.",
+    "Head sweeps are continuous for tilt relative to fork; main compound motion is the separate 375-pose sampled test.",
+    "A 4mm straight driver budget applies before the camera is installed; actual driver must be tried.",
+    "Torque omits fastener mass and joint friction. Cable and COM uncertainty are assumed."
+  ],
+  "assumed_budget_checks_pass": false
+}

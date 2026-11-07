@@ -1,0 +1,72 @@
+import sys
+import json
+from pathlib import Path
+import FreeCAD as App
+import FreeCADGui as Gui
+from PySide import QtCore
+
+root=Path(r'C:\Users\Darsh\VisionControl\hardware\freestanding_mount')
+sys.path.insert(0,str(root))
+output=root/'output_measured_fit'
+def settle():
+    loop=QtCore.QEventLoop()
+    QtCore.QTimer.singleShot(800,loop.quit)
+    loop.exec_()
+    Gui.updateGui()
+try:
+    import mount_geometry
+    doc=mount_geometry.open_assembly(output/'VisionControl_Assembly.FCStd')
+    doc.recompute()
+    colors={'Base':(.24,.32,.4),'Pedestal':(.45,.57,.67),'PanRotor':(.18,.5,.65),
+        'LeftFork':(.18,.5,.65),'RightFork':(.18,.5,.65),'Cradle':(.3,.65,.48),
+        'CameraPlate':(.55,.77,.63),'CameraEnvelope':(.12,.14,.18)}
+    for obj in doc.Objects:
+        if hasattr(obj,'Shape'):
+            obj.ViewObject.Visibility=obj.Name not in mount_geometry.COUPONS
+            obj.ViewObject.ShapeColor=colors.get(obj.Name,(.65,.65,.67))
+            obj.ViewObject.DisplayMode='Flat Lines'
+            if 'Envelope' in obj.Name:obj.ViewObject.Transparency=45
+    # This is presentation only. Stored models keep editable component geometry.
+    view=Gui.activeDocument().activeView()
+    for name,fn in [('assembly_iso',view.viewAxonometric),('assembly_front',view.viewFront),('assembly_side',view.viewRight),('assembly_top',view.viewTop)]:
+        fn();settle();view.fitAll();settle()
+        view.saveImage(str(output/(name+'.png')),1600,1200,'White')
+    doc.Parameters.PanAngle=60.;doc.Parameters.TiltAngle=35.;doc.recompute()
+    expected=mount_geometry.posed('Cradle',mount_geometry.values(doc.Parameters)).Solids[0].CenterOfMass
+    assert (doc.Cradle.Shape.CenterOfMass-expected).Length<1e-6, 'GUI pose did not recompute'
+    (output/'gui_pose_debug.json').write_text(json.dumps({'proxy':str(type(doc.Cradle.Proxy)), 'pan':doc.Parameters.PanAngle,'tilt':doc.Parameters.TiltAngle,'center':list(doc.Cradle.Shape.CenterOfMass),'placement':str(doc.Cradle.Placement)}))
+    view.viewAxonometric();settle();view.fitAll();settle();view.saveImage(str(output/'assembly_extreme.png'),1600,1200,'White')
+    doc.Parameters.PanAngle=0.;doc.Parameters.TiltAngle=0.;doc.recompute();view.viewAxonometric();view.fitAll()
+    doc.save()
+    exp=App.openDocument(str(output/'exploded_mount.FCStd'));exp.recompute()
+    for obj in exp.Objects:
+        obj.ViewObject.Visibility=True
+        obj.ViewObject.ShapeColor=colors.get(obj.Name,(.5,.65,.75))
+    view=Gui.activeDocument().activeView();view.viewAxonometric();settle();view.fitAll();settle()
+    view.saveImage(str(output/'exploded.png'),1600,1600,'White');exp.save()
+    fit=App.newDocument('FirstPrintPreview')
+    for i,n in enumerate(('ServoFitCoupon','PanHornCoupon','TiltHornAdapter')):
+        s=mount_geometry.shape_for(n,mount_geometry.values(doc.Parameters))
+        if n=='PanHornCoupon':s.rotate(App.Vector(),App.Vector(1,0,0),180)
+        if n=='TiltHornAdapter':s.rotate(App.Vector(),App.Vector(0,1,0),90)
+        b=s.BoundBox;s.translate(App.Vector(i*60-b.XMin,-b.YMin,-b.ZMin))
+        obj=fit.addObject('Part::Feature',n);obj.Shape=s
+        obj.ViewObject.Visibility=True;obj.ViewObject.ShapeColor=(.3,.55,.75)
+        obj.ViewObject.DisplayMode='Flat Lines'
+    fit.recompute();view=Gui.activeDocument().activeView()
+    view.viewAxonometric();settle();view.fitAll();settle()
+    view.saveImage(str(output/'first_print_parts.png'),1800,900,'White')
+    from PySide import QtSvg, QtGui
+    for path in (output/'drawings').glob('*.svg'):
+        renderer=QtSvg.QSvgRenderer(str(path))
+        image=QtGui.QImage(1680,1188,QtGui.QImage.Format_ARGB32)
+        image.fill(QtGui.QColor('white'))
+        painter=QtGui.QPainter(image);renderer.render(painter);painter.end()
+        image.save(str(path.with_suffix('.png')))
+    (output/'render_status.json').write_text(json.dumps({'rendered':True,'views':7,'freecad_version':App.Version()}))
+except Exception:
+    import traceback
+    (output/'render_error.txt').write_text(traceback.format_exc())
+finally:
+    for name in list(App.listDocuments()):App.closeDocument(name)
+    QtCore.QTimer.singleShot(500,Gui.getMainWindow().close)
