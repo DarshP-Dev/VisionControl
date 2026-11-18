@@ -109,7 +109,7 @@ def shape_for(kind,p):
         ring=cyl(p['JournalBore']-p['DiametralClearance'],p['JournalLength'],z=deck-p['JournalLength']).cut(cyl(p['JournalInnerDiameter'],p['JournalLength']+2,z=deck-p['JournalLength']-1))
         hub=cyl(p['PanHubDiameter'],p['PanHubThickness'],z=deck-p['PanHubThickness'])
         s=union([disk,ring,hub])
-        s=holes(s,[(p['HornHoleRadius']*math.cos(i*2*math.pi/p['HornHoleCount']),p['HornHoleRadius']*math.sin(i*2*math.pi/p['HornHoleCount'])) for i in range(p['HornHoleCount'])],p['HornHoleDiameter'])
+        s=holes(s,[(p['HornHoleRadius']*math.cos(i*2*math.pi/p['HornHoleCount']),p['HornHoleRadius']*math.sin(i*2*math.pi/p['HornHoleCount'])+p.get('PanHornOffsetY',0.)) for i in range(p['HornHoleCount'])],p['HornHoleDiameter'])
         s=holes(s,[(0,0)],p['HornCenterAccess'])
         return holes(s,forkholes+[(x,-p['PanDiameter']/2+p['CableSaddleOffset']) for x in (-p['CableSaddleBoltX'],p['CableSaddleBoltX'])],p['M3Clearance'])
     if kind=='PanHornCoupon':
@@ -139,6 +139,20 @@ def shape_for(kind,p):
             if p.get('TiltTailReliefDepth',0)>0:
                 s=s.cut(cyl(p['TiltTailReliefDiameter'],p['TiltTailReliefDepth']+.01,
                     f+w-.01,0,az,V(1,0,0)))
+            if p.get('RightForkLowerWebEnabled',False):
+                # External tapered lower web: full-width load path into the
+                # bottom of the servo flange, outside the rotating horn plane.
+                x=f+w; z0=deck+2*w; z1=az-16
+                depth0=p['RightForkLowerWebFootDepth']
+                depth1=p['RightForkLowerWebTopDepth']
+                width=p['RightForkLowerWebWidth']; overlap=p['RightForkLowerWebOverlap']
+                if not (0<depth0<=depth1<=w and 0<width<=p['ForkDepth'] and z1>z0 and 0<overlap<=2):
+                    raise ValueError('Invalid right-fork lower web dimensions')
+                points=[V(x,-width/2,z0),V(x+depth0,-width/2,z0),
+                    V(x+depth1,-width/2,z1),V(x+depth1,-width/2,z1+overlap),
+                    V(x,-width/2,z1+overlap)]
+                web=Part.Face(Part.makePolygon(points+[points[0]])).extrude(V(0,width,0))
+                s=s.fuse(web)
         return s.removeSplitter()
     if kind=='Cradle':
         base=box(2*half+2*w,p['CradleDepth'],w,z=floor)
@@ -168,7 +182,7 @@ def shape_for(kind,p):
         s=s.cut(cyl(p['HornCenterAccess'],10,half+w-1,0,az,V(1,0,0)))
         s=holes(s,[(-p['AdapterBoltRadius'],az),(p['AdapterBoltRadius'],az)],p['M3Clearance'],axis='x')
         points=[(p['HornHoleRadius']*math.sin(i*2*math.pi/p['HornHoleCount']),az+p['HornHoleRadius']*math.cos(i*2*math.pi/p['HornHoleCount'])) for i in range(p['HornHoleCount'])]
-        s=holes(s,points,p['HornHoleDiameter'],axis='x')
+        s=holes(s,[(y+p.get('TiltHornOffsetY',0.),z) for y,z in points],p['HornHoleDiameter'],axis='x')
         for y,z in points:
             if p.get('HornHeadRecessDepth',0)>0:
                 s=s.cut(cyl(p['HornHeadRecessDiameter'],p['HornHeadRecessDepth']+.01,

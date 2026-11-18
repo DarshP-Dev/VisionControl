@@ -1,0 +1,107 @@
+{
+  "source_revision": "output_fit_offset_2026_11_16",
+  "geometry_modified": false,
+  "slicer_validated": false,
+  "selection": [
+    "Base",
+    "BallastCover",
+    "PanHornCoupon",
+    "TiltHornAdapter"
+  ],
+  "solid_volume_ml": 120.61451042608549,
+  "support_raft_estimate_ml": [
+    42.21507864912992,
+    72.36870625565129
+  ],
+  "supported_total_estimate_ml": [
+    162.8295890752154,
+    192.9832166817368
+  ],
+  "handling_allowance_additional_ml": [
+    5,
+    10
+  ],
+  "classification": {
+    "Base": {
+      "category": "SAFE TO PRINT NOW",
+      "reason": "Independent110x100x14 base: pedestal boltsX\u00b131/Y\u00b18, M3 nut seatsAF5.8/depth2.6, open ballast pockets, foot recesses and cover holes. No servo shaft, horn or axial mating features. Verify standard hardware/feet fit after cure.",
+      "brep_ml": 79.24811268134471,
+      "source_stl_sha256": "72833c775cb608428a28555210e6ed1c09fa0c0fdd8ec6bbd06e735d7ed39693"
+    },
+    "BallastCover": {
+      "category": "SAFE TO PRINT NOW",
+      "reason": "92x88x3 plate matches unchanged base holesY\u00b140 and foot corner reliefs. Flush underside countersinks and cover flatness matter; no servo/horn interfaces.",
+      "brep_ml": 23.677039058756225,
+      "source_stl_sha256": "0a50ee60b92cf76df60da6123b6abe076a7b55f1bd31ad1c614e3b7836d157d0"
+    },
+    "CameraPlate": {
+      "category": "SAFE TO PRINT NOW",
+      "reason": "90x52x4 blank camera region, four M3 holesX\u00b134/Y\u00b118 and countersinks. Owner drills camera hole later. No dependence on either horn bore or servo mating-face height; verify eventual washer access through cradle.",
+      "brep_ml": 18.501333632137083,
+      "source_stl_sha256": "71218156cd072288df9ca2fe908954b12e285ebd586c51d22a1d04e1381dd6b5"
+    },
+    "CableSaddle": {
+      "category": "SAFE TO PRINT NOW",
+      "reason": "24x10x8 saddle with open nominal6.5mm cable groove and two M3 holes16mm apart. Ties to the retained rotor mounting pattern; not the central horn or journal stack. Actual cable/strap fit remains a routine check.",
+      "brep_ml": 1.6088173936802972,
+      "source_stl_sha256": "0aa1f7f2eb9944609a1f074dfe7d8b0f81c1d7e89d505004b7b814fef9f19fe2"
+    },
+    "LeftFork": {
+      "category": "PRINT AT RISK",
+      "reason": "Passive support contains8.2mm bushing seat,16mm boss and8mm bushing length. Actual bushingOD/shoulder/washer/end-play stack remains unverified. No direct horn-offset dependency, but final transverse spacing and passive pivot must agree with corrected tilt stack.",
+      "brep_ml": 11.877132717113236,
+      "source_stl_sha256": "63161eb068150c17d2faf6f46914ba8373f768a6af93b0698c51687998f8f60e"
+    },
+    "Cradle": {
+      "category": "PRINT AT RISK",
+      "reason": "Carries5.3mm passive-pivot hole, right7mm centre access and M3 adapter holesY\u00b19, with90mm inside width. None uses corrected horn bore coordinates; however actual pivot diameter/end play and adapter-to-cradle axial fit remain provisional. Do not assume it is independent just because it has no servo pocket.",
+      "brep_ml": 27.33928013373077,
+      "source_stl_sha256": "0666291dab89e5a478a13166e1c7a0af1d3a523a4e82d0db4a98ce22b63b34c4"
+    },
+    "Pedestal": {
+      "category": "WAIT FOR FIT VALIDATION",
+      "reason": "Servo shelf height explicitly equals deck minus shaft projection minus wing thickness minus pan hub thickness. Bearing plane also uses washer thickness. Passed body coupon does not validate this axial load path, case clearance or the35.5/34mm datum discrepancy.",
+      "brep_ml": 47.5172913280732,
+      "source_stl_sha256": "bc91e53a737665a4c83d9ba3cd99b81b67675107b48d3a64ee332bb957ef80b9"
+    },
+    "PanRotor": {
+      "category": "WAIT FOR FIT VALIDATION",
+      "reason": "Contains the corrected horn holes,3mm hub and5.5mm supported journal. Failed offset or revised axial seating can require reprinting this30.31ml part. Coupon reproduces its central interface; wait for that result and axial stack.",
+      "brep_ml": 30.30506975024678,
+      "source_stl_sha256": "55f4990c24f67fa44ff5dd961199aca2e64c2ce0eafc27a35ec7ee06d3f93d2c"
+    },
+    "RightFork": {
+      "category": "WAIT FOR FIT VALIDATION",
+      "reason": "Contains servo flange/contact face, tab holes,38mm horn opening and22x1mm tail relief. Servo axial position relative to adapter/cradle is unresolved. The script does not automatically move this flange when ServoShaftProjection changes, so zero sensitivity to that parameter is NOT evidence of mechanical independence.",
+      "brep_ml": 12.411017442296334,
+      "source_stl_sha256": "d34cef49ac0099c7545232d30de3751d099f77143dba80f0e865c7693413f230"
+    },
+    "TiltHornAdapter": {
+      "category": "PRINT AT RISK",
+      "reason": "REQUIRED TEST COPY in this batch. It is already the real full-assembly adapter, with corrected bores and fixed eccentric head recesses. Reusable only if alignment, head seating and final axial stack pass; do not print a second production copy yet.",
+      "brep_ml": 6.586330148695079,
+      "source_stl_sha256": "cb60567118d4edc8bfc34559f059cf3575d69781756fa571359279ce9bc7d345"
+    },
+    "PanHornCoupon": {
+      "category": "SAFE TO PRINT NOW",
+      "reason": "REQUIRED DIAGNOSTIC COPY. Its purpose is to validate the unverified correction; this classification does not imply production fit is approved. It is not a structural assembly component.",
+      "brep_ml": 11.103028537289475,
+      "source_stl_sha256": "908ac7178024cdec0d9cf380263891803b9b21b0f1738c249cf46f45f5323207"
+    },
+    "ServoFitCoupon": {
+      "category": "SAFE TO PRINT NOW",
+      "reason": "Already passed; omit from this and future batches unless the body/tab interface changes. No benefit from another copy now.",
+      "brep_ml": 3.379881949725019,
+      "source_stl_sha256": "207914216c573de84d838dc049c67e2b640c9adb37ee028b9f28f4d32e43ce54"
+    }
+  },
+  "remaining_parts": [
+    "CameraPlate",
+    "CableSaddle",
+    "LeftFork",
+    "Cradle",
+    "Pedestal",
+    "PanRotor",
+    "RightFork"
+  ]
+}

@@ -1,0 +1,781 @@
+{
+  "date": "2026-11-07",
+  "physical_fit_verified": false,
+  "all_measurements_approximate": true,
+  "source": "Owner final servo measurement request; photo inspected for accessory types only.",
+  "parameters": {
+    "BaseWidth": {
+      "value": 110.0,
+      "previous_value": 110.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BaseDepth": {
+      "value": 100.0,
+      "previous_value": 100.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BaseHeight": {
+      "value": 14.0,
+      "previous_value": 14.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "Wall": {
+      "value": 4.0,
+      "previous_value": 4.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "FootInset": {
+      "value": 8.0,
+      "previous_value": 8.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "FootDiameter": {
+      "value": 12.0,
+      "previous_value": 12.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "FootThickness": {
+      "value": 5.0,
+      "previous_value": 5.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BallastPocketWidth": {
+      "value": 43.0,
+      "previous_value": 43.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BallastPocketDepth": {
+      "value": 92.0,
+      "previous_value": 92.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BallastPocketHeight": {
+      "value": 10.0,
+      "previous_value": 10.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TowerWidth": {
+      "value": 56.0,
+      "previous_value": 56.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TowerDepth": {
+      "value": 50.0,
+      "previous_value": 50.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PanDeckZ": {
+      "value": 76.0,
+      "previous_value": 76.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PanDiameter": {
+      "value": 116.0,
+      "previous_value": 116.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "JournalBore": {
+      "value": 44.0,
+      "previous_value": 40.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "JournalLength": {
+      "value": 5.5,
+      "previous_value": 7.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "DiametralClearance": {
+      "value": 0.5,
+      "previous_value": 0.5,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ThrustWasherThickness": {
+      "value": 2.0,
+      "previous_value": 2.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TiltAxisZ": {
+      "value": 128.0,
+      "previous_value": 128.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ForkInnerHalfWidth": {
+      "value": 54.0,
+      "previous_value": 54.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CradleInnerWidth": {
+      "value": 90.0,
+      "previous_value": 90.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CradleDepth": {
+      "value": 52.0,
+      "previous_value": 52.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraWidth": {
+      "value": 82.0,
+      "previous_value": 82.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraHeight": {
+      "value": 46.0,
+      "previous_value": 46.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraDepth": {
+      "value": 45.0,
+      "previous_value": 45.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraBottomBelowAxis": {
+      "value": 24.0,
+      "previous_value": 24.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "OpticalHeightAboveCameraBottom": {
+      "value": 32.0,
+      "previous_value": 32.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraMassG": {
+      "value": 96.3,
+      "previous_value": 96.3,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraComY": {
+      "value": 0.0,
+      "previous_value": 0.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraComZ": {
+      "value": -1.0,
+      "previous_value": -1.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraHoleEnabled": {
+      "value": false,
+      "previous_value": false,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraThreadMajor": {
+      "value": 6.35,
+      "previous_value": 6.35,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraThreadPitch": {
+      "value": 1.27,
+      "previous_value": 1.27,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraHoleClearance": {
+      "value": 0.5,
+      "previous_value": 0.5,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraInsertX": {
+      "value": 0.0,
+      "previous_value": 0.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CameraInsertY": {
+      "value": 0.0,
+      "previous_value": 0.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ServoWidth": {
+      "value": 22.8,
+      "previous_value": 22.8,
+      "status": "OWNER_APPROXIMATE_MEASUREMENT",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ServoDepth": {
+      "value": 12.2,
+      "previous_value": 12.2,
+      "status": "OWNER_APPROXIMATE_MEASUREMENT",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ServoHeight": {
+      "value": 28.5,
+      "previous_value": 28.5,
+      "status": "OWNER_APPROXIMATE_MEASUREMENT",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ServoFitClearance": {
+      "value": 0.6,
+      "previous_value": 0.6,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ServoShaftOffset": {
+      "value": 5.3,
+      "previous_value": 5.3,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ServoShaftProjection": {
+      "value": 5.0,
+      "previous_value": 5.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Unresolved legacy axial placeholder. Do not set to34mm; actual wing mating face not measured."
+    },
+    "ServoTabPitch": {
+      "value": 28.0,
+      "previous_value": 28.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ServoTabHole": {
+      "value": 2.3,
+      "previous_value": 2.3,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ServoTabThickness": {
+      "value": 2.0,
+      "previous_value": 2.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "HornRadius": {
+      "value": 18.0,
+      "previous_value": 11.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "18mm design-envelope budget, NOT measured outline. Includes allowance beyond outer holes; gauge actual horn."
+    },
+    "HornThickness": {
+      "value": 2.0,
+      "previous_value": 2.0,
+      "status": "OWNER_APPROXIMATE_MEASUREMENT",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "HornHoleRadius": {
+      "value": 14.5,
+      "previous_value": 8.0,
+      "status": "OWNER_APPROXIMATE_MEASUREMENT",
+      "note": "Measured approximate outer radius on double-arm horn; verify both selected horns and29mm span."
+    },
+    "HornHoleDiameter": {
+      "value": 2.3,
+      "previous_value": 2.3,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Printed clearance only. Actual stock horn pilot diameter is UNKNOWN."
+    },
+    "HornHoleCount": {
+      "value": 2,
+      "previous_value": 2,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Design choice: two opposed outer attachments. Symmetry and each actual point still require checking."
+    },
+    "HornCenterAccess": {
+      "value": 7.0,
+      "previous_value": 7.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TiltAdapterThickness": {
+      "value": 6.0,
+      "previous_value": 6.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PivotDiameter": {
+      "value": 5.0,
+      "previous_value": 5.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PivotClearance": {
+      "value": 0.3,
+      "previous_value": 0.3,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BushingOD": {
+      "value": 8.0,
+      "previous_value": 8.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BushingLength": {
+      "value": 8.0,
+      "previous_value": 8.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BushingFitAllowance": {
+      "value": 0.2,
+      "previous_value": 0.2,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "M3Clearance": {
+      "value": 3.4,
+      "previous_value": 3.4,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "M3NutAcrossFlats": {
+      "value": 5.8,
+      "previous_value": 5.8,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "M3NutDepth": {
+      "value": 2.6,
+      "previous_value": 2.6,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PanAngle": {
+      "value": 0.0,
+      "previous_value": 0.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TiltAngle": {
+      "value": 0.0,
+      "previous_value": 0.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PanLimit": {
+      "value": 60.0,
+      "previous_value": 60.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TiltLimit": {
+      "value": 35.0,
+      "previous_value": 35.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CableDiameter": {
+      "value": 4.5,
+      "previous_value": 4.5,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CableBendRadius": {
+      "value": 30.0,
+      "previous_value": 30.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedResinDensity": {
+      "value": 1.15,
+      "previous_value": 1.15,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedMovingBracketMassG": {
+      "value": 65.0,
+      "previous_value": 65.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedBracketComY": {
+      "value": 0.0,
+      "previous_value": 0.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedBracketComZ": {
+      "value": -15.0,
+      "previous_value": -15.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedComUncertainty": {
+      "value": 15.0,
+      "previous_value": 15.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedCableForceN": {
+      "value": 0.2,
+      "previous_value": 0.2,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedCableLever": {
+      "value": 40.0,
+      "previous_value": 40.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedAngularAcceleration": {
+      "value": 1.0471975512,
+      "previous_value": 1.0471975512,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedFixedMassG": {
+      "value": 200.0,
+      "previous_value": 200.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedTotalMovingMassG": {
+      "value": 300.0,
+      "previous_value": 300.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedMovingComOffset": {
+      "value": 25.0,
+      "previous_value": 25.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedDynamicLateralForceN": {
+      "value": 0.5,
+      "previous_value": 0.5,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedPullHeight": {
+      "value": 140.0,
+      "previous_value": 140.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TargetTipMargin": {
+      "value": 2.0,
+      "previous_value": 2.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BaseBoltX": {
+      "value": 31.0,
+      "previous_value": 31.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BaseBoltY": {
+      "value": 8.0,
+      "previous_value": 8.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ForkBoltInset": {
+      "value": 4.0,
+      "previous_value": 4.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ForkBoltY": {
+      "value": 12.0,
+      "previous_value": 12.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PlateBoltX": {
+      "value": 34.0,
+      "previous_value": 34.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PlateBoltY": {
+      "value": 18.0,
+      "previous_value": 18.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AdapterBoltRadius": {
+      "value": 9.0,
+      "previous_value": 9.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CoverBoltY": {
+      "value": 40.0,
+      "previous_value": 40.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PostWidth": {
+      "value": 10.0,
+      "previous_value": 10.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ForkDepth": {
+      "value": 30.0,
+      "previous_value": 30.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ForkAboveAxis": {
+      "value": 26.0,
+      "previous_value": 26.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ForkFootWidth": {
+      "value": 18.0,
+      "previous_value": 18.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ForkFootDepth": {
+      "value": 40.0,
+      "previous_value": 40.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CradleSideDepth": {
+      "value": 28.0,
+      "previous_value": 28.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CradleAboveAxis": {
+      "value": 14.0,
+      "previous_value": 14.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PanHubDiameter": {
+      "value": 38.0,
+      "previous_value": 28.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PanHubThickness": {
+      "value": 3.0,
+      "previous_value": 3.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "JournalInnerDiameter": {
+      "value": 37.0,
+      "previous_value": 30.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ThrustWasherOD": {
+      "value": 50.0,
+      "previous_value": 50.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CableSaddleOffset": {
+      "value": 12.0,
+      "previous_value": 12.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "CableSaddleBoltX": {
+      "value": 8.0,
+      "previous_value": 8.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "M3CountersinkDiameter": {
+      "value": 6.5,
+      "previous_value": 6.5,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "M3CountersinkDepth": {
+      "value": 1.7,
+      "previous_value": 1.7,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PostX": {
+      "value": 22.0,
+      "previous_value": 22.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PostY": {
+      "value": 19.0,
+      "previous_value": 19.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PedestalFootWidth": {
+      "value": 72.0,
+      "previous_value": 72.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PedestalFootDepth": {
+      "value": 58.0,
+      "previous_value": 58.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "BaseNutSeatZ": {
+      "value": 7.0,
+      "previous_value": 7.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "RotorSpokeWidth": {
+      "value": 14.0,
+      "previous_value": 14.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "RotorRimWidth": {
+      "value": 8.0,
+      "previous_value": 8.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "LightweightRotor": {
+      "value": true,
+      "previous_value": true,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "ServoTabEndWidth": {
+      "value": 6.0,
+      "previous_value": 6.0,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "HornHubDiameter": {
+      "value": 6.0,
+      "previous_value": null,
+      "status": "OWNER_APPROXIMATE_MEASUREMENT",
+      "note": "Measured approximate OD; hub projections on both faces UNKNOWN. 7mm through-access supplies radial clearance only."
+    },
+    "HornInnerHoleRadius": {
+      "value": 4.5,
+      "previous_value": null,
+      "status": "OWNER_APPROXIMATE_MEASUREMENT",
+      "note": "Measured radius, not diameter. Recorded but not selected; conflict with7mm central access."
+    },
+    "InstalledHornOverallHeight": {
+      "value": 34.0,
+      "previous_value": null,
+      "status": "OWNER_APPROXIMATE_MEASUREMENT",
+      "note": "Body bottom to highest installed horn point, not tab datum or projection. Unknown highest-point feature; informational measurement only."
+    },
+    "TiltHornOpeningDiameter": {
+      "value": 38.0,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TiltAdapterDiameter": {
+      "value": 40.0,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TiltAdapterBackThickness": {
+      "value": 4.0,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TiltAdapterNoseDiameter": {
+      "value": 36.0,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "HornHeadRecessDiameter": {
+      "value": 5.5,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "HornHeadRecessDepth": {
+      "value": 2.2,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedHornScrewHeadDiameter": {
+      "value": 4.5,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedHornScrewHeadHeight": {
+      "value": 2.0,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedCentreScrewHeadDiameter": {
+      "value": 5.5,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "AssumedCentreScrewProjection": {
+      "value": 2.0,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TiltTailReliefDiameter": {
+      "value": 22.0,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "TiltTailReliefDepth": {
+      "value": 1.0,
+      "previous_value": null,
+      "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
+      "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    }
+  },
+  "missing_measurements": [
+    "tab geometry and datums",
+    "shaft offsets",
+    "B-to-M and T-to-M",
+    "actual horn bore diameters",
+    "full horn outline",
+    "hub projection both faces",
+    "supplied screw dimensions/engagement",
+    "camera insert and optical datum"
+  ],
+  "axial_release": "HOLD: model35.5mm wing mating face vs owner34mm highest point"
+}

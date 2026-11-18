@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-07",
+  "date": "2026-11-17",
   "physical_fit_verified": false,
   "all_measurements_approximate": true,
   "source": "Owner final servo measurement request; photo inspected for accessory types only.",
@@ -765,6 +765,43 @@
       "previous_value": null,
       "status": "DESIGN_OR_PROVISIONAL_ASSUMPTION",
       "note": "Preserved design or provisional hardware dimension; see measurement checklist."
+    },
+    "PanHornOffsetY": {
+      "value": 0.1,
+      "previous_value": 0.0,
+      "status": "OWNER_REQUESTED_TRANSLATION_WITH_DOCUMENTED_ORIENTATION",
+      "note": "Both holes high with pair horizontal. +Y is down in defined contact-face view; absolute180-degree handling orientation still needs physical check."
+    },
+    "TiltHornOffsetY": {
+      "value": 0.1,
+      "previous_value": 0.0,
+      "status": "OWNER_REQUESTED_TRANSLATION_WITH_DOCUMENTED_ORIENTATION",
+      "note": "Both holes high with pair horizontal. +Y is down in defined contact-face view; absolute180-degree handling orientation still needs physical check."
+    },
+    "RightForkLowerWebEnabled": {
+      "value": true,
+      "status": "DESIGN_REINFORCEMENT",
+      "note": "Local lower web; not a measured hardware dimension. See RIGHT_FORK_REINFORCEMENT.md."
+    },
+    "RightForkLowerWebFootDepth": {
+      "value": 2.0,
+      "status": "DESIGN_REINFORCEMENT",
+      "note": "Local lower web; not a measured hardware dimension. See RIGHT_FORK_REINFORCEMENT.md."
+    },
+    "RightForkLowerWebTopDepth": {
+      "value": 4.0,
+      "status": "DESIGN_REINFORCEMENT",
+      "note": "Local lower web; not a measured hardware dimension. See RIGHT_FORK_REINFORCEMENT.md."
+    },
+    "RightForkLowerWebWidth": {
+      "value": 30.0,
+      "status": "DESIGN_REINFORCEMENT",
+      "note": "Local lower web; not a measured hardware dimension. See RIGHT_FORK_REINFORCEMENT.md."
+    },
+    "RightForkLowerWebOverlap": {
+      "value": 1.0,
+      "status": "DESIGN_REINFORCEMENT",
+      "note": "Local lower web; not a measured hardware dimension. See RIGHT_FORK_REINFORCEMENT.md."
     }
   },
   "missing_measurements": [
@@ -777,5 +814,6 @@
     "supplied screw dimensions/engagement",
     "camera insert and optical datum"
   ],
-  "axial_release": "HOLD: model35.5mm wing mating face vs owner34mm highest point"
+  "axial_release": "HOLD: model35.5mm wing mating face vs owner34mm highest point",
+  "fit_feedback": "ServoFitCoupon passed; both horn parts fit, common approximately0.1mm hole offset reported; corrected parts not yet physically tested."
 }

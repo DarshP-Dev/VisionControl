@@ -1,0 +1,148 @@
+{
+  "physical_alignment_verified": false,
+  "parts": {
+    "Base": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "BallastCover": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "Pedestal": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "PanRotor": {
+      "symmetric_difference_mm3": 6.437970438777295,
+      "volume_change_mm3": 0.0,
+      "changed_material_outside_old_and_new_bores_mm3": 0.0,
+      "bore_centres": [
+        [
+          -14.5,
+          0.10000000000000178
+        ],
+        [
+          14.5,
+          0.1
+        ]
+      ],
+      "diameter_mm": 2.3,
+      "spacing_mm": 29.0,
+      "fixed_recess_centres": []
+    },
+    "LeftFork": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "RightFork": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "Cradle": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "CameraPlate": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "TiltHornAdapter": {
+      "symmetric_difference_mm3": 3.494898238193502,
+      "volume_change_mm3": 0.0,
+      "changed_material_outside_old_and_new_bores_mm3": 0.0,
+      "bore_centres": [
+        [
+          0.10000000000000178,
+          113.5
+        ],
+        [
+          0.1,
+          142.5
+        ]
+      ],
+      "diameter_mm": 2.3,
+      "spacing_mm": 29.0,
+      "fixed_recess_centres": [
+        [
+          1.7757378587636622e-15,
+          113.5
+        ],
+        [
+          0.0,
+          142.5
+        ]
+      ]
+    },
+    "CableSaddle": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "ServoFitCoupon": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "PanHornCoupon": {
+      "symmetric_difference_mm3": 6.437970438777295,
+      "volume_change_mm3": 0.0,
+      "changed_material_outside_old_and_new_bores_mm3": 0.0,
+      "bore_centres": [
+        [
+          -14.5,
+          0.10000000000000178
+        ],
+        [
+          14.5,
+          0.1
+        ]
+      ],
+      "diameter_mm": 2.3,
+      "spacing_mm": 29.0,
+      "fixed_recess_centres": []
+    },
+    "CameraEnvelope": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "PanServoEnvelope": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "TiltServoEnvelope": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "PanHornEnvelope": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "TiltHornEnvelope": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "ThrustWasher": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    },
+    "PivotBushing": {
+      "symmetric_difference_mm3": 0.0,
+      "volume_change_mm3": 0.0
+    }
+  },
+  "coordinate_convention": "View horn-contact face: pan +X right / normal -Z; tilt +Z right / normal +X. Screen down is +Y. Unmarked-part 180-degree orientation remains a physical assumption.",
+  "material_and_clearance": {
+    "pan_hub_edge_ligament_before_after_mm": [
+      3.35,
+      3.3496551765139047
+    ],
+    "tilt_nose_edge_ligament_before_after_mm": [
+      2.35,
+      2.3496551765139047
+    ],
+    "tilt_head_recess_edge_ligament_mm": 2.75,
+    "tilt_remaining_axial_grip_mm": 3.8,
+    "assumed_4_5mm_head_radial_clearance_in_fixed_recess_mm": 0.4,
+    "note": "No strength certification; actual screw seating and corrected alignment need repeat fit test. Diameters, recess depth and bulk material outside bore relocation unchanged."
+  },
+  "passed": true
+}

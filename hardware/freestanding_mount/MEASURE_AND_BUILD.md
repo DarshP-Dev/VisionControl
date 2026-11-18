@@ -1,3 +1,9 @@
+> **2026-11-16 update:** Current corrected CAD is in `output_fit_offset_2026_11_16/`.
+> Both horn bores shift+0.1 mm Y under the contact-view convention in
+> [FIT_OFFSET_REVIEW.md](FIT_OFFSET_REVIEW.md); diameters, spacing and recesses stay fixed.
+> ServoFitCoupon passed. Reprint only the two horn test parts for this correction.
+> The earlier revision information below is retained as background.
+
 # Measurement, printing and assembly plan
 
 Updated 2026-11-07: current fit-revision outputs are in `output_measured_fit/`; read

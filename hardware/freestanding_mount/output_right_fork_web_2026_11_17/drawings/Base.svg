@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 420 297"><rect width="420" height="297" fill="white"/><g font-family="sans-serif" font-size="4"><text x="10" y="10">Base — PROVISIONAL; mm; projection scale 1:1 at 100% print</text><text x="220" y="230">Envelope X 110.00 / Y 100.00 / Z 14.00 mm</text><text x="220" y="240">Hole coordinates: drawings/interface_schedule.csv</text><text x="220" y="250">Fit coupon and physical interface verification required</text><g transform="translate(105,100) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path id= "1" d=" M 7 -55 L -7 -55 " />
+<path id= "2" d=" M 7 -55 L 7 -47 " />
+<path id= "3" d=" M 7 -47 L 7 47 " />
+<path id= "4" d=" M -7 -55 L -7 55 " />
+<path id= "5" d=" M 7 47 L 7 55 " />
+<path id= "6" d=" M 7 55 L -7 55 " />
+<path id= "7" d=" M 7 -47 L -4 -47 " />
+<path id= "8" d=" M 7 47 L -4 47 " />
+</g>
+</g><text x="80" y="170">FRONT</text><g transform="translate(280,100) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path id= "1" d=" M -55 -50 L -55 50 " />
+<path id= "2" d=" M -55 -50 L 55 -50 " />
+<path id= "3" d=" M -55 50 L 55 50 " />
+<path id= "4" d=" M 55 -50 L 55 50 " />
+<circle cx ="-31" cy ="-8" r ="1.7" /><circle cx ="0" cy ="-40" r ="1.7" /><circle cx ="31" cy ="-8" r ="1.7" /><circle cx ="-31" cy ="8" r ="1.7" /><circle cx ="31" cy ="8" r ="1.7" /><circle cx ="0" cy ="40" r ="1.7" /></g>
+</g><text x="255" y="170">TOP</text><g transform="translate(105,205) scale(1,-1)"><g   fill="none"
+   stroke="rgb(0, 0, 0)"
+   stroke-linecap="butt"
+   stroke-linejoin="miter"
+   stroke-width="1.0"
+   transform="scale(1, -1)"
+  >
+<path id= "1" d=" M -7 50 L 7 50 " />
+<path id= "2" d=" M 7 50 L 7 -50 " />
+<path id= "3" d=" M -7 -50 L 7 -50 " />
+<path id= "4" d=" M -7 50 L -7 42 " />
+<path id= "5" d=" M -7 42 L -7 -42 " />
+<path id= "6" d=" M -7 -42 L -7 -50 " />
+<path id= "7" d=" M -7 -42 L 4 -42 " />
+<path id= "8" d=" M -7 42 L 4 42 " />
+</g>
+</g><text x="80" y="275">SIDE</text></g></svg>

@@ -125,5 +125,12 @@
   "AssumedCentreScrewHeadDiameter": 5.5,
   "AssumedCentreScrewProjection": 2.0,
   "TiltTailReliefDiameter": 22.0,
-  "TiltTailReliefDepth": 1.0
+  "TiltTailReliefDepth": 1.0,
+  "PanHornOffsetY": 0.1,
+  "TiltHornOffsetY": 0.1,
+  "RightForkLowerWebEnabled": true,
+  "RightForkLowerWebFootDepth": 2.0,
+  "RightForkLowerWebTopDepth": 4.0,
+  "RightForkLowerWebWidth": 30.0,
+  "RightForkLowerWebOverlap": 1.0
 }

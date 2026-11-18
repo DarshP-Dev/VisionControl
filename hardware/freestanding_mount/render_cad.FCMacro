@@ -7,7 +7,7 @@ from PySide import QtCore
 
 root=Path(r'C:\Users\Darsh\VisionControl\hardware\freestanding_mount')
 sys.path.insert(0,str(root))
-output=root/'output_measured_fit'
+output=root/'output_right_fork_web_2026_11_17'
 def settle():
     loop=QtCore.QEventLoop()
     QtCore.QTimer.singleShot(800,loop.quit)
@@ -56,6 +56,20 @@ try:
     fit.recompute();view=Gui.activeDocument().activeView()
     view.viewAxonometric();settle();view.fitAll();settle()
     view.saveImage(str(output/'first_print_parts.png'),1800,900,'White')
+    review=App.newDocument('RightForkReinforcementReview')
+    previous=json.loads((root/'history/pre_right_fork_web/parameters.json').read_text())
+    current=mount_geometry.values(doc.Parameters)
+    old=review.addObject('Part::Feature','PreviousRightFork');old.Shape=mount_geometry.shape_for('RightFork',previous)
+    new=review.addObject('Part::Feature','ReinforcedRightFork');new.Shape=mount_geometry.shape_for('RightFork',current)
+    for obj in (old,new):
+        obj.ViewObject.ShapeColor=(.25,.65,.70);obj.ViewObject.DisplayMode='Flat Lines'
+    review.recompute();view=Gui.activeDocument().activeView()
+    for label,visible,hidden in [('before',old,new),('after',new,old)]:
+        hidden.ViewObject.Visibility=False;visible.ViewObject.Visibility=True
+        view.viewAxonometric();settle();view.fitAll();settle()
+        view.saveImage(str(output/('right_fork_'+label+'.png')),1200,1200,'White')
+        view.viewRight();settle();view.fitAll();settle()
+        view.saveImage(str(output/('right_fork_'+label+'_outside.png')),1200,1200,'White')
     from PySide import QtSvg, QtGui
     for path in (output/'drawings').glob('*.svg'):
         renderer=QtSvg.QSvgRenderer(str(path))
@@ -63,7 +77,7 @@ try:
         image.fill(QtGui.QColor('white'))
         painter=QtGui.QPainter(image);renderer.render(painter);painter.end()
         image.save(str(path.with_suffix('.png')))
-    (output/'render_status.json').write_text(json.dumps({'rendered':True,'views':7,'freecad_version':App.Version()}))
+    (output/'render_status.json').write_text(json.dumps({'rendered':True,'views':10,'freecad_version':App.Version()}))
 except Exception:
     import traceback
     (output/'render_error.txt').write_text(traceback.format_exc())

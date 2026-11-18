@@ -22,8 +22,8 @@ def check(directory):
     r=p['HornHoleRadius']; d=p['AssumedHornScrewHeadDiameter']; h=p['AssumedHornScrewHeadHeight']
     top=deck-p['ServoShaftProjection']-p['HornThickness']-p['PanHubThickness']
     budget={
-        'pan_attachment_heads':union([cyl(d,h,s*r,0,deck+p['Wall']) for s in (-1,1)]),
-        'tilt_attachment_heads':union([cyl(d,h,x+p['HornHeadRecessDepth']-h,0,az+s*r,V(1,0,0)) for s in (-1,1)]),
+        'pan_attachment_heads':union([cyl(d,h,s*r,p.get('PanHornOffsetY',0.),deck+p['Wall']) for s in (-1,1)]),
+        'tilt_attachment_heads':union([cyl(d,h,x+p['HornHeadRecessDepth']-h,p.get('TiltHornOffsetY',0.),az+s*r,V(1,0,0)) for s in (-1,1)]),
         'pan_tab_heads':union([cyl(d,h,p['ServoShaftOffset']+s*p['ServoTabPitch']/2,0,top+p['ServoTabThickness']) for s in (-1,1)]),
         'tilt_tab_heads':union([cyl(d,h,p['ForkInnerHalfWidth']+2*p['Wall']+p['ServoTabThickness'],0,az+p['ServoShaftOffset']+s*p['ServoTabPitch']/2,V(1,0,0)) for s in (-1,1)]),
         'tilt_adapter_M3_heads':union([cyl(6,3,x-p['Wall']-3.5,y,az,V(1,0,0)) for y in (-p['AdapterBoltRadius'],p['AdapterBoltRadius'])]),
@@ -45,7 +45,7 @@ def check(directory):
     tilt_sweeps=[]
     for name in ('tilt_attachment_heads','tilt_adapter_M3_heads','tilt_adapter_M3_nut_budgets','tilt_adapter_M3_shafts'):
         b=budget[name].BoundBox
-        radius=r if name=='tilt_attachment_heads' else p['AdapterBoltRadius']
+        radius=math.hypot(r,p.get('TiltHornOffsetY',0.)) if name=='tilt_attachment_heads' else p['AdapterBoltRadius']
         head_radius=d/2 if name=='tilt_attachment_heads' else (3 if name.endswith('_heads') else (1.5 if name.endswith('_shafts') else 3.2))
         sweep=cyl(2*(radius+head_radius),b.XLength,b.XMin,0,az,V(1,0,0)).cut(cyl(2*(radius-head_radius),b.XLength+2,b.XMin-1,0,az,V(1,0,0)))
         for part in ('RightFork','LeftFork','PanRotor','TiltServoEnvelope'):
@@ -78,8 +78,8 @@ def check(directory):
     # hole-loop implementation. The central camera area must still be material.
     hole_probes={}
     for sign in (-1,1):
-        probes=[('pan',cyl(2.2,7,sign*14.5,0,deck-3),'PanRotor'),
-                ('tilt',cyl(2.2,6,x,0,az+sign*14.5,V(1,0,0)),'TiltHornAdapter')]
+        probes=[('pan',cyl(2.2,7,sign*14.5,p.get('PanHornOffsetY',0.),deck-3),'PanRotor'),
+                ('tilt',cyl(2.2,6,x,p.get('TiltHornOffsetY',0.),az+sign*14.5,V(1,0,0)),'TiltHornAdapter')]
         for label,probe,part in probes:
             volume=probe.common(shapes[part]).Volume
             assert volume<1e-5,(label,sign,volume)

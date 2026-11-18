@@ -1,3 +1,18 @@
+> **2026-11-17:** RightFork now has a tapered lower support web. Current full CAD:
+> `output_right_fork_web_2026_11_17/`. See [RIGHT_FORK_REINFORCEMENT.md](RIGHT_FORK_REINFORCEMENT.md).
+> All other part geometry is unchanged; the earlier horn-test batch remains valid.
+
+Current correction files:
+- [Updated assembly](output_fit_offset_2026_11_16/VisionControl_Assembly.FCStd)
+- [Updated STL](output_fit_offset_2026_11_16/stl/) and [STEP](output_fit_offset_2026_11_16/step/)
+- [Offset coordinates and repeat-fit instructions](FIT_OFFSET_REVIEW.md)
+
+> **2026-11-16 update:** Current corrected CAD is in `output_fit_offset_2026_11_16/`.
+> Both horn bores shift+0.1 mm Y under the contact-view convention in
+> [FIT_OFFSET_REVIEW.md](FIT_OFFSET_REVIEW.md); diameters, spacing and recesses stay fixed.
+> ServoFitCoupon passed. Reprint only the two horn test parts for this correction.
+> The earlier revision information below is retained as background.
+
 # VisionControl freestanding mount — measured-horn fit revision
 
 Updated2026-11-07. Current executed artifacts are in **output_measured_fit/**.

@@ -1,0 +1,254 @@
+{
+  "stls": {
+    "Base": {
+      "solid_ml": 79.2392890625,
+      "bbox_mm": [
+        110.0,
+        100.0,
+        14.0
+      ],
+      "closed": true,
+      "sha256": "72833c775cb608428a28555210e6ed1c09fa0c0fdd8ec6bbd06e735d7ed39693"
+    },
+    "BallastCover": {
+      "solid_ml": 23.678716796875,
+      "bbox_mm": [
+        92.0,
+        88.0,
+        3.0
+      ],
+      "closed": true,
+      "sha256": "0a50ee60b92cf76df60da6123b6abe076a7b55f1bd31ad1c614e3b7836d157d0"
+    },
+    "Pedestal": {
+      "solid_ml": 47.53201953125,
+      "bbox_mm": [
+        72.0,
+        58.0,
+        60.0
+      ],
+      "closed": true,
+      "sha256": "bc91e53a737665a4c83d9ba3cd99b81b67675107b48d3a64ee332bb957ef80b9"
+    },
+    "PanRotor": {
+      "solid_ml": 30.267265625,
+      "bbox_mm": [
+        116.0,
+        116.0,
+        9.5
+      ],
+      "closed": true,
+      "sha256": "55f4990c24f67fa44ff5dd961199aca2e64c2ce0eafc27a35ec7ee06d3f93d2c"
+    },
+    "LeftFork": {
+      "solid_ml": 11.8763505859375,
+      "bbox_mm": [
+        18.0,
+        40.0,
+        74.0
+      ],
+      "closed": true,
+      "sha256": "63161eb068150c17d2faf6f46914ba8373f768a6af93b0698c51687998f8f60e"
+    },
+    "RightFork": {
+      "solid_ml": 12.4170029296875,
+      "bbox_mm": [
+        18.0,
+        40.0,
+        76.0
+      ],
+      "closed": true,
+      "sha256": "d34cef49ac0099c7545232d30de3751d099f77143dba80f0e865c7693413f230"
+    },
+    "Cradle": {
+      "solid_ml": 27.340640625,
+      "bbox_mm": [
+        98.0,
+        52.0,
+        46.0
+      ],
+      "closed": true,
+      "sha256": "0666291dab89e5a478a13166e1c7a0af1d3a523a4e82d0db4a98ce22b63b34c4"
+    },
+    "CameraPlate": {
+      "solid_ml": 18.502427734375,
+      "bbox_mm": [
+        90.0,
+        52.0,
+        4.0
+      ],
+      "closed": true,
+      "sha256": "71218156cd072288df9ca2fe908954b12e285ebd586c51d22a1d04e1381dd6b5"
+    },
+    "TiltHornAdapter": {
+      "solid_ml": 6.569671875,
+      "bbox_mm": [
+        6.0,
+        39.981027241796255,
+        39.96206657588482
+      ],
+      "closed": true,
+      "sha256": "cb60567118d4edc8bfc34559f059cf3575d69781756fa571359279ce9bc7d345"
+    },
+    "CableSaddle": {
+      "solid_ml": 1.6095869140625,
+      "bbox_mm": [
+        24.0,
+        10.0,
+        8.0
+      ],
+      "closed": true,
+      "sha256": "0aa1f7f2eb9944609a1f074dfe7d8b0f81c1d7e89d505004b7b814fef9f19fe2"
+    },
+    "ServoFitCoupon": {
+      "solid_ml": 3.379968017578125,
+      "bbox_mm": [
+        44.0,
+        26.200000762939453,
+        4.0
+      ],
+      "closed": true,
+      "sha256": "207914216c573de84d838dc049c67e2b640c9adb37ee028b9f28f4d32e43ce54"
+    },
+    "PanHornCoupon": {
+      "solid_ml": 11.0763095703125,
+      "bbox_mm": [
+        43.5,
+        43.5,
+        9.5
+      ],
+      "closed": true,
+      "sha256": "908ac7178024cdec0d9cf380263891803b9b21b0f1738c249cf46f45f5323207"
+    }
+  },
+  "sensitivity": {
+    "ServoShaftProjection": {
+      "trial_value": 3.5,
+      "changed_parts": [
+        "Pedestal"
+      ]
+    },
+    "ThrustWasherThickness": {
+      "trial_value": 3.0,
+      "changed_parts": [
+        "Pedestal"
+      ]
+    },
+    "PanHornOffsetY": {
+      "trial_value": 0.0,
+      "changed_parts": [
+        "PanRotor",
+        "PanHornCoupon"
+      ]
+    },
+    "TiltHornOffsetY": {
+      "trial_value": 0.0,
+      "changed_parts": [
+        "TiltHornAdapter"
+      ]
+    },
+    "BushingOD": {
+      "trial_value": 8.5,
+      "changed_parts": [
+        "LeftFork"
+      ]
+    },
+    "PivotDiameter": {
+      "trial_value": 5.5,
+      "changed_parts": [
+        "Cradle"
+      ]
+    }
+  },
+  "layout_slicer_validated": false,
+  "layout": [
+    {
+      "part": "Base",
+      "axis_of_flat_part": "Y",
+      "angle_deg_from_flat": 65,
+      "origin_xy_mm": [
+        5.0,
+        5.0
+      ],
+      "bare_projected_bbox_mm": [
+        59.17631780999004,
+        100.0,
+        105.6105122384013
+      ],
+      "reserved_footprint_mm": [
+        67.17631780999004,
+        108.0
+      ],
+      "height_with_8mm_lift_mm": 113.6105122384013
+    },
+    {
+      "part": "BallastCover",
+      "axis_of_flat_part": "X",
+      "angle_deg_from_flat": 65,
+      "origin_xy_mm": [
+        77.17631780999004,
+        5.0
+      ],
+      "bare_projected_bbox_mm": [
+        92.0,
+        39.9093303942915,
+        81.0229400444473
+      ],
+      "reserved_footprint_mm": [
+        100.0,
+        47.9093303942915
+      ],
+      "height_with_8mm_lift_mm": 89.0229400444473
+    },
+    {
+      "part": "PanHornCoupon",
+      "axis_of_flat_part": "reuse prior successful test orientation",
+      "angle_deg_from_flat": null,
+      "origin_xy_mm": [
+        77.17631780999004,
+        57.9093303942915
+      ],
+      "bare_projected_bbox_mm": [
+        44.52527372178637,
+        44.52527372178637,
+        44.52527372178637
+      ],
+      "reserved_footprint_mm": [
+        52.52527372178637,
+        52.52527372178637
+      ],
+      "height_with_8mm_lift_mm": 52.52527372178637
+    },
+    {
+      "part": "TiltHornAdapter",
+      "axis_of_flat_part": "reuse prior successful test orientation",
+      "angle_deg_from_flat": null,
+      "origin_xy_mm": [
+        134.70159153177642,
+        57.9093303942915
+      ],
+      "bare_projected_bbox_mm": [
+        40.44749683231337,
+        40.44749683231337,
+        40.44749683231337
+      ],
+      "reserved_footprint_mm": [
+        48.44749683231337,
+        48.44749683231337
+      ],
+      "height_with_8mm_lift_mm": 48.44749683231337
+    }
+  ],
+  "planning_allowances": {
+    "plate_mm": [
+      192,
+      120,
+      245
+    ],
+    "edge_mm": 5,
+    "gap_between_reserved_envelopes_mm": 5,
+    "lateral_support_allowance_each_side_mm": 4,
+    "assumed_lift_above_plate_mm": 8,
+    "warning": "No supports/rafts or slices generated. Real supports may exceed these allowances. Orientation signs must be chosen for drainage."
+  }
+}

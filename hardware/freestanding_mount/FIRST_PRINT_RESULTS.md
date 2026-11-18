@@ -1,4 +1,20 @@
-# Physical fit record — not yet tested
+# Physical fit record — owner feedback received 2026-11-16
+
+Owner reports ServoFitCoupon passed all tests. Minor side-to-side movement is
+acceptable with screws installed; no servo-pocket change requested.
+
+PanHornCoupon: horn fits correctly; mounting-hole alignment appears approximately
+0.1 mm too high. TiltHornAdapter: horn fits correctly; similar approximately
+0.1 mm alignment issue. Owner subsequently confirms BOTH printed holes are high with the pair held
+horizontally and horn-contact face toward the observer. A common+0.1 mm Y
+translation is implemented in output_fit_offset_2026_11_16 under the explicit
+contact-view orientation in FIT_OFFSET_REVIEW.md. Corrected physical fit remains
+UNTESTED; no exact dimensions or screw/head measurements were supplied.
+
+The detailed numerical measurements below were not supplied by this feedback.
+The earlier NOT TESTED entries are retained as the original worksheet, rather
+than interpreted as new failures. Coupon-level results above supersede its
+blank test status where explicitly covered by the owner's report.
 
 Date / printer / resin batch / temperature:
 

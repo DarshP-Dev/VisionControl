@@ -1,3 +1,14 @@
+> **2026-11-17:** The current right fork has a local lower web reinforcement.
+> See [RIGHT_FORK_REINFORCEMENT.md](RIGHT_FORK_REINFORCEMENT.md) and
+> `output_right_fork_web_2026_11_17/` for the new comparison, motion and export checks.
+> Other component geometry is unchanged from the corrected horn-hole revision.
+
+> **2026-11-16 update:** Current corrected CAD is in `output_fit_offset_2026_11_16/`.
+> Both horn bores shift+0.1 mm Y under the contact-view convention in
+> [FIT_OFFSET_REVIEW.md](FIT_OFFSET_REVIEW.md); diameters, spacing and recesses stay fixed.
+> ServoFitCoupon passed. Reprint only the two horn test parts for this correction.
+> The earlier revision information below is retained as background.
+
 # CAD validation — measured-horn fit revision, 2026-11-07
 
 Current output: **output_measured_fit/**. FreeCAD1.1.4 executed the generation,
